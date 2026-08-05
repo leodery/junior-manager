@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="theme-color" content="#275b48">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="家庭理财">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="家庭理财">
+    <meta name="format-detection" content="telephone=no">
+    <title>家庭理财工作台</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23275b48'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='%23f5e9c8' font-family='serif' font-weight='bold'>¥</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%23275b48'/><text x='90' y='128' font-size='110' text-anchor='middle' fill='%23f5e9c8' font-family='serif' font-weight='bold'>¥</text></svg>">
+    <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22%E5%AE%B6%E5%BA%AD%E7%90%86%E8%B4%A2%E5%B7%A5%E4%BD%9C%E5%8F%B0%22%2C%22short_name%22%3A%22%E5%AE%B6%E5%BA%AD%E7%90%86%E8%B4%A2%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f5f7f1%22%2C%22theme_color%22%3A%22%23275b48%22%2C%22orientation%22%3A%22portrait%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjQwIiBmaWxsPSIjMjc1YjQ4Ii8+PHRleHQgeD0iOTAiIHk9IjEyOCIgZm9udC1zaXplPSIxMTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmNWU5YzgiIGZvbnQtZmFtaWx5PSJzZXJpZiIgZm9udC13ZWlnaHQ9ImJvbGQiPiY5ODc0PC90ZXh0Pjwvc3ZnPg%3D%3D%22%2C%22sizes%22%3A%22180x180%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+    <style>
+        :root {
+            --ink: #20312b;
+            --muted: #6d7d76;
+            --line: #dfe7df;
+            --paper: #f5f7f1;
+            --card: #fffefa;
+            --forest: #275b48;
+            --forest-dark: #173d31;
+            --mint: #d8ebdb;
+            --gold: #c68c38;
+            --coral: #c7624d;
+            --shadow: 0 12px 32px rgba(38, 69, 53, .08);
+            --radius: 16px;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            color: var(--ink);
+            background: var(--paper);
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            line-height: 1.55;
+        }
+        button, input, select { font: inherit; }
+        button { cursor: pointer; }
+        .shell { max-width: 1180px; margin: auto; padding: 28px 20px 50px; }
+        .topbar { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin-bottom: 24px; }
+        .eyebrow { color: var(--gold); font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+        h1, h2, h3, p { margin: 0; }
+        h1 { margin-top: 4px; color: var(--forest-dark); font-family: Georgia, "Noto Serif SC", serif; font-size: clamp(30px, 5vw, 48px); line-height: 1.1; }
+        .subtitle { color: var(--muted); margin-top: 8px; }
+        .month-control { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 14px; }
+        input, select { min-height: 40px; border: 1px solid var(--line); border-radius: 9px; background: #fff; color: var(--ink); padding: 8px 10px; outline: none; }
+        input, select, button { max-width: 100%; }
+        input:focus, select:focus { border-color: var(--forest); box-shadow: 0 0 0 3px rgba(39, 91, 72, .1); }
+        .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+        .metric { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
+        .metric-label { color: var(--muted); font-size: 13px; }
+        .metric-value { margin-top: 6px; color: var(--forest-dark); font-size: 25px; font-weight: 800; }
+        .metric-value.negative { color: var(--coral); }
+        .layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(300px, .75fr); gap: 18px; align-items: start; min-width: 0; }
+        .stack, .card { min-width: 0; }
+        .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+        .card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+        .card h2 { color: var(--forest-dark); font-size: 18px; }
+        .card-note { color: var(--muted); font-size: 13px; }
+        .form-grid { display: grid; grid-template-columns: 1.1fr .8fr 1fr 1fr auto; gap: 8px; margin-bottom: 16px; }
+        .primary-btn, .ghost-btn { border-radius: 9px; padding: 8px 13px; font-weight: 700; }
+        .primary-btn { border: 1px solid var(--forest); background: var(--forest); color: white; }
+        .primary-btn:hover { background: var(--forest-dark); }
+        .ghost-btn { border: 1px solid var(--line); background: transparent; color: var(--forest); }
+        .ghost-btn:hover { background: var(--mint); }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { color: var(--muted); font-size: 12px; font-weight: 600; text-align: left; }
+        th, td { padding: 11px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+        td:last-child, th:last-child { text-align: right; }
+        .delete-btn { border: 0; background: transparent; color: var(--muted); padding: 3px 5px; }
+        .delete-btn:hover { color: var(--coral); }
+        .amount-income { color: var(--forest); font-weight: 700; }
+        .amount-expense { color: var(--coral); font-weight: 700; }
+        .budget-row { margin: 16px 0; }
+        .budget-line { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 7px; font-size: 14px; }
+        .budget-line strong { color: var(--forest-dark); }
+        .bar { height: 9px; overflow: hidden; border-radius: 20px; background: #e8eee8; }
+        .bar > span { display: block; height: 100%; border-radius: inherit; background: var(--forest); transition: width .25s ease; }
+        .bar.over > span { background: var(--coral); }
+        .allocation { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .allocation .mini { padding: 13px; border-radius: 12px; background: var(--mint); }
+        .mini small { display: block; color: var(--muted); font-size: 12px; }
+        .mini strong { display: block; margin-top: 3px; color: var(--forest-dark); font-size: 18px; }
+        .goal { padding: 14px 0; border-bottom: 1px solid var(--line); }
+        .goal:last-child { border-bottom: 0; padding-bottom: 0; }
+        .goal-title { display: flex; justify-content: space-between; gap: 10px; font-weight: 700; }
+        .goal-meta { display: flex; justify-content: space-between; color: var(--muted); font-size: 13px; margin: 6px 0; }
+        .goal .bar > span { background: var(--gold); }
+        .empty { color: var(--muted); padding: 18px 0; text-align: center; font-size: 14px; }
+        .tip { border-left: 4px solid var(--gold); background: #fff7e8; padding: 12px 14px; color: #775523; font-size: 14px; }
+        .category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .category-card { padding: 13px; border: 1px solid var(--line); border-radius: 12px; background: #fbfcf8; }
+        .category-card.over { border-color: rgba(199, 98, 77, .55); background: #fff5f1; }
+        .category-card.under { border-color: rgba(39, 91, 72, .35); }
+        .category-head, .category-meta { display: flex; justify-content: space-between; gap: 10px; }
+        .category-head { color: var(--forest-dark); font-weight: 700; }
+        .category-meta { margin: 8px 0 6px; color: var(--muted); font-size: 12px; }
+        .category-card.over .category-head { color: var(--coral); }
+        .difference-over { color: var(--coral); font-weight: 700; }
+        .difference-under { color: var(--forest); font-weight: 700; }
+        .report-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .report-preview { width: 100%; min-width: 0; margin-top: 14px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: #fbfcf8; color: var(--muted); font-size: 13px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 260px; overflow: auto; }
+        .sync-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+        .sync-status { margin-top: 10px; color: var(--muted); font-size: 12px; }
+        .share-url { display: flex; gap: 8px; }
+        .share-url input { min-width: 0; flex: 1; }
+        .share-help { margin-top: 12px; padding: 11px 13px; border-radius: 10px; background: var(--mint); color: var(--forest-dark); font-size: 13px; }
+        .share-help ol { margin: 6px 0 0; padding-left: 19px; }
+        .section-label { margin: 4px 0 12px; color: var(--forest-dark); font-size: 15px; font-weight: 800; }
+        .quick-nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; }
+        .quick-nav a { display: inline-flex; align-items: center; min-height: 38px; padding: 7px 12px; border: 1px solid var(--line); border-radius: 20px; background: var(--card); color: var(--forest); font-size: 13px; font-weight: 700; text-decoration: none; }
+        .quick-nav a:hover, .quick-nav a:focus-visible { border-color: var(--forest); background: var(--mint); outline: none; }
+        .actual-panel { border: 2px solid var(--forest); background: #f8fcf8; }
+        .actual-panel .section-label { color: var(--forest); }
+        .footer { margin-top: 22px; color: var(--muted); font-size: 12px; text-align: center; }
+        .auth-gate { position: fixed; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center; padding: 18px; background: rgba(23, 61, 49, .72); -webkit-overflow-scrolling: touch; }
+        .auth-gate.hidden { display: none; }
+        .auth-box { width: min(440px, 100%); max-height: calc(100vh - 36px); overflow-y: auto; padding: 24px; border-radius: 18px; background: var(--card); box-shadow: 0 24px 70px rgba(0,0,0,.22); -webkit-overflow-scrolling: touch; }
+        .auth-box h2 { color: var(--forest-dark); }
+        .auth-box p { margin-top: 7px; color: var(--muted); font-size: 13px; }
+        .auth-form { display: grid; gap: 10px; margin-top: 18px; }
+        .auth-form label { color: var(--muted); font-size: 13px; }
+        .auth-note { margin-top: 12px; padding: 10px 12px; border-left: 3px solid var(--gold); background: #fff7e8; color: #775523; font-size: 12px; }
+        .user-bar { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-bottom: 10px; color: var(--muted); font-size: 13px; }
+        .user-bar select { min-height: 34px; }
+        .operator-cell { color: var(--muted); font-size: 12px; }
+        @media (max-width: 820px) {
+            .topbar { align-items: start; flex-direction: column; }
+            .summary { grid-template-columns: repeat(2, 1fr); }
+            .layout { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 560px) {
+            .shell { padding: 16px 12px 90px; }
+            .topbar { gap: 12px; margin-bottom: 14px; }
+            .eyebrow { font-size: 11px; letter-spacing: .1em; }
+            h1 { font-size: 28px; }
+            .subtitle { font-size: 13px; }
+            .month-control { width: 100%; justify-content: space-between; }
+            .month-control input { flex: 1; min-width: 0; }
+            .summary { gap: 8px; }
+            .metric { padding: 14px; }
+            .metric-label { font-size: 12px; }
+            .metric-value { font-size: 20px; }
+            .card { padding: 16px 14px; border-radius: 14px; }
+            .card-head { align-items: flex-start; flex-direction: column; gap: 4px; margin-bottom: 13px; }
+            .form-grid, #goalForm { grid-template-columns: 1fr !important; gap: 9px; }
+            .form-grid input:first-child, .form-grid button { grid-column: auto; }
+            .form-grid button { width: 100%; min-height: 44px; }
+            .table-wrap { min-width: 0; max-width: 100%; margin: 0 -4px; overflow-x: auto; }
+            th, td { padding: 10px 6px; }
+            .budget-line { align-items: flex-start; flex-direction: column; gap: 2px; }
+            .allocation { grid-template-columns: 1fr; }
+            .allocation .mini { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 13px; }
+            .mini strong { margin-top: 0; }
+            .category-grid { grid-template-columns: 1fr; }
+            .tip { font-size: 13px; }
+            .share-url { flex-direction: column; }
+            .share-url button { width: 100%; min-height: 44px; }
+            /* 登录面板：移动端优先 */
+            .auth-gate { align-items: flex-start; overflow-y: auto; padding: 0; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+            .auth-box { max-width: 100%; max-height: none; min-height: 100vh; border-radius: 0; padding: 24px 20px; padding-top: calc(env(safe-area-inset-top) + 24px); padding-bottom: calc(env(safe-area-inset-bottom) + 24px); display: flex; flex-direction: column; justify-content: center; }
+            .auth-form { gap: 12px; }
+            .auth-form input, .auth-form select { min-height: 48px; font-size: 16px; }
+            .auth-form .primary-btn { min-height: 48px; font-size: 16px; }
+            .user-bar { flex-wrap: wrap; gap: 6px; font-size: 12px; }
+            .user-bar select { min-height: 38px; }
+            .user-bar .ghost-btn { min-height: 38px; padding: 6px 10px; font-size: 12px; }
+            .quick-nav { position: sticky; top: 0; z-index: 10; background: var(--paper); padding: 10px 0; margin: 0 -12px 14px; padding-left: 12px; padding-right: 12px; overflow-x: auto; flex-wrap: nowrap; }
+            .quick-nav a { white-space: nowrap; min-height: 36px; padding: 6px 12px; font-size: 12px; }
+            /* 底部导航条 */
+            .mobile-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; z-index: 15; background: var(--card); border-top: 1px solid var(--line); box-shadow: 0 -4px 16px rgba(0,0,0,.06); padding-bottom: env(safe-area-inset-bottom); }
+            .mobile-nav a { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; color: var(--muted); font-size: 11px; font-weight: 700; text-decoration: none; transition: color .2s; }
+            .mobile-nav a.active { color: var(--forest); }
+            .mobile-nav a span:first-child { font-size: 22px; line-height: 1; }
+            input, select, button { min-height: 44px; }
+            .primary-btn, .ghost-btn { min-height: 44px; }
+        }
+        /* 底部导航：桌面隐藏 */
+        .mobile-nav { display: none; }
+        @media (max-width: 560px) { .mobile-nav { display: flex; } }
+        /* 成员管理 */
+        .member-mgmt { margin-top: 18px; }
+        .member-list { display: flex; flex-direction: column; gap: 8px; }
+        .member-row {
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            padding: 12px 14px; border-radius: 12px; background: #fbfcf8; border: 1px solid var(--line);
+            flex-wrap: wrap;
+        }
+        .member-row .mem-info { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+        .member-row .mem-name { font-weight: 600; color: var(--forest-dark); font-size: 14px; }
+        .member-row .mem-role {
+            font-size: 11px; padding: 2px 10px; border-radius: 12px; font-weight: 500;
+            white-space: nowrap;
+        }
+        .mem-role.admin { background: var(--mint); color: var(--forest); }
+        .mem-role.editor { background: #e8eee8; color: #3a5a4a; }
+        .mem-role.viewer { background: #f5f5f5; color: #888; }
+        .remove-member-btn {
+            border: 1px solid var(--line); background: #fff; color: var(--muted);
+            padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+            cursor: pointer; transition: all .2s; white-space: nowrap; min-height: 36px;
+        }
+        .remove-member-btn:hover { border-color: var(--coral); color: var(--coral); background: #fff5f1; }
+        .remove-member-btn:disabled { opacity: .3; cursor: not-allowed; }
+        .member-row.self .remove-member-btn { display: none; }
+        @media (max-width: 560px) {
+            .member-row { padding: 14px 12px; }
+            .member-row .mem-name { font-size: 15px; }
+            .remove-member-btn { min-height: 42px; padding: 8px 16px; font-size: 13px; }
+        }
+        /* 品牌版权栏 */
+        .brand-footer { margin-top: 6px; }
+        @media (max-width: 560px) {
+            .brand-footer { padding: 8px 0 20px !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-gate" id="authGate" aria-hidden="false">
+        <div class="auth-box">
+            <div class="eyebrow">家庭账本 · 首次使用</div>
+            <h2 id="authTitle">创建你的家庭账本</h2>
+            <p id="authDescription">先创建一个家庭，拿到 6 位邀请码，家人用邀请码加入就能一起记账。</p>
+            <form class="auth-form" id="authForm">
+                <label for="authMode">使用方式</label>
+                <select id="authMode">
+                    <option value="create">创建家庭（我是管理员）</option>
+                    <option value="join">加入家庭（用邀请码）</option>
+                    <option value="login">我以前加入过，回来继续用</option>
+                </select>
+                <label for="authName">你的称呼（家人看到的就是这个名字）</label>
+                <input id="authName" required placeholder="如：爸爸、妈妈、阳阳" maxlength="10">
+                <label for="familyName" id="familyNameLabel">家庭名称</label>
+                <input id="familyName" placeholder="如：李家账本" maxlength="20">
+                <label for="joinCode" id="joinCodeLabel" hidden>家庭邀请码（向家人要 6 位码）</label>
+                <input id="joinCode" placeholder="6 位邀请码，如 A2K9P3" maxlength="6" hidden style="text-transform:uppercase;">
+                <button class="primary-btn" id="authSubmit" type="submit">创建家庭</button>
+            </form>
+            <div class="auth-note" id="authNote">数据保存在腾讯云，国内秒开；家人用同 Wi-Fi 或流量都能实时看到你的修改。</div>
+        </div>
+    </div>
+    <main class="shell">
+        <header class="topbar">
+            <div>
+                <div class="eyebrow">家庭财务 · 每月复盘</div>
+                <h1>把钱花在真正重要的地方</h1>
+                <p class="subtitle">记录本月现金流，先留出储蓄，再安排生活。</p>
+            </div>
+            <label class="month-control">管理月份 <input id="monthInput" type="month"></label>
+        </header>
+        <div class="user-bar" id="userBar">
+            当前操作人：<strong id="currentUserName">未登录</strong>
+            <select id="userSwitcher" aria-label="切换操作人"></select>
+            <button class="ghost-btn" id="inviteBtn" type="button" hidden>📋 复制邀请码</button>
+            <button class="ghost-btn" id="leaveFamilyBtn" type="button">退出家庭</button>
+        </div>
+        <nav class="quick-nav" aria-label="快速操作">
+            <a href="#incomeSection">记录收入</a>
+            <a href="#plannedSection">预计支出规划</a>
+            <a href="#actualSection">记录实际支出</a>
+            <a href="#reportSection">生成月度报告</a>
+        </nav>
+
+        <section class="summary" id="summary" aria-label="本月概览">
+            <div class="metric"><div class="metric-label">本月收入</div><div class="metric-value" id="totalIncome">¥0.00</div></div>
+            <div class="metric"><div class="metric-label">本月支出</div><div class="metric-value" id="totalExpense">¥0.00</div></div>
+            <div class="metric"><div class="metric-label">可结余</div><div class="metric-value" id="balance">¥0.00</div></div>
+            <div class="metric"><div class="metric-label">储蓄率</div><div class="metric-value" id="savingRate">0%</div></div>
+        </section>
+
+        <div class="layout">
+            <div class="stack">
+                <section class="card">
+                    <div class="card-head"><div><h2>收入与支出</h2><p class="card-note">收入、支出分开记录，支出同时追踪预计和实际金额。</p></div></div>
+                    <div class="section-label" id="incomeSection">收入</div>
+                    <form class="form-grid" id="incomeForm">
+                        <input id="incomeName" placeholder="收入项目，如：工资、兼职" required>
+                        <input id="incomeAmount" type="number" min="0" step="0.01" placeholder="实际收入" required>
+                        <button class="primary-btn" type="submit">添加收入</button>
+                    </form>
+                    <div class="table-wrap">
+                        <table><thead><tr><th>收入项目</th><th>实际金额</th><th>操作人/时间</th><th>操作</th></tr></thead><tbody id="incomeList"></tbody></table>
+                        <div class="empty" id="incomeEmpty">还没有收入记录。</div>
+                    </div>
+                    <div class="section-label" id="plannedSection" style="margin-top:20px;">预计支出规划</div>
+                    <form class="form-grid" id="plannedExpenseForm">
+                        <input id="plannedName" placeholder="规划项目，如：下月买菜" required>
+                        <select id="plannedCategory" aria-label="预计支出分类"></select>
+                        <input id="plannedAmount" type="number" min="0" step="0.01" placeholder="预计金额" required>
+                        <button class="primary-btn" type="submit">加入规划</button>
+                    </form>
+                    <div class="table-wrap">
+                        <table><thead><tr><th>规划项目</th><th>分类</th><th>预计金额</th><th>操作人/时间</th><th>操作</th></tr></thead><tbody id="plannedList"></tbody></table>
+                        <div class="empty" id="plannedEmpty">还没有预计支出规划。</div>
+                    </div>
+                    <section class="actual-panel" id="actualSection" style="margin-top:20px; padding:16px; border-radius:12px;">
+                    <div class="section-label">实际支出记录</div>
+                    <p class="card-note" style="margin:-5px 0 12px;">这里记录已经发生的消费，会计入本月实际支出和结余。</p>
+                    <form class="form-grid" id="actualExpenseForm">
+                        <input id="actualName" placeholder="实际项目，如：今天买菜" required>
+                        <select id="actualCategory" aria-label="实际支出分类"></select>
+                        <input id="actualAmount" type="number" min="0" step="0.01" placeholder="实际金额" required>
+                        <button class="primary-btn" type="submit">记录支出</button>
+                    </form>
+                    <div class="table-wrap">
+                        <table><thead><tr><th>实际项目</th><th>分类</th><th>实际金额</th><th>预计对照</th><th>差值</th><th>操作人/时间</th><th>操作</th></tr></thead><tbody id="actualList"></tbody></table>
+                        <div class="empty" id="actualEmpty">还没有实际支出记录。</div>
+                    </div>
+                    </section>
+                </section>
+
+                <section class="card" id="reportSection">
+                    <div class="card-head"><div><h2>预算分配</h2><p class="card-note">建议先把收入分成：储蓄 20%，固定生活 50%，弹性支出 30%。</p></div></div>
+                    <div class="allocation">
+                        <div class="mini"><small>建议储蓄（20%）</small><strong id="savingPlan">¥0.00</strong></div>
+                        <div class="mini"><small>建议固定生活（50%）</small><strong id="fixedPlan">¥0.00</strong></div>
+                        <div class="mini"><small>建议弹性支出（30%）</small><strong id="flexPlan">¥0.00</strong></div>
+                    </div>
+                    <div id="budgetRows"></div>
+                </section>
+                <section class="card">
+                    <div class="card-head"><div><h2>分类规划</h2><p class="card-note">按类别查看支出，及时调整家庭预算。</p></div></div>
+                    <div class="category-grid" id="categoryPlan"></div>
+                </section>
+            </div>
+
+            <aside class="stack">
+                <section class="card">
+                    <div class="card-head"><div><h2>储蓄目标</h2><p class="card-note">把大目标拆成每月可执行的小步。</p></div></div>
+                    <form class="form-grid" id="goalForm" style="grid-template-columns: 1fr 1fr auto;">
+                        <input id="goalName" placeholder="目标，如：应急金" required>
+                        <input id="goalAmount" type="number" min="0" step="0.01" placeholder="目标金额" required>
+                        <button class="primary-btn" type="submit">添加</button>
+                    </form>
+                    <div id="goalList"></div>
+                </section>
+                <section class="card">
+                    <div class="card-head"><div><h2>家庭同步</h2><p class="card-note">同一浏览器的多个页面会自动同步；跨设备请导出后发给家人导入。</p></div></div>
+                    <div class="sync-actions">
+                        <button class="primary-btn" id="exportBtn" type="button">导出家庭账本</button>
+                        <button class="ghost-btn" id="importBtn" type="button">导入家庭账本</button>
+                        <input id="importFile" type="file" accept="application/json" hidden>
+                    </div>
+                    <div class="sync-status" id="syncStatus">数据只保存在当前浏览器，不会自动上传网络。</div>
+                </section>
+                <section class="card" id="shareSection">
+                    <div class="card-head"><div><h2>家人手机访问</h2><p class="card-note">把下面的地址发给家人，在手机浏览器打开就能用同一份账本。</p></div></div>
+                    <div class="share-url">
+                        <input id="shareUrl" aria-label="手机访问地址" value="">
+                        <button class="primary-btn" id="copyShareUrlBtn" type="button">复制地址</button>
+                        <button class="ghost-btn" id="nativeShareBtn" type="button">系统分享</button>
+                    </div>
+                    <div class="sync-status" id="shareStatus">建议部署到腾讯云 CloudBase 静态托管，所有家人都能直接打开。</div>
+                    <div class="share-help" id="inviteCodePanel" hidden>
+                        <strong>家庭邀请码</strong>
+                        <div style="font-size:28px; font-weight:800; letter-spacing:6px; color:var(--forest-dark); margin:8px 0;" id="inviteCodeDisplay">——</div>
+                        <p style="margin:4px 0 0; color:var(--forest-dark);">让家人在打开页面时选"加入家庭"，填这个 6 位码和自己的称呼即可加入。</p>
+                    </div>
+                    <div class="share-help">
+                        <strong>三种让家人用上的方式</strong>
+                        <ol>
+                            <li><b>最快：</b>点顶部"📋 复制邀请码"按钮，把邀请码和当前页面 URL 微信发给家人。</li>
+                            <li><b>更稳：</b>把这份 HTML 上传到 CloudBase 静态托管（见 README），会得到一个 https://xxx-xxxx.tcloudbaseapp.com 的永久地址。</li>
+                            <li><b>本地测试：</b>电脑和手机同 Wi-Fi 时，用 <code>python -m http.server 8000</code> 起服务，手机访问电脑 IP。</li>
+                        </ol>
+                    </div>
+                </section>
+                <section class="card">
+                    <div class="card-head"><div><h2>本月行动建议</h2><p class="card-note">根据当前结余动态生成。</p></div></div>
+                    <div class="tip" id="advice">先添加收入和支出，工作台会给出本月建议。</div>
+                </section>
+                <section class="card">
+                    <div class="card-head"><div><h2>月度家庭报告</h2><p class="card-note">月末生成后，可复制到家庭群或下载发送给家人。</p></div></div>
+                    <input id="reportRecipient" placeholder="收件人称呼，如：家庭成员" aria-label="报告收件人称呼">
+                    <div class="report-actions">
+                        <button class="primary-btn" id="generateReportBtn" type="button">生成报告</button>
+                        <button class="ghost-btn" id="copyReportBtn" type="button">复制报告</button>
+                        <button class="ghost-btn" id="downloadReportBtn" type="button">下载报告</button>
+                    </div>
+                    <div class="report-preview" id="reportPreview">点击“生成报告”，查看本月消费分析与下月建议。</div>
+                </section>
+                <section class="card">
+                    <div class="card-head"><div><h2>家庭理财底线</h2></div></div>
+                    <ul style="margin:0;padding-left:18px;color:var(--muted);font-size:14px;">
+                        <li>先储蓄后消费，优先建立 3—6 个月应急金。</li>
+                        <li>固定支出尽量不超过家庭收入的 50%。</li>
+                        <li>信用卡和借贷支出要单独记录，避免低估真实开销。</li>
+                    </ul>
+                </section>
+            </aside>
+        </div>
+        <div class="footer" style="display:none;"></div>
+
+        <!-- 成员管理（仅管理员可见） -->
+        <section class="card member-mgmt" id="memberMgmtCard" style="display:none;">
+            <div class="card-head"><div><h2>👥 家庭成员管理</h2><p class="card-note">管理员可以在此查看和移除家庭成员。</p></div></div>
+            <div class="member-list" id="memberMgmtList"></div>
+        </section>
+
+        <!-- leodery 品牌版权栏 -->
+        <div class="brand-footer" style="text-align:center;padding:10px 0 16px;">
+            <span style="display:inline-flex;align-items:center;gap:10px;padding:7px 20px;border-radius:20px;background:linear-gradient(135deg,#d8ebdb 0%,#e8f0e8 40%,#fff7e8 100%);border:1px solid rgba(39,91,72,.18);box-shadow:0 1px 6px rgba(39,91,72,.08);font-size:11px;color:#6d7d76;letter-spacing:.3px;">
+                <span style="width:5px;height:5px;border-radius:50%;background:#275b48;opacity:.5;"></span>
+                2026 <b style="color:#275b48;font-weight:700;">leodery</b> © 版权所有
+                <span style="width:5px;height:5px;border-radius:50%;background:#275b48;opacity:.5;"></span>
+            </span>
+        </div>
+    </main>
+    <nav class="mobile-nav" aria-label="手机底部导航">
+        <a href="#summary" class="active"><span>📊</span><span>概览</span></a>
+        <a href="#incomeSection"><span>💰</span><span>记账</span></a>
+        <a href="#actualSection"><span>📝</span><span>支出</span></a>
+        <a href="#reportSection"><span>📋</span><span>报告</span></a>
+        <a href="#shareSection"><span>👥</span><span>分享</span></a>
+    </nav>
+
+    <!-- 腾讯云开发 CloudBase Web SDK（本地嵌入，不依赖外网） -->
+    <script src="cloudbase.full.js"></script>
+    <script>
+        // SDK 加载失败兜底：尝试从备用 CDN 加载
+        if (typeof window.cloudbase === 'undefined') {
+            var cbFallback = document.createElement('script');
+            cbFallback.src = 'https://static.cloudbase.net/cloudbase-js-sdk/latest/cloudbase.full.js';
+            cbFallback.onerror = function () {
+                console.error('CloudBase SDK 主备 CDN 均加载失败');
+            };
+            document.head.appendChild(cbFallback);
+        }
+        // ====== 1. 在这里填入你的 CloudBase 环境 ID ======
+        // 开通步骤：
+        //   1) 打开 https://console.cloud.tencent.com/tcb 用微信/QQ 登录
+        //   2) 新建环境 → 新用户有 1 个月免费额度
+        //   3) 在环境列表里复制「环境 ID」（形如 family-xxxxxxx）
+        //   4) 把下面 CLOUDBASE_ENV 改成你的环境 ID
+        //   5) 在「安全配置 → Web 域名」里把当前页面域名加进白名单
+        //   6) 在「数据库」里新建三个集合：families / family_members / family_snapshots
+        const CLOUDBASE_ENV = 'leoderyyang-d9gc0pfwpbdac9915';   // 你的 CloudBase 环境 ID
+        const USE_CLOUDBASE = true;
+    </script>
+    <script>
+        (() => {
+            const storageKey = 'family-finance-workbench-v1';
+            const monthInput = document.getElementById('monthInput');
+            const state = JSON.parse(localStorage.getItem(storageKey) || '{}');
+            const now = new Date();
+            const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            monthInput.value = state.month || currentMonth;
+            const categories = [
+                { id: 'gifts', name: '人情往来', rate: .08 },
+                { id: 'living', name: '生活支出', rate: .35 },
+                { id: 'medical', name: '医疗支出', rate: .12 },
+                { id: 'entertainment', name: '娱乐支出', rate: .10 },
+                { id: 'education', name: '教育支出', rate: .15 },
+                { id: 'fixed', name: '住房及固定', rate: .20 },
+            ];
+            const defaultData = { transactions: [], goals: [] };
+            let data = state.data || {};
+            let members = state.members || [];
+            let currentUserId = state.currentUserId || '';
+            let cloudUser = null;
+            let cloudApp = null;
+            let cloudDb = null;
+            let cloudFamilyId = state.cloudFamilyId || '';
+            let cloudInviteCode = state.cloudInviteCode || '';
+            let cloudWatcher = null;
+            const channel = 'BroadcastChannel' in window ? new BroadcastChannel('family-finance-workbench') : null;
+
+            function currentUser() {
+                return members.find(member => member.id === currentUserId) || members[0] || null;
+            }
+            function formatOperation(item) {
+                const operator = item.operatorName || '历史记录';
+                const time = item.operatedAt ? new Date(item.operatedAt).toLocaleString('zh-CN', { hour12: false }) : '时间未知';
+                return `${operator} · ${time}`;
+            }
+            function saveAuth() {
+                localStorage.setItem(storageKey, JSON.stringify({
+                    month: monthInput.value, data, members, currentUserId,
+                    cloudFamilyId, cloudInviteCode, displayName: currentUser()?.name || ''
+                }));
+            }
+            function genInviteCode() {
+                // 去掉 0/O/1/I 这 4 个易混淆的字符，生成 6 位邀请码
+                const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+                let code = '';
+                for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+                return code;
+            }
+            async function getCloudApp() {
+                if (cloudApp) return cloudApp;
+                if (!USE_CLOUDBASE) throw new Error('未配置 CloudBase 环境 ID');
+                if (!window.cloudbase) throw new Error('CloudBase SDK 加载失败，请检查网络');
+                cloudApp = window.cloudbase.init({ env: CLOUDBASE_ENV });
+                cloudDb = cloudApp.database();
+                return cloudApp;
+            }
+            async function cloudSignIn() {
+                if (!USE_CLOUDBASE) {
+                    // 本地演示模式：用一个伪 uid，所有"云端"功能都退化到本地存储
+                    const localUid = localStorage.getItem('family-finance-local-uid');
+                    if (localUid) return { uid: localUid, isAnonymous: true };
+                    const uid = 'local-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+                    localStorage.setItem('family-finance-local-uid', uid);
+                    return { uid, isAnonymous: true };
+                }
+                const app = await getCloudApp();
+                // 匿名登录：不需要微信/邮箱/密码，注册即可用
+                await app.auth().signInAnonymously();
+                const uid = app.auth().currentUser?.uid || ('cb-' + Date.now());
+                return { uid, isAnonymous: true };
+            }
+            async function cloudSave() {
+                if (!cloudUser || !cloudFamilyId) return;
+                const status = document.getElementById('syncStatus');
+                if (!USE_CLOUDBASE) {
+                    // 本地演示模式：用 BroadcastChannel 通知同浏览器其他标签页
+                    if (channel) channel.postMessage('updated');
+                    status.textContent = '本地演示模式：仅同浏览器多标签页同步。配置 CloudBase 后全家手机都能用。';
+                    return;
+                }
+                try {
+                    const db = cloudDb || (await getCloudApp()).database();
+                    await db.collection('family_snapshots').where({ familyId: cloudFamilyId }).update({
+                        payload: { month: monthInput.value, data },
+                        updatedBy: cloudUser.uid,
+                        updatedAt: Date.now(),
+                    });
+                } catch (error) {
+                    status.textContent = `云端保存失败：${error.message || error}`;
+                }
+            }
+            async function loadCloudFamily() {
+                if (!USE_CLOUDBASE) {
+                    // 本地模式：从 localStorage 恢复
+                    members = state.members || [];
+                    currentUserId = state.currentUserId || '';
+                    data = state.data || {};
+                    if (channel) channel.postMessage('updated');
+                    return;
+                }
+                const db = (await getCloudApp()).database();
+                // 找当前用户的所有成员身份
+                const memberRes = await db.collection('family_members').where({ userId: cloudUser.uid }).get();
+                if (!memberRes.data || !memberRes.data.length) throw new Error('你还没有加入任何家庭，请先创建或加入');
+                const myMemberships = memberRes.data;
+                cloudFamilyId = myMemberships[0].familyId;
+                // 拉家庭信息和所有成员
+                const familyRes = await db.collection('families').doc(cloudFamilyId).get();
+                if (!familyRes.data || !familyRes.data[0]) throw new Error('家庭信息丢失');
+                cloudInviteCode = familyRes.data[0].inviteCode;
+                const allMembers = await db.collection('family_members').where({ familyId: cloudFamilyId }).get();
+                members = (allMembers.data || []).map(m => ({ id: m.userId, name: m.displayName, role: m.role, joinedAt: m.joinedAt }));
+                currentUserId = cloudUser.uid;
+                // 拉快照
+                const snapRes = await db.collection('family_snapshots').where({ familyId: cloudFamilyId }).get();
+                const snap = (snapRes.data || [])[0];
+                if (snap?.payload) {
+                    data = snap.payload.data || {};
+                    if (snap.payload.month) monthInput.value = snap.payload.month;
+                }
+                saveAuth();
+                // 监听变化：一家人任一端改，其他人秒同步
+                if (cloudWatcher) cloudWatcher.close();
+                cloudWatcher = db.collection('family_snapshots').where({ familyId: cloudFamilyId }).watch({
+                    onChange: snapshot => {
+                        const docs = snapshot.docs || [];
+                        if (!docs.length) return;
+                        const s = docs[0];
+                        if (s.updatedBy === cloudUser.uid) return;
+                        data = s.payload?.data || {};
+                        if (s.payload?.month) monthInput.value = s.payload.month;
+                        render(false);
+                        document.getElementById('syncStatus').textContent = `📡 收到 ${s.updatedBy === cloudUser.uid ? '' : ''}家庭成员的云端更新`;
+                    },
+                    onError: err => {
+                        document.getElementById('syncStatus').textContent = `实时同步断开：${err.message || err}`;
+                    }
+                });
+            }
+            async function authenticateCloud() {
+                const mode = document.getElementById('authMode').value;
+                const name = document.getElementById('authName').value.trim();
+                if (!name) throw new Error('请填写你的称呼');
+                // 1) 登录（匿名）
+                const sign = await cloudSignIn();
+                cloudUser = { uid: sign.uid };
+                // 2) 根据模式处理
+                if (!USE_CLOUDBASE) {
+                    // 本地演示模式：直接进入"本地家庭"
+                    if (!state.cloudFamilyId) {
+                        cloudFamilyId = 'local-' + sign.uid;
+                        cloudInviteCode = genInviteCode();
+                        members = [{ id: sign.uid, name, role: 'admin', joinedAt: Date.now() }];
+                    } else {
+                        cloudFamilyId = state.cloudFamilyId;
+                        cloudInviteCode = state.cloudInviteCode || genInviteCode();
+                    }
+                    currentUserId = sign.uid;
+                    saveAuth();
+                    document.getElementById('syncStatus').textContent = '本地演示模式：在浏览器控制台填入 CloudBase 环境 ID 后可升级为家庭云端同步';
+                    return;
+                }
+                const db = (await getCloudApp()).database();
+                if (mode === 'create') {
+                    const familyName = document.getElementById('familyName').value.trim() || `${name}的家庭`;
+                    // 找未使用的邀请码（最多试 5 次）
+                    let code, exists = true, tries = 0;
+                    while (exists && tries < 5) {
+                        code = genInviteCode();
+                        const check = await db.collection('families').where({ inviteCode: code }).count();
+                        exists = (check.total || 0) > 0;
+                        tries++;
+                    }
+                    if (exists) throw new Error('生成邀请码失败，请重试');
+                    // 看这个用户是否已经有家庭
+                    const oldMem = await db.collection('family_members').where({ userId: sign.uid }).get();
+                    if (oldMem.data && oldMem.data.length) {
+                        // 已经有家庭了，直接加载（不报错）
+                        cloudFamilyId = oldMem.data[0].familyId;
+                        await loadCloudFamily();
+                        return;
+                    }
+                    const addRes = await db.collection('families').add({
+                        name: familyName,
+                        inviteCode: code,
+                        createdBy: sign.uid,
+                        createdAt: Date.now(),
+                    });
+                    cloudFamilyId = addRes.id;
+                    cloudInviteCode = code;
+                    await db.collection('family_members').add({
+                        familyId: cloudFamilyId,
+                        userId: sign.uid,
+                        displayName: name,
+                        role: 'admin',
+                        joinedAt: Date.now(),
+                    });
+                    // 初始化空快照
+                    await db.collection('family_snapshots').add({
+                        familyId: cloudFamilyId,
+                        payload: { month: monthInput.value, data: {} },
+                        updatedBy: sign.uid,
+                        updatedAt: Date.now(),
+                    });
+                } else if (mode === 'join') {
+                    const code = document.getElementById('joinCode').value.trim().toUpperCase();
+                    if (!code || code.length !== 6) throw new Error('邀请码必须是 6 位');
+                    const find = await db.collection('families').where({ inviteCode: code }).get();
+                    if (!find.data || !find.data.length) throw new Error('邀请码无效，请向家人核对');
+                    const family = find.data[0];
+                    const oldMem = await db.collection('family_members').where({ userId: sign.uid, familyId: family._id }).get();
+                    if (oldMem.data && oldMem.data.length) {
+                        // 已经在这个家庭里了，直接加载
+                        cloudFamilyId = family._id;
+                        cloudInviteCode = family.inviteCode;
+                        await loadCloudFamily();
+                        return;
+                    }
+                    await db.collection('family_members').add({
+                        familyId: family._id,
+                        userId: sign.uid,
+                        displayName: name,
+                        role: 'editor',
+                        joinedAt: Date.now(),
+                    });
+                    cloudFamilyId = family._id;
+                    cloudInviteCode = family.inviteCode;
+                } else if (mode === 'login') {
+                    // 不需要额外操作，loadCloudFamily 会从成员表里找
+                }
+                await loadCloudFamily();
+            }
+            function canEdit() {
+                return ['admin', 'editor'].includes(currentUser()?.role);
+            }
+            function isAdmin() {
+                return currentUser()?.role === 'admin';
+            }
+            function refreshUserBar() {
+                const user = currentUser();
+                const roleText = user?.role === 'admin' ? '管理员' : user?.role === 'editor' ? '成员' : user?.role === 'viewer' ? '只读' : '';
+                document.getElementById('currentUserName').textContent = user ? `${user.name}${roleText ? '（' + roleText + '）' : ''}` : '未登录';
+                const switcher = document.getElementById('userSwitcher');
+                if (members.length > 1) {
+                    switcher.innerHTML = members.map(member => `<option value="${member.id}">${member.name}</option>`).join('');
+                    switcher.value = user?.id || '';
+                    switcher.hidden = false;
+                } else {
+                    switcher.hidden = true;
+                }
+                document.getElementById('inviteBtn').hidden = !isAdmin();
+                document.getElementById('leaveFamilyBtn').textContent = isAdmin() ? '⚙️ 管理成员' : '退出家庭';
+                applyPermissions();
+                renderMemberMgmt();
+            }
+            function renderMemberMgmt() {
+                const card = document.getElementById('memberMgmtCard');
+                const list = document.getElementById('memberMgmtList');
+                if (!card || !list) return;
+                if (!isAdmin()) { card.style.display = 'none'; return; }
+                card.style.display = 'block';
+                const user = currentUser();
+                const roleLabels = {admin:'管理员',editor:'可编辑',viewer:'只读'};
+                const roleClass = {admin:'admin',editor:'editor',viewer:'viewer'};
+                list.innerHTML = members.map(m => `
+                    <div class="member-row${m.id === user?.id ? ' self' : ''}">
+                        <div class="mem-info">
+                            <span class="mem-name">${m.name}${m.id === user?.id ? '（我）' : ''}</span>
+                            <span class="mem-role ${roleClass[m.role] || 'viewer'}">${roleLabels[m.role] || m.role}</span>
+                            <span style="font-size:10px;color:var(--muted);">加入于 ${new Date(m.joinedAt).toLocaleDateString('zh-CN')}</span>
+                        </div>
+                        ${m.id !== user?.id ? `<button class="remove-member-btn" onclick="window._removeMember('${m.id}','${m.name}')">🗑 移出家庭</button>` : ''}
+                    </div>
+                `).join('');
+                if (members.length <= 1) {
+                    list.innerHTML += '<div class="empty" style="padding:12px 0;">目前只有你一位成员。邀请家人加入后即可在此管理。</div>';
+                }
+            }
+            async function removeMember(memberId, memberName) {
+                if (!isAdmin()) { alert('仅管理员可移除成员'); return; }
+                if (!confirm(`确定要将「${memberName}」移出家庭吗？\n\n该成员将无法再查看或编辑家庭账本。此操作不可撤销。`)) return;
+                try {
+                    if (cloudFamilyId && cloudbase.app) {
+                        const db = cloudbase.app.database();
+                        const memRes = await db.collection('family_members').where({ familyId: cloudFamilyId, userId: memberId }).get();
+                        if (memRes.data && memRes.data.length) {
+                            await db.collection('family_members').doc(memRes.data[0]._id).remove();
+                        }
+                    }
+                    members = members.filter(m => m.id !== memberId);
+                    if (members.length === 0) {
+                        members = [currentUser()];
+                    }
+                    persistLocal();
+                    refreshUserBar();
+                    alert(`✅「${memberName}」已从家庭中移除`);
+                } catch (e) {
+                    console.error('移除成员失败', e);
+                    alert('移除失败：' + (e.message || '网络错误，请重试'));
+                }
+            }
+            window._removeMember = removeMember;
+            function applyPermissions() {
+                const editable = canEdit();
+                ['incomeForm', 'plannedExpenseForm', 'actualExpenseForm', 'goalForm'].forEach(id => {
+                    document.querySelectorAll(`#${id} input, #${id} select, #${id} button`).forEach(element => { element.disabled = !editable; });
+                });
+                document.getElementById('exportBtn').disabled = !isAdmin();
+                document.getElementById('importBtn').disabled = !isAdmin();
+                document.querySelectorAll('.delete-btn').forEach(button => { button.disabled = !isAdmin(); });
+            }
+            function stamp(item) {
+                const user = currentUser();
+                return { ...item, operatorId: user?.id || '', operatorName: user?.name || '', operatedAt: new Date().toISOString() };
+            }
+            function finishAuth() {
+                document.getElementById('authGate').classList.add('hidden');
+                document.getElementById('authGate').setAttribute('aria-hidden', 'true');
+                document.body.style.overflow = '';
+                // 显示邀请码
+                if (cloudInviteCode) {
+                    document.getElementById('inviteCodeDisplay').textContent = cloudInviteCode;
+                    document.getElementById('inviteCodePanel').hidden = false;
+                }
+                refreshUserBar();
+                render();
+                applyPermissions();
+            }
+            function showAuthGate() {
+                document.getElementById('authGate').classList.remove('hidden');
+                document.getElementById('authGate').setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function populateCategories() {
+                const options = categories.map(category => `<option value="${category.id}">${category.name}</option>`).join('') + '<option value="other">其他支出</option>';
+                ['plannedCategory', 'actualCategory'].forEach(id => {
+                    document.getElementById(id).innerHTML = options;
+                });
+            }
+
+            function monthData() {
+                if (!data[monthInput.value]) data[monthInput.value] = structuredClone(defaultData);
+                const current = data[monthInput.value];
+                const legacy = current.transactions || [];
+                if (!current.incomes) current.incomes = legacy.filter(item => item.type === 'income').map(item => ({ id: item.id, name: item.name, amount: Number(item.amount || 0) }));
+                if (!current.plannedExpenses) current.plannedExpenses = legacy.filter(item => item.type === 'expense').map(item => ({ id: `${item.id}-planned`, name: item.name, category: item.category || 'other', amount: Number(item.expected ?? item.amount ?? 0) }));
+                if (!current.actualExpenses) current.actualExpenses = legacy.filter(item => item.type === 'expense').map(item => ({ id: `${item.id}-actual`, name: item.name, category: item.category || 'other', amount: Number(item.actual ?? item.amount ?? 0) }));
+                delete current.transactions;
+                current.incomes = current.incomes || [];
+                current.plannedExpenses = current.plannedExpenses || [];
+                current.actualExpenses = current.actualExpenses || [];
+                current.goals = current.goals || [];
+                return current;
+            }
+            function save(broadcast = true) {
+                localStorage.setItem(storageKey, JSON.stringify({ month: monthInput.value, data, members, currentUserId, cloudFamilyId }));
+                if (broadcast && channel) channel.postMessage('updated');
+                cloudSave();
+            }
+            function money(value) {
+                return `¥${Number(value || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            }
+            function render(shouldSave = true) {
+                const month = monthData();
+                const income = month.incomes.reduce((sum, item) => sum + item.amount, 0);
+                const expense = month.actualExpenses.reduce((sum, item) => sum + item.amount, 0);
+                const balance = income - expense;
+                document.getElementById('totalIncome').textContent = money(income);
+                document.getElementById('totalExpense').textContent = money(expense);
+                document.getElementById('balance').textContent = money(balance);
+                document.getElementById('balance').classList.toggle('negative', balance < 0);
+                document.getElementById('savingRate').textContent = income ? `${Math.round(Math.max(balance, 0) / income * 100)}%` : '0%';
+                document.getElementById('savingPlan').textContent = money(income * .2);
+                document.getElementById('fixedPlan').textContent = money(income * .5);
+                document.getElementById('flexPlan').textContent = money(income * .3);
+                renderIncome(month.incomes);
+                renderPlannedExpenses(month.plannedExpenses);
+                renderActualExpenses(month.actualExpenses);
+                renderGoals(month.goals);
+                renderBudget(income, expense, balance);
+                renderCategoryPlan(month.plannedExpenses, month.actualExpenses, income);
+                renderAdvice(income, expense, balance);
+                const reportPreview = document.getElementById('reportPreview');
+                if (reportPreview.dataset.generated === 'true') reportPreview.textContent = buildReport();
+                if (shouldSave) save();
+            }
+            function renderIncome(items) {
+                const list = document.getElementById('incomeList');
+                const empty = document.getElementById('incomeEmpty');
+                list.innerHTML = '';
+                empty.style.display = items.length ? 'none' : 'block';
+                items.slice().reverse().forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${item.name}</td><td class="amount-income">+${money(item.amount)}</td><td class="operator-cell">${formatOperation(item)}</td><td><button class="delete-btn" type="button" aria-label="删除${item.name}">删除</button></td>`;
+                    row.querySelector('button').addEventListener('click', () => {
+                        const month = monthData();
+                        month.incomes = month.incomes.filter(transaction => transaction.id !== item.id);
+                        render();
+                    });
+                    list.appendChild(row);
+                });
+            }
+            function renderPlannedExpenses(items) {
+                const list = document.getElementById('plannedList');
+                const empty = document.getElementById('plannedEmpty');
+                list.innerHTML = '';
+                empty.style.display = items.length ? 'none' : 'block';
+                items.slice().reverse().forEach(item => {
+                    const row = document.createElement('tr');
+                    const categoryName = categories.find(category => category.id === item.category)?.name || (item.category === 'other' ? '其他支出' : '未分类');
+                    row.innerHTML = `<td>${item.name}</td><td>${categoryName}</td><td>${money(item.amount)}</td><td class="operator-cell">${formatOperation(item)}</td><td><button class="delete-btn" type="button" aria-label="删除${item.name}">删除</button></td>`;
+                    row.querySelector('button').addEventListener('click', () => {
+                        const month = monthData();
+                        month.plannedExpenses = month.plannedExpenses.filter(transaction => transaction.id !== item.id);
+                        render();
+                    });
+                    list.appendChild(row);
+                });
+            }
+            function renderActualExpenses(items) {
+                const list = document.getElementById('actualList');
+                const empty = document.getElementById('actualEmpty');
+                list.innerHTML = '';
+                empty.style.display = items.length ? 'none' : 'block';
+                const shownDifference = new Set();
+                items.slice().reverse().forEach(item => {
+                    const row = document.createElement('tr');
+                    const categoryName = categories.find(category => category.id === item.category)?.name || (item.category === 'other' ? '其他支出' : '未分类');
+                    const month = monthData();
+                    const planned = month.plannedExpenses.filter(plan => plan.category === item.category);
+                    const plannedTotal = planned.reduce((sum, plan) => sum + plan.amount, 0);
+                    const difference = item.amount - plannedTotal;
+                    const differenceClass = difference > 0 ? 'difference-over' : 'difference-under';
+                    const differenceText = difference > 0 ? `超出 ${money(difference)}` : difference < 0 ? `节省 ${money(Math.abs(difference))}` : '持平';
+                    const categoryDifference = shownDifference.has(item.category) ? '见分类规划' : `<span class="${differenceClass}">${differenceText}</span>`;
+                    shownDifference.add(item.category);
+                    row.innerHTML = `<td>${item.name}</td><td>${categoryName}</td><td class="amount-expense">-${money(item.amount)}</td><td>${money(plannedTotal)}</td><td>${categoryDifference}</td><td class="operator-cell">${formatOperation(item)}</td><td><button class="delete-btn" type="button" aria-label="删除${item.name}">删除</button></td>`;
+                    row.querySelector('button').addEventListener('click', () => {
+                        const month = monthData();
+                        month.actualExpenses = month.actualExpenses.filter(transaction => transaction.id !== item.id);
+                        render();
+                    });
+                    list.appendChild(row);
+                });
+            }
+            function renderGoals(goals) {
+                const list = document.getElementById('goalList');
+                list.innerHTML = '';
+                if (!goals.length) { list.innerHTML = '<div class="empty">还没有储蓄目标。</div>'; return; }
+                goals.forEach(goal => {
+                    const saved = goal.saved || 0;
+                    const percent = Math.min(100, goal.amount ? saved / goal.amount * 100 : 0);
+                    const item = document.createElement('div');
+                    item.className = 'goal';
+                    item.innerHTML = `<div class="goal-title"><span>${goal.name}</span><button class="delete-btn" type="button">删除</button></div><div class="goal-meta"><span>${money(saved)} / ${money(goal.amount)}</span><span>${Math.round(percent)}%</span></div><div class="bar"><span style="width:${percent}%"></span></div>`;
+                    item.querySelector('button').addEventListener('click', () => {
+                        const month = monthData();
+                        month.goals = month.goals.filter(current => current.id !== goal.id);
+                        render();
+                    });
+                    list.appendChild(item);
+                });
+            }
+            function renderBudget(income, expense, balance) {
+                const rows = document.getElementById('budgetRows');
+                const categories = [
+                    ['全部支出', expense, income * .8],
+                    ['建议可支配支出', Math.max(expense - income * .5, 0), income * .3],
+                    ['建议保留结余', Math.max(balance, 0), income * .2]
+                ];
+                rows.innerHTML = categories.map(([name, value, limit]) => {
+                    const percent = limit ? Math.min(value / limit * 100, 100) : 0;
+                    return `<div class="budget-row"><div class="budget-line"><span>${name}</span><strong>${money(value)} / ${money(limit)}</strong></div><div class="bar ${value > limit && limit ? 'over' : ''}"><span style="width:${percent}%"></span></div></div>`;
+                }).join('');
+            }
+            function renderCategoryPlan(plannedItems, actualItems, income) {
+                const plan = document.getElementById('categoryPlan');
+                plan.innerHTML = categories.concat({ id: 'other', name: '其他支出', rate: .0 }).map(category => {
+                    const expected = plannedItems.filter(item => item.category === category.id).reduce((sum, item) => sum + item.amount, 0);
+                    const spent = actualItems.filter(item => item.category === category.id).reduce((sum, item) => sum + item.amount, 0);
+                    const budget = income * category.rate;
+                    const percent = budget ? Math.min(spent / budget * 100, 100) : 0;
+                    const difference = spent - expected;
+                    const differenceText = difference > 0 ? `超出 ${money(difference)}` : difference < 0 ? `节省 ${money(Math.abs(difference))}` : '持平';
+                    return `<div class="category-card ${spent > budget && budget ? 'over' : difference < 0 ? 'under' : ''}"><div class="category-head"><span>${category.name}</span><span>实际 ${money(spent)}</span></div><div class="category-meta"><span>预计 ${money(expected)}</span><span>预算 ${money(budget)}</span></div><div class="category-meta"><span>${budget && spent > budget ? '已超支' : budget ? `剩余 ${money(budget - spent)}` : '待设置收入'}</span><span class="${difference > 0 ? 'difference-over' : 'difference-under'}">${differenceText}</span></div><div class="bar"><span style="width:${percent}%"></span></div></div>`;
+                }).join('');
+            }
+            function buildReport() {
+                const month = monthData();
+                const recipient = document.getElementById('reportRecipient').value.trim() || '家庭成员';
+                const income = month.incomes.reduce((sum, item) => sum + item.amount, 0);
+                const planned = month.plannedExpenses.reduce((sum, item) => sum + item.amount, 0);
+                const actual = month.actualExpenses.reduce((sum, item) => sum + item.amount, 0);
+                const balance = income - actual;
+                const lines = [
+                    `【${monthInput.value} 家庭理财月度报告】`,
+                    `发送给：${recipient}`,
+                    '',
+                    '一、本月概况',
+                    `收入：${money(income)}`,
+                    `预计支出：${money(planned)}`,
+                    `实际支出：${money(actual)}`,
+                    `支出差值：${actual - planned > 0 ? '超出 ' : actual - planned < 0 ? '节省 ' : ''}${money(Math.abs(actual - planned))}`,
+                    `本月结余：${money(balance)}`,
+                    `储蓄率：${income ? Math.round(Math.max(balance, 0) / income * 100) : 0}%`,
+                    `报告生成：${currentUser()?.name || '未登录'} · ${new Date().toLocaleString('zh-CN', { hour12: false })}`,
+                    '',
+                    '二、分类消费分析',
+                ];
+                categories.concat({ id: 'other', name: '其他支出', rate: 0 }).forEach(category => {
+                    const categoryPlanned = month.plannedExpenses.filter(item => item.category === category.id).reduce((sum, item) => sum + item.amount, 0);
+                    const categoryActual = month.actualExpenses.filter(item => item.category === category.id).reduce((sum, item) => sum + item.amount, 0);
+                    if (!categoryPlanned && !categoryActual) return;
+                    const difference = categoryActual - categoryPlanned;
+                    lines.push(`${category.name}：预计 ${money(categoryPlanned)}，实际 ${money(categoryActual)}，${difference > 0 ? '超出 ' : difference < 0 ? '节省 ' : ''}${money(Math.abs(difference))}`);
+                });
+                const overBudget = categories.map(category => {
+                    const spent = month.actualExpenses.filter(item => item.category === category.id).reduce((sum, item) => sum + item.amount, 0);
+                    return { name: category.name, spent, budget: income * category.rate };
+                }).filter(item => item.budget && item.spent > item.budget).sort((a, b) => (b.spent - b.budget) - (a.spent - a.budget));
+                lines.push('', '三、消费建议');
+                if (!income && !actual) lines.push('本月还没有完整账目，建议先补充收入和实际支出。');
+                else if (balance < 0) lines.push('本月实际支出超过收入，建议暂停非必要消费，并优先复盘娱乐、购物和订阅类支出。');
+                else if (income && balance / income < .2) lines.push('本月储蓄率低于 20%，建议下月先转存应急金，再安排弹性消费。');
+                else lines.push('本月现金流总体健康，建议继续保持先储蓄后消费的习惯。');
+                if (overBudget.length) lines.push(`重点关注：${overBudget.slice(0, 2).map(item => `${item.name}超预算 ${money(item.spent - item.budget)}`).join('、')}。`);
+                else lines.push('各主要分类暂未超过按收入计算的建议预算。');
+                lines.push('下月执行：月初完成预计支出规划，发生消费后及时登记实际金额，月末对照差值复盘。');
+                return lines.join('\n');
+            }
+            document.getElementById('generateReportBtn').addEventListener('click', () => {
+                const preview = document.getElementById('reportPreview');
+                preview.textContent = buildReport();
+                preview.dataset.generated = 'true';
+            });
+            document.getElementById('copyReportBtn').addEventListener('click', async () => {
+                const preview = document.getElementById('reportPreview');
+                const report = buildReport();
+                preview.textContent = report;
+                preview.dataset.generated = 'true';
+                try {
+                    await navigator.clipboard.writeText(report);
+                    document.getElementById('syncStatus').textContent = '月度报告已复制，可以发送给家庭成员。';
+                } catch {
+                    document.getElementById('syncStatus').textContent = '复制失败，请使用“下载报告”后发送。';
+                }
+            });
+            document.getElementById('downloadReportBtn').addEventListener('click', () => {
+                const report = buildReport();
+                const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `家庭理财月度报告-${monthInput.value}.txt`;
+                link.click();
+                URL.revokeObjectURL(url);
+                document.getElementById('syncStatus').textContent = '月度报告已下载，可以发送给家庭成员。';
+            });
+            const shareUrl = document.getElementById('shareUrl');
+            if (window.location.protocol !== 'file:') shareUrl.value = window.location.href.split('#')[0];
+            document.getElementById('copyShareUrlBtn').addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(shareUrl.value);
+                    document.getElementById('shareStatus').textContent = '访问地址已复制，可以发送给家庭成员。';
+                } catch {
+                    shareUrl.select();
+                    document.getElementById('shareStatus').textContent = '请手动复制上方地址发送给家庭成员。';
+                }
+            });
+            document.getElementById('nativeShareBtn').addEventListener('click', async () => {
+                if (!navigator.share) {
+                    shareUrl.select();
+                    document.getElementById('shareStatus').textContent = '当前浏览器不支持系统分享，请复制上方地址发送。';
+                    return;
+                }
+                try {
+                    await navigator.share({ title: '家庭理财工作台', text: '请打开家庭理财工作台', url: shareUrl.value });
+                    document.getElementById('shareStatus').textContent = '分享面板已打开。';
+                } catch (error) {
+                    if (error.name !== 'AbortError') document.getElementById('shareStatus').textContent = '系统分享失败，请复制地址发送。';
+                }
+            });
+            function renderAdvice(income, expense, balance) {
+                const advice = document.getElementById('advice');
+                if (!income && !expense) advice.textContent = '先添加收入和支出，工作台会给出本月建议。';
+                else if (balance < 0) advice.textContent = '本月支出已经超过收入，建议优先暂停非必要消费，并检查订阅、外卖和冲动购物。';
+                else if (income && balance / income < .2) advice.textContent = '当前结余低于建议的 20%，可以先设一个小额储蓄目标，再逐步压缩弹性支出。';
+                else advice.textContent = '当前现金流健康，建议把结余优先转入应急金或明确的长期目标。';
+            }
+            document.getElementById('incomeForm').addEventListener('submit', event => {
+                event.preventDefault();
+                const name = document.getElementById('incomeName').value.trim();
+                const amount = Number(document.getElementById('incomeAmount').value);
+                if (!name || !amount || amount < 0) return;
+                monthData().incomes.push(stamp({ id: Date.now(), name, amount }));
+                event.target.reset();
+                render();
+            });
+            document.getElementById('plannedExpenseForm').addEventListener('submit', event => {
+                event.preventDefault();
+                const name = document.getElementById('plannedName').value.trim();
+                const amount = Number(document.getElementById('plannedAmount').value);
+                if (!name || amount <= 0 || !Number.isFinite(amount)) return;
+                monthData().plannedExpenses.push(stamp({ id: Date.now(), name, category: document.getElementById('plannedCategory').value, amount }));
+                event.target.reset();
+                render();
+            });
+            document.getElementById('actualExpenseForm').addEventListener('submit', event => {
+                event.preventDefault();
+                const name = document.getElementById('actualName').value.trim();
+                const amount = Number(document.getElementById('actualAmount').value);
+                if (!name || amount <= 0 || !Number.isFinite(amount)) return;
+                monthData().actualExpenses.push(stamp({ id: Date.now(), name, category: document.getElementById('actualCategory').value, amount }));
+                event.target.reset();
+                render();
+            });
+            document.getElementById('goalForm').addEventListener('submit', event => {
+                event.preventDefault();
+                const name = document.getElementById('goalName').value.trim();
+                const amount = Number(document.getElementById('goalAmount').value);
+                if (!name || !amount || amount < 0) return;
+                monthData().goals.push(stamp({ id: Date.now(), name, amount, saved: 0 }));
+                event.target.reset();
+                render();
+            });
+            document.getElementById('authMode').addEventListener('change', event => {
+                const mode = event.target.value;
+                const creating = mode === 'create';
+                const joining = mode === 'join';
+                document.getElementById('familyName').hidden = !creating;
+                document.getElementById('familyNameLabel').hidden = !creating;
+                document.getElementById('joinCode').hidden = !joining;
+                document.getElementById('joinCodeLabel').hidden = !joining;
+                document.getElementById('authSubmit').textContent =
+                    mode === 'login' ? '回到家庭' :
+                    joining ? '加入家庭' : '创建家庭';
+                document.getElementById('authTitle').textContent =
+                    mode === 'login' ? '回到你的家庭' :
+                    joining ? '加入家庭' : '创建家庭账本';
+                document.getElementById('authDescription').textContent =
+                    mode === 'login' ? '我们会从云端找回你加入过的家庭' :
+                    joining ? '向家人要 6 位邀请码，加入后就能一起记账' :
+                    '创建一个家庭，拿到 6 位邀请码，家人扫码加入';
+            });
+            document.getElementById('authForm').addEventListener('submit', async event => {
+                event.preventDefault();
+                const submit = document.getElementById('authSubmit');
+                submit.disabled = true;
+                try {
+                    await authenticateCloud();
+                    document.getElementById('authForm').reset();
+                    finishAuth();
+                } catch (error) {
+                    document.getElementById('authNote').textContent = `操作失败：${error.message || error}`;
+                } finally {
+                    submit.disabled = false;
+                }
+            });
+            document.getElementById('userSwitcher').addEventListener('change', event => {
+                currentUserId = event.target.value;
+                saveAuth();
+                refreshUserBar();
+            });
+            document.getElementById('inviteBtn').addEventListener('click', async () => {
+                if (!cloudInviteCode) {
+                    document.getElementById('syncStatus').textContent = '邀请码未生成，请检查网络';
+                    return;
+                }
+                const text = `【${members.length}人家庭邀请】\n邀请码：${cloudInviteCode}\n${window.location.origin}${window.location.pathname}\n用这个邀请码加入我们家的账本`;
+                try {
+                    await navigator.clipboard.writeText(text);
+                    document.getElementById('syncStatus').textContent = `✅ 邀请码 ${cloudInviteCode} 已复制，发送给家人即可`;
+                } catch {
+                    window.prompt('复制失败，请手动复制以下内容发给家人：', text);
+                }
+            });
+            document.getElementById('leaveFamilyBtn').addEventListener('click', () => {
+                if (isAdmin()) {
+                    // 管理员：滚动到成员管理面板
+                    const card = document.getElementById('memberMgmtCard');
+                    if (card) { card.style.display = 'block'; card.scrollIntoView({behavior:'smooth',block:'center'}); }
+                    return;
+                }
+                if (!confirm('确定要退出当前家庭吗？你的本地记账数据会被清空，重新加入需要邀请码。')) return;
+                localStorage.removeItem(storageKey);
+                localStorage.removeItem('family-finance-local-uid');
+                if (cloudWatcher) { try { cloudWatcher.close(); } catch {} cloudWatcher = null; }
+                location.reload();
+            });
+            monthInput.addEventListener('change', render);
+            document.getElementById('exportBtn').addEventListener('click', () => {
+                const blob = new Blob([JSON.stringify({ version: 1, exportedAt: new Date().toISOString(), data }, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `家庭账本-${monthInput.value}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+                document.getElementById('syncStatus').textContent = '账本已导出，可以发送给家人导入。';
+            });
+            document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
+            document.getElementById('importFile').addEventListener('change', async event => {
+                const file = event.target.files[0];
+                if (!file) return;
+                try {
+                    const imported = JSON.parse(await file.text());
+                    if (!imported.data || typeof imported.data !== 'object') throw new Error('invalid');
+                    data = imported.data;
+                    render();
+                    document.getElementById('syncStatus').textContent = '账本已导入并同步到当前页面。';
+                } catch {
+                    document.getElementById('syncStatus').textContent = '导入失败：请选择本工作台导出的 JSON 文件。';
+                }
+                event.target.value = '';
+            });
+            window.addEventListener('storage', event => {
+                if (event.key !== storageKey) return;
+                const latest = JSON.parse(event.newValue || '{}');
+                data = latest.data || {};
+                monthInput.value = latest.month || monthInput.value;
+                render(false);
+                document.getElementById('syncStatus').textContent = '已同步其他页面的最新账本。';
+            });
+            if (channel) channel.addEventListener('message', () => {
+                const latest = JSON.parse(localStorage.getItem(storageKey) || '{}');
+                data = latest.data || {};
+                members = latest.members || members;
+                currentUserId = latest.currentUserId || currentUserId;
+                monthInput.value = latest.month || monthInput.value;
+                render(false);
+                refreshUserBar();
+                document.getElementById('syncStatus').textContent = '已同步其他页面的最新账本。';
+            });
+            populateCategories();
+            (async () => {
+                if (USE_CLOUDBASE) {
+                    // 真实 CloudBase 模式：先尝试匿名登录看是否已有家庭
+                    try {
+                        const sign = await cloudSignIn();
+                        cloudUser = { uid: sign.uid };
+                        // 查一下这个匿名用户是否已经加入过家庭
+                        const db = (await getCloudApp()).database();
+                        const memCheck = await db.collection('family_members').where({ userId: sign.uid }).get();
+                        if (memCheck.data && memCheck.data.length) {
+                            // 已有家庭，自动恢复
+                            await loadCloudFamily();
+                            finishAuth();
+                            document.getElementById('syncStatus').textContent = `✅ 已自动恢复家庭。邀请码：${cloudInviteCode}（点"复制邀请码"发给家人）`;
+                            return;
+                        }
+                    } catch (e) {
+                        // 匿名登录或查询失败，继续走手动登录
+                        console.log('auto-login skip:', e.message || e);
+                    }
+                } else if (state.cloudFamilyId && state.currentUserId) {
+                    // 本地演示模式：从 localStorage 恢复
+                    try {
+                        const sign = await cloudSignIn();
+                        cloudUser = { uid: sign.uid };
+                        await loadCloudFamily();
+                        finishAuth();
+                        if (cloudInviteCode) {
+                            document.getElementById('syncStatus').textContent = `✅ 已恢复家庭。邀请码：${cloudInviteCode}`;
+                        }
+                        return;
+                    } catch (error) {
+                        localStorage.removeItem(storageKey);
+                        document.getElementById('authNote').textContent = `上次登录已过期：${error.message || error}，请重新创建或加入家庭`;
+                    }
+                }
+                showAuthGate();
+                // 没有配置 CloudBase 时给出提示
+                if (!USE_CLOUDBASE) {
+                    document.getElementById('authNote').innerHTML =
+                        '⚠️ 当前是<strong>本地演示模式</strong>（仅同浏览器多标签页同步）。<br>' +
+                        '要让全家手机都能用，请按页面顶部说明开通腾讯云 CloudBase（免费），' +
+                        '把环境 ID 填到 <code>CLOUDBASE_ENV</code> 即可升级。';
+                }
+            document.getElementById('authMode').dispatchEvent(new Event('change'));
+        })();
+
+        // 底部导航：平滑滚动 + 高亮当前
+        (function () {
+            const navLinks = document.querySelectorAll('.mobile-nav a');
+            const sections = ['summary', 'incomeSection', 'plannedSection', 'actualSection', 'reportSection', 'shareSection'];
+            navLinks.forEach(link => {
+                link.addEventListener('click', e => {
+                    e.preventDefault();
+                    const target = document.getElementById(link.getAttribute('href').slice(1));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        navLinks.forEach(l => l.classList.remove('active'));
+                        link.classList.add('active');
+                    }
+                });
+            });
+            // 滚动时高亮当前可见区域
+            let scrollTimer;
+            window.addEventListener('scroll', () => {
+                clearTimeout(scrollTimer);
+                scrollTimer = setTimeout(() => {
+                    let current = sections[0];
+                    for (const id of sections) {
+                        const el = document.getElementById(id);
+                        if (el && el.getBoundingClientRect().top < window.innerHeight * 0.4) current = id;
+                    }
+                    navLinks.forEach(l => {
+                        l.classList.toggle('active', l.getAttribute('href').slice(1) === current);
+                    });
+                }, 80);
+            });
+        })();
+        })();
+    </script>
+</body>
+</html>
