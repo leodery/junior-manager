@@ -238,8 +238,7 @@ function openEventModal() { $('modalOverlay').style.display='flex'; $('eventModa
 
 // ==================== CloudBase ====================
 const CLOUDBASE_ENV = 'leoderyyang-d9gc0pfwpbdac9915';
-const FAMILY_ID = localStorage.getItem('parent_family_id') || ('fam-'+Date.now().toString(36));
-localStorage.setItem('parent_family_id', FAMILY_ID);
+const FAMILY_ID = localStorage.getItem('cb_family_id') || (function(){ var id='fam-'+Date.now().toString(36); localStorage.setItem('cb_family_id',id); return id; })();
 let cloudApp = null, cloudDb = null, cloudReady = false;
 
 function setStatus(text, cls) {
@@ -423,32 +422,38 @@ function saveEvent() {
 
 // ==================== INIT ====================
 async function initApp() {
-  // Load local first
+  // 先加载本地缓存
   loadLocal();
   render();
 
-  // Try cloud sync
+  // 尝试云端同步
   await initCloudBase();
   if (cloudReady) {
     var cloudData = await syncFromCloud();
-    if (cloudData && cloudData.tasks) {
-      // Merge: cloud data takes priority (newest wins)
-      tasks = cloudData.tasks || [];
+    if (cloudData && cloudData.tasks && cloudData.tasks.length > 0) {
+      // ☁️ 云端有数据，以云端为准（包含孩子端的所有任务）
+      tasks = cloudData.tasks;
       events = cloudData.events || [];
       saveLocal();
       render();
-      toast('☁️ 已从云端同步数据');
+      toast('☁️ 已同步孩子端数据 (' + tasks.length + '个任务)');
+    } else if (tasks.length > 0) {
+      // 本地有数据但云端没有 → 推送到云端
+      await syncToCloud(tasks, events);
+      toast('📤 已上传本地数据到云端');
     }
-    // Push local to cloud
-    syncToCloud(tasks, events);
+    localStorage.setItem('parent_last_sync', String(Date.now()));
 
-    // Set up periodic sync
+    // 每 10 秒拉取云端更新
     setInterval(async () => {
       var cd = await syncFromCloud();
-      if (cd && cd.tasks && cd.updatedAt > (parseInt(localStorage.getItem('parent_last_sync')||'0'))) {
-        tasks = cd.tasks; events = cd.events;
-        saveLocal(); render();
-        localStorage.setItem('parent_last_sync', String(Date.now()));
+      if (cd && cd.tasks) {
+        var lastSync = parseInt(localStorage.getItem('parent_last_sync')||'0');
+        if (cd.updatedAt > lastSync) {
+          tasks = cd.tasks; events = cd.events || [];
+          saveLocal(); render();
+          localStorage.setItem('parent_last_sync', String(Date.now()));
+        }
       }
     }, 10000);
   }
