@@ -1,0 +1,27 @@
+{
+    "bin": {
+        "id": "junior-study-dashboard",
+        "readonly": false,
+        "bytes": 0,
+        "bytes_readable": "0 B",
+        "files": 0,
+        "updated_at": "2026-08-04T12:52:24.120515Z",
+        "updated_at_relative": "now",
+        "created_at": "2026-08-04T12:52:24.010833Z",
+        "created_at_relative": "now",
+        "expired_at": "2026-08-11T12:52:24.120515Z",
+        "expired_at_relative": "6 days from now"
+    },
+    "file": {
+        "filename": "junior-study-dashboard.html",
+        "content-type": "text/html; charset=UTF-8",
+        "bytes": 39218,
+        "bytes_readable": "39 kB",
+        "md5": "Nl3Elx1KgckLA+uOkEDjoA==",
+        "sha256": "97f3e67d8a27d7f0d7d2091e773b40fd261e638e1358e926e153948a20244441",
+        "updated_at": "2026-08-04T12:52:24.081859Z",
+        "updated_at_relative": "now",
+        "created_at": "2026-08-04T12:52:24.081859Z",
+        "created_at_relative": "now"
+    }
+}
