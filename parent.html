@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="家长监督">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23FFB347' width='100' height='100' rx='20'/><text x='50' y='65' text-anchor='middle' font-size='45'>👨‍👩‍👧</text></svg>">
+<title>家长监督 — 我的初中全能管家</title>
+<style>
+:root {
+  --blue: #A8D8EA; --blue-light: #C5E8F7; --blue-bg: #EEF7FB;
+  --pink: #FFB7B2; --pink-light: #FFD1DC;
+  --yellow: #FFF1C1; --mint: #B5EAD7; --mint-bg: #F0FBF7;
+  --lavender: #C7CEEA; --white: #FFFFFF; --bg: #F5F3F0;
+  --text: #4A4A4A; --text-light: #8A8A8A; --text-lighter: #B0B0B0;
+  --shadow: 0 2px 12px rgba(0,0,0,0.06);
+  --radius: 16px; --radius-sm: 10px;
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --safe-bottom: env(safe-area-inset-bottom, 16px);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { font-size:16px; -webkit-tap-highlight-color:transparent; }
+body {
+  font-family:var(--font); background:var(--bg); color:var(--text);
+  max-width:480px; margin:0 auto; min-height:100vh; min-height:100dvh;
+  overflow-x:hidden; padding:16px 14px; padding-bottom:calc(var(--safe-bottom)+20px);
+  -webkit-font-smoothing:antialiased;
+}
+.card { background:var(--white); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow); margin-bottom:12px; }
+.card-title { font-size:15px; font-weight:600; margin-bottom:10px; }
+.stat-row { display:flex; gap:8px; margin-bottom:10px; }
+.stat-card { flex:1; background:#FAFAFA; border-radius:var(--radius-sm); padding:12px; text-align:center; }
+.stat-val { font-size:22px; font-weight:700; }
+.stat-label { font-size:10px; color:var(--text-light); margin-top:2px; }
+.badge { font-size:10px; padding:2px 8px; border-radius:12px; font-weight:500; }
+.badge-pink { background:#FFF0F3; color:#E88B85; }
+.badge-mint { background:var(--mint-bg); color:#3A7D5F; }
+.badge-orange { background:#FFF0E6; color:#D4895A; }
+.btn {
+  display:inline-flex; align-items:center; gap:4px; padding:8px 16px; border-radius:20px;
+  font-size:13px; font-weight:500; border:none; cursor:pointer; font-family:var(--font); transition:all 0.2s;
+}
+.btn:active { transform:scale(0.96); }
+.btn-primary { background:var(--blue); color:#fff; }
+.btn-sm { padding:5px 12px; font-size:11px; border-radius:14px; }
+.btn-outline { background:transparent; border:1.5px solid var(--blue); color:#5B9BD5; }
+.btn-danger { background:var(--pink); color:#fff; }
+.input {
+  width:100%; padding:10px 14px; border:1.5px solid #E8E8E8; border-radius:8px;
+  font-size:14px; font-family:var(--font); background:#FAFAFA; margin-bottom:6px;
+}
+.input:focus { outline:none; border-color:var(--blue); background:#fff; }
+select.input { appearance:none; padding-right:32px; background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888'%3e%3cpath d='M6 8L1 3h10z'/%3e%3c/svg%3e"); background-repeat:no-repeat; background-position:right 12px center; }
+.progress-bar { height:8px; background:#eee; border-radius:4px; overflow:hidden; margin:2px 0; }
+.progress-fill { height:100%; border-radius:4px; transition:width 0.5s; }
+.parent-badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:600; background:#FFF0E6; color:#D4895A; }
+.pin-gate { position:fixed; inset:0; z-index:300; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.55); }
+.pin-gate.hidden { display:none; }
+.pin-box { background:#fff; border-radius:20px; padding:28px 22px; width:85%; max-width:320px; text-align:center; box-shadow:0 8px 40px rgba(0,0,0,0.2); }
+.pin-dots { display:flex; gap:10px; justify-content:center; margin:16px 0; }
+.pin-dot { width:44px; height:52px; border-radius:12px; border:2px solid #E0E0E0; font-size:24px; font-weight:700; text-align:center; line-height:48px; background:#FAFAFA; }
+.pin-dot.filled { border-color:var(--blue); background:#fff; }
+.pin-numpad { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+.pin-key { padding:14px; border-radius:14px; font-size:20px; font-weight:600; border:1px solid #E8E8E8; background:#FAFAFA; cursor:pointer; font-family:var(--font); }
+.pin-key:active { background:var(--blue-bg); border-color:var(--blue); transform:scale(0.94); }
+.pin-key.del { font-size:14px; color:var(--pink); }
+.pin-key.done { background:#FFB347; color:#fff; border-color:#FFB347; }
+.empty { text-align:center; padding:20px; color:var(--text-lighter); font-size:13px; }
+.connection-bar {
+  display:flex; align-items:center; gap:6px; padding:8px 12px; border-radius:10px;
+  font-size:11px; margin-bottom:10px; background:#FAFAFA;
+}
+.connection-bar.online { background:var(--mint-bg); color:#3A7D5F; }
+.connection-bar.offline { background:#FFF0F0; color:#C06060; }
+.connection-bar.connecting { background:var(--blue-bg); color:#5B9BD5; }
+.task-item {
+  display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px;
+  background:#FAFAFA; margin-bottom:6px; border-left:3px solid transparent;
+}
+.task-item.done { opacity:0.65; border-left-color:var(--mint); }
+.task-item.todo { border-left-color:var(--blue); }
+.task-item.parent { border-left-color:#FFB347; }
+.task-item .task-info { flex:1; min-width:0; }
+.task-item .task-title { font-size:13px; font-weight:500; }
+.task-item .task-meta { font-size:10px; color:var(--text-light); margin-top:2px; }
+.task-item .task-title.done-text { text-decoration:line-through; color:#aaa; }
+.modal-overlay { position:fixed; inset:0; z-index:200; display:flex; align-items:flex-end; justify-content:center; background:rgba(0,0,0,0.35); }
+.modal { background:#fff; width:100%; max-width:480px; border-radius:20px 20px 0 0; padding:20px 16px 32px; max-height:80vh; overflow-y:auto; animation:slideUp 0.3s; }
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.modal h3 { font-size:17px; margin-bottom:16px; text-align:center; }
+.close-btn { position:absolute; right:16px; top:16px; font-size:24px; cursor:pointer; color:#999; }
+.toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:10px 20px; border-radius:20px; font-size:13px; z-index:400; }
+</style>
+</head>
+<body>
+
+<!-- PIN Gate -->
+<div class="pin-gate" id="pinGate">
+  <div class="pin-box">
+    <span style="font-size:40px;">👨‍👩‍👧</span>
+    <h3 style="margin:4px 0;">家长验证</h3>
+    <p style="font-size:12px;color:var(--text-light);">请输入 4 位密码</p>
+    <div class="pin-dots" id="pinDots">
+      <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+    </div>
+    <div class="pin-numpad" id="pinNumpad"></div>
+    <button style="margin-top:12px;border:none;background:none;color:var(--text-lighter);font-size:11px;cursor:pointer;" onclick="location.reload()">取消</button>
+  </div>
+</div>
+
+<!-- Main -->
+<main id="mainContent" style="display:none;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:28px;">👨‍👩‍👧</span>
+      <div>
+        <div style="font-size:18px;font-weight:700;">家长监督</div>
+        <div style="font-size:11px;color:var(--text-light);" id="currentDate"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:4px;">
+      <button class="btn btn-sm btn-outline" onclick="openTaskModal()">+ 加任务</button>
+      <button class="btn btn-sm btn-outline" onclick="openEventModal()">+ 加日程</button>
+    </div>
+  </div>
+
+  <!-- Connection status -->
+  <div class="connection-bar" id="connectionBar">⏳ 正在连接...</div>
+
+  <!-- Stats -->
+  <div class="card">
+    <div class="card-title">📊 任务完成概览</div>
+    <div class="stat-row" id="taskStats"></div>
+    <div id="categoryBars"></div>
+  </div>
+
+  <!-- Tasks -->
+  <div class="card">
+    <div class="card-title">📋 全部任务 (<span id="taskCount">0</span>)</div>
+    <div id="taskList"><div class="empty">暂无任务</div></div>
+  </div>
+
+  <!-- Events -->
+  <div class="card">
+    <div class="card-title">📅 近期日程</div>
+    <div id="eventList"><div class="empty">暂无日程</div></div>
+  </div>
+
+  <!-- Settings -->
+  <div class="card" style="text-align:center;">
+    <button class="btn btn-sm" style="background:#f5f5f5;color:var(--text-light);font-size:11px;" onclick="changePin()">⚙️ 修改密码</button>
+    <span style="font-size:10px;color:var(--text-lighter);margin-left:8px;">默认 0000</span>
+    <span style="display:block;margin-top:8px;font-size:10px;color:var(--text-lighter);">
+      2026 <b>leodery</b> © 版权所有 · 家长端
+    </span>
+  </div>
+</main>
+
+<!-- Task Modal -->
+<div class="modal-overlay" id="modalOverlay" style="display:none;" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="taskModal" style="display:none;">
+    <span class="close-btn" onclick="closeModal()">✕</span>
+    <h3>👨‍👩‍👧 添加任务</h3>
+    <input class="input" id="tkTitle" placeholder="任务标题">
+    <select class="input" id="tkCategory">
+      <option value="course">📚 课程</option><option value="exam">📝 考试</option>
+      <option value="personal">🎯 个人</option><option value="life">🏠 生活</option>
+    </select>
+    <input class="input" type="date" id="tkDueDate">
+    <textarea class="input" id="tkNote" placeholder="备注" style="min-height:50px;"></textarea>
+    <button class="btn btn-primary" style="width:100%;" onclick="saveTask()">💾 保存</button>
+  </div>
+  <div class="modal" id="eventModal" style="display:none;">
+    <span class="close-btn" onclick="closeModal()">✕</span>
+    <h3>👨‍👩‍👧 添加日程</h3>
+    <input class="input" id="evTitle" placeholder="事件标题">
+    <input class="input" type="date" id="evDate">
+    <input class="input" type="time" id="evTime">
+    <select class="input" id="evType">
+      <option value="exam">🔵 考试</option><option value="homework">🟠 作业</option>
+      <option value="personal">🟢 个人</option><option value="life">⚪ 生活</option>
+    </select>
+    <textarea class="input" id="evDesc" placeholder="备注" style="min-height:50px;"></textarea>
+    <button class="btn btn-primary" style="width:100%;" onclick="saveEvent()">💾 保存</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" style="display:none;"></div>
+
+<script>
+// ==================== PIN ====================
+function getPin() { return localStorage.getItem('parent_pin_v2') || '0000'; }
+function setPin(p) { localStorage.setItem('parent_pin_v2', p); }
+let pinInput = '';
+
+function buildNumpad() {
+  $('pinNumpad').innerHTML = ['1','2','3','4','5','6','7','8','9','清除','0','确认'].map(k => {
+    let cls = 'pin-key' + (k==='清除'?' del':'') + (k==='确认'?' done':'');
+    return '<button class="'+cls+'" onclick="pinKey(\''+k+'\')">'+k+'</button>';
+  }).join('');
+}
+function pinKey(k) {
+  if (k==='清除') { pinInput=pinInput.slice(0,-1); updateDots(); return; }
+  if (k==='确认') { verify(); return; }
+  if (pinInput.length>=4) return;
+  pinInput+=k; updateDots();
+  if (pinInput.length===4) setTimeout(verify,200);
+}
+function updateDots() {
+  document.querySelectorAll('#pinDots .pin-dot').forEach((d,i)=>{
+    d.classList.toggle('filled',i<pinInput.length);
+    d.textContent=pinInput[i]||'';
+  });
+}
+function verify() {
+  if (pinInput===getPin()) {
+    $('pinGate').classList.add('hidden');
+    $('mainContent').style.display='block';
+    initApp();
+  } else if (pinInput.length===4) {
+    toast('❌ 密码错误'); pinInput=''; updateDots();
+  }
+}
+function changePin() {
+  var np=prompt('请输入新的4位数字密码：','');
+  if (!np||!/^\d{4}$/.test(np)) { toast('请输入4位数字'); return; }
+  setPin(np); toast('✅ 密码已更新');
+}
+
+// ==================== HELPERS ====================
+function $(id) { return document.getElementById(id); }
+function today() { return new Date().toISOString().split('T')[0]; }
+function toast(m) { var t=$('toast'); t.textContent=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
+function closeModal() { $('modalOverlay').style.display='none'; }
+function openTaskModal() { $('modalOverlay').style.display='flex'; $('taskModal').style.display='block'; $('eventModal').style.display='none'; }
+function openEventModal() { $('modalOverlay').style.display='flex'; $('eventModal').style.display='block'; $('taskModal').style.display='none'; }
+
+// ==================== CloudBase ====================
+const CLOUDBASE_ENV = 'leoderyyang-d9gc0pfwpbdac9915';
+const FAMILY_ID = localStorage.getItem('parent_family_id') || ('fam-'+Date.now().toString(36));
+localStorage.setItem('parent_family_id', FAMILY_ID);
+let cloudApp = null, cloudDb = null, cloudReady = false;
+
+function setStatus(text, cls) {
+  var bar = $('connectionBar');
+  bar.textContent = text;
+  bar.className = 'connection-bar ' + cls;
+}
+
+async function initCloudBase() {
+  setStatus('⏳ 正在连接云端...', 'connecting');
+  // Dynamic SDK load
+  if (!window.cloudbase) {
+    await new Promise((resolve) => {
+      var s = document.createElement('script');
+      s.src = 'https://static.cloudbase.net/cloudbase-js-sdk/latest/cloudbase.full.js';
+      s.async = true;
+      s.onload = resolve;
+      s.onerror = () => {
+        // Try sibling path
+        var s2 = document.createElement('script');
+        s2.src = 'cloudbase.full.js';
+        s2.async = true;
+        s2.onload = resolve;
+        s2.onerror = resolve;
+        document.head.appendChild(s2);
+      };
+      document.head.appendChild(s);
+      setTimeout(resolve, 8000);
+    });
+  }
+  if (window.cloudbase) {
+    try {
+      cloudApp = window.cloudbase.init({ env: CLOUDBASE_ENV });
+      cloudDb = cloudApp.database();
+      await cloudApp.auth().signInAnonymously();
+      cloudReady = true;
+      setStatus('✅ 云端已连接 · 家庭ID: '+FAMILY_ID.substring(0,8)+'...', 'online');
+      return true;
+    } catch(e) {
+      console.error('CloudBase init error:', e);
+    }
+  }
+  cloudReady = false;
+  setStatus('⚠️ 离线模式 · 数据仅保存在本设备', 'offline');
+  return false;
+}
+
+async function syncFromCloud() {
+  if (!cloudReady || !cloudDb) return null;
+  try {
+    var res = await cloudDb.collection('junior_data').where({ familyId: FAMILY_ID }).get();
+    if (res.data && res.data.length) {
+      return res.data[0];
+    }
+  } catch(e) { console.error('Sync error:', e); }
+  return null;
+}
+
+async function syncToCloud(tasks, events) {
+  if (!cloudReady || !cloudDb) return;
+  try {
+    var existing = await cloudDb.collection('junior_data').where({ familyId: FAMILY_ID }).get();
+    var doc = { familyId: FAMILY_ID, tasks: tasks, events: events, updatedAt: Date.now() };
+    if (existing.data && existing.data.length) {
+      await cloudDb.collection('junior_data').doc(existing.data[0]._id).update(doc);
+    } else {
+      await cloudDb.collection('junior_data').add(doc);
+    }
+  } catch(e) { console.error('Sync save error:', e); }
+}
+
+// ==================== DATA ====================
+let tasks = [];
+let events = [];
+
+function loadLocal() {
+  try {
+    var raw = localStorage.getItem('parent_junior_data');
+    if (raw) { var d = JSON.parse(raw); tasks = d.tasks || []; events = d.events || []; }
+  } catch(e) {}
+}
+function saveLocal() {
+  localStorage.setItem('parent_junior_data', JSON.stringify({ tasks, events }));
+}
+
+// ==================== RENDER ====================
+function render() {
+  document.getElementById('currentDate').textContent = new Date().toLocaleDateString('zh-CN', {year:'numeric',month:'long',day:'numeric',weekday:'short'});
+  var todo=tasks.filter(t=>t.status==='todo').length;
+  var doing=tasks.filter(t=>t.status==='doing').length;
+  var done=tasks.filter(t=>t.status==='done').length;
+  var total=tasks.length||1;
+
+  $('taskStats').innerHTML =
+    '<div class="stat-card"><div class="stat-val" style="color:var(--pink);">'+(total-1<0?0:total)+'</div><div class="stat-label">总任务</div></div>'+
+    '<div class="stat-card"><div class="stat-val" style="color:var(--mint);">'+done+'</div><div class="stat-label">已完成</div></div>'+
+    '<div class="stat-card"><div class="stat-val" style="color:#FFB347;">'+Math.round(done/total*100)+'%</div><div class="stat-label">完成率</div></div>';
+
+  var cats=['course','exam','personal','life'];
+  var catLabels={course:'📚 课程',exam:'📝 考试',personal:'🎯 个人',life:'🏠 生活'};
+  var catColors=['var(--blue)','var(--pink)','var(--mint)','#D0D0D0'];
+  $('categoryBars').innerHTML=cats.map((c,i)=>{
+    var ct=tasks.filter(t=>t.category===c);
+    var cd=ct.filter(t=>t.status==='done').length;
+    var p=ct.length?Math.round(cd/ct.length*100):0;
+    return '<div style="display:flex;align-items:center;gap:8px;margin:2px 0;">'+
+      '<span style="font-size:10px;width:50px;text-align:right;color:var(--text-light);">'+catLabels[c]+'</span>'+
+      '<div class="progress-bar" style="flex:1;"><div class="progress-fill" style="width:'+p+'%;background:'+catColors[i]+';"></div></div>'+
+      '<span style="font-size:10px;width:30px;">'+p+'%</span></div>';
+  }).join('');
+
+  $('taskCount').textContent=total;
+  $('taskList').innerHTML=tasks.length===0?'<div class="empty">暂无任务，点击上方"加任务"开始</div>':tasks.map(t=>{
+    var isDone=t.status==='done', isParent=t.addedBy==='parent';
+    return '<div class="task-item '+t.status+(isParent?' parent':'')+'">'+
+      '<div class="task-info">'+
+        '<div class="task-title'+(isDone?' done-text':'')+'">'+t.title+'</div>'+
+        '<div class="task-meta">'+({todo:'📋 待办',doing:'🔄 进行中',done:'✅ 已完成'}[t.status]||'')+
+          (t.dueDate?' · 📅 '+t.dueDate:'')+
+          (t.completedAt?' · ✅ '+t.completedAt:'')+
+          (t.note?' · 💬 '+t.note:'')+
+        '</div>'+
+      '</div>'+
+      (isParent?'<span class="parent-badge">👨‍👩‍👧</span>':'')+
+      (!isDone?'<button class="btn btn-sm btn-outline" style="font-size:10px;padding:3px 8px;" onclick="toggleTask(\''+t.id+'\')">✅</button>':
+        '<button class="btn btn-sm" style="font-size:10px;padding:3px 8px;background:#f0f0f0;" onclick="toggleTask(\''+t.id+'\')">↩</button>')+
+      '<button class="btn btn-sm btn-danger" style="font-size:10px;padding:3px 8px;" onclick="deleteTask(\''+t.id+'\')">🗑</button>'+
+    '</div>';
+  }).join('');
+
+  var sortedEvents=events.sort((a,b)=>(a.date||'').localeCompare(b.date||'')).slice(0,10);
+  $('eventList').innerHTML=sortedEvents.length===0?'<div class="empty">暂无日程</div>':sortedEvents.map(e=>{
+    return '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f5f5f5;">'+
+      '<span style="font-size:10px;color:var(--text-light);white-space:nowrap;">'+(e.date||'')+'</span>'+
+      '<span style="font-size:12px;flex:1;">'+e.title+(e.time?' '+e.time:'')+'</span>'+
+      (e.addedBy==='parent'?'<span class="parent-badge">👨‍👩‍👧</span>':'')+
+      '<button class="btn btn-sm btn-danger" style="font-size:9px;padding:2px 6px;" onclick="deleteEvent(\''+e.id+'\')">✕</button></div>';
+  }).join('');
+}
+
+// ==================== ACTIONS ====================
+function toggleTask(id) {
+  var t=tasks.find(t=>t.id===id); if(!t) return;
+  t.status=t.status==='done'?'todo':'done';
+  t.completedAt=t.status==='done'?today():null;
+  saveLocal(); syncToCloud(tasks,events); render();
+}
+
+function deleteTask(id) {
+  if(!confirm('确定删除此任务？')) return;
+  tasks=tasks.filter(t=>t.id!==id);
+  saveLocal(); syncToCloud(tasks,events); render();
+}
+
+function saveTask() {
+  tasks.push({
+    id:'pt'+Date.now(), title:$('tkTitle').value.trim(), category:$('tkCategory').value,
+    status:'todo', dueDate:$('tkDueDate').value, note:$('tkNote').value.trim(),
+    addedBy:'parent', completedAt:null,
+  });
+  if (!$('tkTitle').value.trim()) { toast('请填写任务标题'); return; }
+  saveLocal(); syncToCloud(tasks,events); render(); closeModal();
+  toast('✅ 任务已添加');
+}
+
+function deleteEvent(id) {
+  if(!confirm('确定删除？')) return;
+  events=events.filter(e=>e.id!==id);
+  saveLocal(); syncToCloud(tasks,events); render();
+}
+
+function saveEvent() {
+  events.push({
+    id:'pe'+Date.now(), title:$('evTitle').value.trim(), date:$('evDate').value,
+    time:$('evTime').value, type:$('evType').value, desc:$('evDesc').value.trim(), addedBy:'parent'
+  });
+  if (!$('evTitle').value.trim()||!$('evDate').value) { toast('请填写标题和日期'); return; }
+  saveLocal(); syncToCloud(tasks,events); render(); closeModal();
+  toast('✅ 日程已添加');
+}
+
+// ==================== INIT ====================
+async function initApp() {
+  // Load local first
+  loadLocal();
+  render();
+
+  // Try cloud sync
+  await initCloudBase();
+  if (cloudReady) {
+    var cloudData = await syncFromCloud();
+    if (cloudData && cloudData.tasks) {
+      // Merge: cloud data takes priority (newest wins)
+      tasks = cloudData.tasks || [];
+      events = cloudData.events || [];
+      saveLocal();
+      render();
+      toast('☁️ 已从云端同步数据');
+    }
+    // Push local to cloud
+    syncToCloud(tasks, events);
+
+    // Set up periodic sync
+    setInterval(async () => {
+      var cd = await syncFromCloud();
+      if (cd && cd.tasks && cd.updatedAt > (parseInt(localStorage.getItem('parent_last_sync')||'0'))) {
+        tasks = cd.tasks; events = cd.events;
+        saveLocal(); render();
+        localStorage.setItem('parent_last_sync', String(Date.now()));
+      }
+    }, 10000);
+  }
+}
+
+// Start
+buildNumpad();
+updateDots();
+</script>
+</body>
+</html>

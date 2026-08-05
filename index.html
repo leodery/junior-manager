@@ -3403,6 +3403,100 @@ function renderAll() {
   if ($('page-parent').classList.contains('active')) renderParentPage();
 }
 
+// ==================== CLOUDBASE SYNC（与家长端同步） ====================
+const CB_ENV = 'leoderyyang-d9gc0pfwpbdac9915';
+const CB_FAMILY_ID = localStorage.getItem('cb_family_id') || (function(){ var id='fam-'+Date.now().toString(36); localStorage.setItem('cb_family_id',id); return id; })();
+let cbReady = false, cbDb = null;
+
+(function initCloudSync() {
+  if (!window.cloudbase) {
+    var s = document.createElement('script');
+    s.src = 'https://static.cloudbase.net/cloudbase-js-sdk/latest/cloudbase.full.js';
+    s.async = true;
+    s.onload = doCloudInit;
+    s.onerror = function() {
+      var s2 = document.createElement('script');
+      s2.src = 'cloudbase.full.js';
+      s2.async = true;
+      s2.onload = doCloudInit;
+      document.head.appendChild(s2);
+    };
+    document.head.appendChild(s);
+    setTimeout(function() { if (!cbReady && window.cloudbase) doCloudInit(); }, 8000);
+  } else { doCloudInit(); }
+
+  async function doCloudInit() {
+    if (!window.cloudbase) return;
+    try {
+      var app = window.cloudbase.init({ env: CB_ENV });
+      cbDb = app.database();
+      await app.auth().signInAnonymously();
+      cbReady = true;
+      syncToCloud();
+      // Periodic pull from cloud (parent's changes)
+      setInterval(syncFromCloud, 15000);
+    } catch(e) { console.log('CloudBase sync not available:', e.message); }
+  }
+
+  async function syncToCloud() {
+    if (!cbReady || !cbDb) return;
+    DATA = loadData();
+    try {
+      var existing = await cbDb.collection('junior_data').where({ familyId: CB_FAMILY_ID }).get();
+      var doc = { familyId: CB_FAMILY_ID, tasks: DATA.tasks||[], events: DATA.events||[], updatedAt: Date.now() };
+      if (existing.data && existing.data.length) {
+        await cbDb.collection('junior_data').doc(existing.data[0]._id).update(doc);
+      } else {
+        await cbDb.collection('junior_data').add(doc);
+      }
+    } catch(e) {}
+  }
+
+  async function syncFromCloud() {
+    if (!cbReady || !cbDb) return;
+    try {
+      var res = await cbDb.collection('junior_data').where({ familyId: CB_FAMILY_ID }).get();
+      if (res.data && res.data.length) {
+        var cloud = res.data[0];
+        var lastSync = parseInt(localStorage.getItem('cb_last_sync')||'0');
+        if (cloud.updatedAt > lastSync) {
+          DATA = loadData();
+          // Merge: parent tasks/events that don't exist locally
+          var localTaskIds = new Set((DATA.tasks||[]).map(function(t){ return t.id; }));
+          var localEventIds = new Set((DATA.events||[]).map(function(e){ return e.id; }));
+          var newTasks = (cloud.tasks||[]).filter(function(t){ return !localTaskIds.has(t.id); });
+          var newEvents = (cloud.events||[]).filter(function(e){ return !localEventIds.has(e.id); });
+          if (newTasks.length || newEvents.length) {
+            DATA.tasks = (DATA.tasks||[]).concat(newTasks);
+            DATA.events = (DATA.events||[]).concat(newEvents);
+            saveData(DATA);
+            localStorage.setItem('cb_last_sync', String(cloud.updatedAt));
+            renderHome();
+            if ($('page-parent').classList.contains('active')) renderParentPage();
+            console.log('☁️ 同步了家长端数据: '+newTasks.length+'任务, '+newEvents.length+'日程');
+          }
+        }
+      }
+    } catch(e) {}
+  }
+
+  // Hook into saveData to push to cloud
+  var _originalSaveData = saveData;
+  saveData = function(d) {
+    _originalSaveData(d);
+    if (cbReady) {
+      var existing = cbDb.collection('junior_data').where({ familyId: CB_FAMILY_ID }).get().then(function(res) {
+        var doc = { familyId: CB_FAMILY_ID, tasks: d.tasks||[], events: d.events||[], updatedAt: Date.now() };
+        if (res.data && res.data.length) {
+          cbDb.collection('junior_data').doc(res.data[0]._id).update(doc);
+        } else {
+          cbDb.collection('junior_data').add(doc);
+        }
+      }).catch(function(){});
+    }
+  };
+})();
+
 // ==================== INIT ====================
 initCalendar();
 renderAll();
