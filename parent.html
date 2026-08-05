@@ -151,7 +151,9 @@ select.input { appearance:none; padding-right:32px; background-image:url("data:i
   <div class="card" style="text-align:center;">
     <button class="btn btn-sm" style="background:#f5f5f5;color:var(--text-light);font-size:11px;" onclick="changePin()">⚙️ 修改密码</button>
     <span style="font-size:10px;color:var(--text-lighter);margin-left:8px;">默认 0000</span>
-    <span style="display:block;margin-top:8px;font-size:10px;color:var(--text-lighter);">
+    <button class="btn btn-sm" style="background:#f5f5f5;color:var(--text-light);font-size:10px;" onclick="setFamilyId()">🔗 绑定孩子设备</button>
+    <span style="display:block;margin-top:6px;font-size:9px;color:var(--text-lighter);" id="famIdDisplay">家庭ID: ...</span>
+    <span style="display:block;margin-top:4px;font-size:10px;color:var(--text-lighter);">
       2026 <b>leodery</b> © 版权所有 · 家长端
     </span>
   </div>
@@ -226,6 +228,12 @@ function changePin() {
   var np=prompt('请输入新的4位数字密码：','');
   if (!np||!/^\d{4}$/.test(np)) { toast('请输入4位数字'); return; }
   setPin(np); toast('✅ 密码已更新');
+}
+function setFamilyId() {
+  var fid = prompt('输入孩子设备上的家庭ID来绑定：\n\n（在孩子App的底部家长页面可查看）', FAMILY_ID);
+  if (!fid) return;
+  localStorage.setItem('cb_family_id', fid);
+  toast('✅ 已绑定，刷新后生效'); setTimeout(function(){ location.reload(); },1000);
 }
 
 // ==================== HELPERS ====================
@@ -422,6 +430,9 @@ function saveEvent() {
 
 // ==================== INIT ====================
 async function initApp() {
+  // 显示家庭ID
+  var fd = document.getElementById('famIdDisplay');
+  if (fd) fd.textContent = '家庭ID: ' + FAMILY_ID.substring(0, 12) + '...';
   // 先加载本地缓存
   loadLocal();
   render();
