@@ -340,6 +340,28 @@ select.input { appearance: none; padding-right: 32px; background-image: url("dat
 /* Field highlight animation */
 @keyframes fieldFlash { 0% { background: #fff; } 50% { background: var(--blue-bg); } 100% { background: #fff; } }
 .field-filled { animation: fieldFlash 0.6s ease; }
+/* Parent mode */
+.parent-gate { position: fixed; inset: 0; z-index: 300; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); }
+.parent-gate.hidden { display: none; }
+.parent-gate-box { background: #fff; border-radius: 20px; padding: 28px 22px; width: 85%; max-width: 340px; text-align: center; box-shadow: var(--shadow-lg); }
+.parent-gate-box h3 { font-size: 18px; margin-bottom: 4px; }
+.parent-gate-box .sub { font-size: 12px; color: var(--text-light); margin-bottom: 16px; }
+.pin-dots { display: flex; gap: 10px; justify-content: center; margin-bottom: 16px; }
+.pin-dot { width: 44px; height: 52px; border-radius: 12px; border: 2px solid #E0E0E0; font-size: 24px; font-weight: 700; text-align: center; line-height: 48px; background: #FAFAFA; }
+.pin-dot.filled { border-color: var(--blue); background: #fff; }
+.pin-numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.pin-key { padding: 14px; border-radius: 14px; font-size: 20px; font-weight: 600; border: 1px solid #E8E8E8; background: #FAFAFA; cursor: pointer; font-family: var(--font); transition: all 0.15s; }
+.pin-key:active { background: var(--blue-bg); border-color: var(--blue); transform: scale(0.94); }
+.pin-key.del { font-size: 14px; color: var(--pink); }
+.pin-key.done { background: var(--blue); color: #fff; border-color: var(--blue); }
+.parent-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; background: #FFF0E6; color: #D4895A; margin-left: 4px; }
+.parent-section { border-left: 3px solid #FFB347; }
+.parent-card { position: relative; }
+.parent-card::after { content: '👨‍👩‍👧 家长'; position: absolute; top: 6px; right: 8px; font-size: 9px; color: #D4895A; background: #FFF0E6; padding: 2px 6px; border-radius: 8px; font-weight: 600; }
+.stat-bar-wrap { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+.stat-bar-label { font-size: 11px; width: 50px; text-align: right; color: var(--text-light); }
+.stat-bar-fill { flex: 1; height: 10px; background: #eee; border-radius: 5px; overflow: hidden; }
+.stat-bar-inner { height: 100%; border-radius: 5px; transition: width 0.5s; }
 /* Brand footer */
 .brand-footer {
   position: relative; width: 100%; max-width: 480px; margin: 0 auto;
@@ -635,6 +657,71 @@ select.input { appearance: none; padding-right: 32px; background-image: url("dat
   </div>
 </div>
 
+<!-- ==================== PAGE 5: 家长监督 ==================== -->
+<div class="page" id="page-parent">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+    <span style="font-size:28px;">👨‍👩‍👧</span>
+    <div>
+      <div class="section-title" style="margin-bottom:0;">家长监督</div>
+      <div class="section-sub" style="margin-bottom:0;">查看任务完成情况 · 添加任务与日程</div>
+    </div>
+  </div>
+
+  <!-- 完成率概览 -->
+  <div class="card">
+    <div class="card-title" style="margin-bottom:10px;">📊 任务完成概览</div>
+    <div class="stat-row" style="margin-bottom:10px;" id="parentStats"></div>
+    <div id="parentCompletionBars"></div>
+  </div>
+
+  <!-- 全部任务列表 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">📋 全部任务 (<span id="parentTaskTotal">0</span>)</span>
+      <div style="display:flex;gap:4px;">
+        <button class="btn btn-sm btn-outline" onclick="openParentTaskModal()">+ 加任务</button>
+        <button class="btn btn-sm btn-primary" onclick="openParentEventModal()">+ 加日程</button>
+      </div>
+    </div>
+    <div class="scroll-x" style="margin-bottom:8px;" id="parentTaskFilter">
+      <div class="sub-tab active" data-filter="all">全部</div>
+      <div class="sub-tab" data-filter="todo">📋 待办</div>
+      <div class="sub-tab" data-filter="doing">🔄 进行中</div>
+      <div class="sub-tab" data-filter="done">✅ 已完成</div>
+      <div class="sub-tab" data-filter="parent">👨‍👩‍👧 家长加的</div>
+    </div>
+    <div id="parentTaskList"></div>
+  </div>
+
+  <!-- 今日日程 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">📅 近期日程</span>
+    </div>
+    <div id="parentEventList"></div>
+  </div>
+
+  <!-- 修改PIN -->
+  <div class="card" style="text-align:center;">
+    <button class="btn btn-sm" style="background:#f5f5f5;color:var(--text-light);font-size:11px;" onclick="changeParentPin()">⚙️ 修改家长密码</button>
+    <span style="font-size:10px;color:var(--text-lighter);margin-left:6px;">默认0000</span>
+  </div>
+</div>
+
+<!-- ==================== PIN Gate ==================== -->
+<div class="parent-gate hidden" id="parentGate">
+  <div class="parent-gate-box">
+    <span style="font-size:40px;">👨‍👩‍👧</span>
+    <h3>家长验证</h3>
+    <p class="sub">请输入 4 位数字密码</p>
+    <div class="pin-dots" id="pinDots">
+      <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+    </div>
+    <div class="pin-numpad" id="pinNumpad"></div>
+    <button style="margin-top:12px;border:none;background:none;color:var(--text-lighter);font-size:11px;cursor:pointer;" onclick="closeParentGate()">取消</button>
+  </div>
+</div>
+
 <!-- ==================== PAGE 4: 复盘与素材库 ==================== -->
 <div class="page" id="page-review">
   <div class="sub-tabs" id="reviewSubTabs">
@@ -846,6 +933,35 @@ select.input { appearance: none; padding-right: 32px; background-image: url("dat
     <input class="input" id="ntTags" placeholder="标签（用逗号分隔）" style="margin-bottom:12px;">
     <button class="btn btn-primary" style="width:100%;" onclick="saveNote()">保存笔记</button>
   </div>
+
+  <!-- Parent Task Modal -->
+  <div class="modal" id="parentTaskModal" style="display:none;">
+    <span class="close-btn" onclick="closeModal()">✕</span>
+    <h3>👨‍👩‍👧 家长添加任务</h3>
+    <input class="input" id="ptkTitle" placeholder="任务标题" style="margin-bottom:6px;">
+    <select class="input" id="ptkCategory" style="margin-bottom:6px;">
+      <option value="course">📚 课程</option><option value="exam">📝 考试</option>
+      <option value="personal">🎯 个人</option><option value="life">🏠 生活</option>
+    </select>
+    <input class="input" type="date" id="ptkDueDate" style="margin-bottom:6px;">
+    <textarea class="input" id="ptkNote" placeholder="备注（如：每天背20个单词）" style="min-height:50px;margin-bottom:12px;"></textarea>
+    <button class="btn btn-primary" style="width:100%;" onclick="saveParentTask()">💾 保存（标记为家长添加）</button>
+  </div>
+
+  <!-- Parent Event Modal -->
+  <div class="modal" id="parentEventModal" style="display:none;">
+    <span class="close-btn" onclick="closeModal()">✕</span>
+    <h3>👨‍👩‍👧 家长添加日程</h3>
+    <input class="input" id="pevTitle" placeholder="事件标题" style="margin-bottom:6px;">
+    <input class="input" type="date" id="pevDate" style="margin-bottom:6px;">
+    <input class="input" type="time" id="pevTime" style="margin-bottom:6px;">
+    <select class="input" id="pevType" style="margin-bottom:6px;">
+      <option value="exam">🔵 考试</option><option value="homework">🟠 作业</option>
+      <option value="personal">🟢 个人任务</option><option value="life">⚪ 生活</option>
+    </select>
+    <textarea class="input" id="pevDesc" placeholder="备注（如：家长会）" style="min-height:50px;margin-bottom:12px;"></textarea>
+    <button class="btn btn-primary" style="width:100%;" onclick="saveParentEvent()">💾 保存（标记为家长添加）</button>
+  </div>
 </div>
 
 <!-- Check-in Prompt Dialog -->
@@ -895,6 +1011,9 @@ select.input { appearance: none; padding-right: 32px; background-image: url("dat
   </div>
   <div class="nav-item" data-page="review">
     <span class="icon">📝</span><span class="label">复盘</span>
+  </div>
+  <div class="nav-item" data-page="parent" style="opacity:0.6;">
+    <span class="icon" style="font-size:16px;">🔒</span><span class="label" style="font-size:9px;">家长</span>
   </div>
 </nav>
 
@@ -1001,6 +1120,20 @@ function closeModal() { $('modalOverlay').style.display = 'none'; $$('.modal').f
 // ==================== NAVIGATION ====================
 document.querySelectorAll('.nav-item').forEach(item => {
   item.addEventListener('click', () => {
+    // Parent tab requires PIN
+    if (item.dataset.page === 'parent') {
+      if (parentUnlocked) {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        $('page-parent').classList.add('active');
+        renderParentPage();
+      } else {
+        openParentGate();
+      }
+      return;
+    }
+    parentUnlocked = false; // lock when switching away
     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
     item.classList.add('active');
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -3026,12 +3159,248 @@ function importData(e) {
 }
 
 // ==================== RENDER ALL ====================
+// ==================== PARENT MODE ====================
+function getParentPin() { return localStorage.getItem('parent_pin') || '0000'; }
+function setParentPin(pin) { localStorage.setItem('parent_pin', pin); }
+let pinInput = '';
+let parentUnlocked = false;
+
+function openParentGate() {
+  pinInput = ''; updatePinDots(); $('parentGate').classList.remove('hidden');
+  buildNumpad();
+}
+function closeParentGate() { pinInput = ''; updatePinDots(); $('parentGate').classList.add('hidden'); }
+function updatePinDots() {
+  var dots = document.querySelectorAll('#pinDots .pin-dot');
+  for (var i = 0; i < 4; i++) {
+    dots[i].classList.toggle('filled', i < pinInput.length);
+    dots[i].textContent = pinInput[i] || '';
+  }
+}
+function buildNumpad() {
+  var pad = $('pinNumpad');
+  var keys = ['1','2','3','4','5','6','7','8','9','清除','0','确认'];
+  pad.innerHTML = keys.map(function(k) {
+    var cls = 'pin-key';
+    if (k === '清除') cls += ' del';
+    if (k === '确认') cls += ' done';
+    return '<button class="' + cls + '" onclick="pinKeyPress(\'' + k + '\')">' + k + '</button>';
+  }).join('');
+}
+function pinKeyPress(key) {
+  if (key === '清除') { pinInput = pinInput.slice(0, -1); updatePinDots(); return; }
+  if (key === '确认') { verifyPin(); return; }
+  if (pinInput.length >= 4) return;
+  pinInput += key; updatePinDots();
+  if (pinInput.length === 4) { setTimeout(verifyPin, 200); }
+}
+function verifyPin() {
+  if (pinInput === getParentPin()) {
+    parentUnlocked = true; closeParentGate();
+    document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+    $('page-parent').classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(function(i) { i.classList.remove('active'); });
+    document.querySelector('.nav-item[data-page="parent"]').classList.add('active');
+    renderParentPage();
+    showToast('👨‍👩‍👧 家长模式已解锁');
+  } else if (pinInput.length === 4) {
+    showToast('❌ 密码错误');
+    pinInput = ''; updatePinDots();
+  }
+}
+function changeParentPin() {
+  var np = prompt('请输入新的4位数字密码：', '');
+  if (!np || !/^\d{4}$/.test(np)) { showToast('请输入4位数字'); return; }
+  setParentPin(np); showToast('✅ 密码已更新为 ' + np);
+}
+
+// Parent page rendering
+function renderParentPage() {
+  DATA = loadData();
+  var tasks = DATA.tasks || [];
+  var events = DATA.events || [];
+  var todo = tasks.filter(function(t) { return t.status === 'todo'; }).length;
+  var doing = tasks.filter(function(t) { return t.status === 'doing'; }).length;
+  var done = tasks.filter(function(t) { return t.status === 'done'; }).length;
+  var total = tasks.length || 1;
+  var parentTasks = tasks.filter(function(t) { return t.addedBy === 'parent'; });
+
+  // Stats
+  $('parentStats').innerHTML =
+    '<div class="stat-card"><div class="stat-val" style="color:var(--pink);">' + (total-1<0?0:total) + '</div><div class="stat-label">总任务</div></div>' +
+    '<div class="stat-card"><div class="stat-val" style="color:var(--mint);">' + done + '</div><div class="stat-label">已完成</div></div>' +
+    '<div class="stat-card"><div class="stat-val" style="color:#FFB347;">' + Math.round(done/total*100) + '%</div><div class="stat-label">完成率</div></div>' +
+    '<div class="stat-card"><div class="stat-val" style="color:#D4895A;">' + parentTasks.length + '</div><div class="stat-label">家长加的</div></div>';
+
+  // Completion bars by category
+  var cats = ['course','exam','personal','life'];
+  var catLabels = {course:'📚 课程', exam:'📝 考试', personal:'🎯 个人', life:'🏠 生活'};
+  var catColors = ['var(--blue)','var(--pink)','var(--mint)','#D0D0D0'];
+  $('parentCompletionBars').innerHTML = cats.map(function(cat, i) {
+    var catTasks = tasks.filter(function(t) { return t.category === cat; });
+    var catDone = catTasks.filter(function(t) { return t.status === 'done'; }).length;
+    var pct = catTasks.length ? Math.round(catDone/catTasks.length*100) : 0;
+    return '<div class="stat-bar-wrap">' +
+      '<span class="stat-bar-label">' + catLabels[cat] + '</span>' +
+      '<div class="stat-bar-fill"><div class="stat-bar-inner" style="width:' + pct + '%;background:' + catColors[i] + ';"></div></div>' +
+      '<span style="font-size:11px;width:36px;color:var(--text-light);">' + pct + '%</span></div>';
+  }).join('');
+
+  // Task list with filter
+  renderParentTaskList('all');
+
+  // Recent events
+  var recentEvents = (events || []).sort(function(a,b) { return (a.date||'').localeCompare(b.date||''); }).slice(0, 8);
+  $('parentEventList').innerHTML = recentEvents.length === 0
+    ? '<div class="empty"><div class="empty-icon">📅</div>暂无日程</div>'
+    : recentEvents.map(function(e) {
+        var isParent = e.addedBy === 'parent';
+        return '<div style="padding:8px 0;border-bottom:1px solid #f5f5f5;display:flex;align-items:center;gap:8px;">' +
+          '<span style="font-size:11px;color:var(--text-light);white-space:nowrap;">' + (e.date||'') + '</span>' +
+          '<span style="font-size:13px;flex:1;">' + e.title + '</span>' +
+          (isParent ? '<span class="parent-badge">👨‍👩‍👧 家长</span>' : '') +
+          '<button class="btn btn-sm btn-danger" style="font-size:9px;padding:2px 6px;" onclick="deleteParentEvent(\'' + e.id + '\')">✕</button>' +
+          '</div>';
+      }).join('');
+
+  $('parentTaskTotal').textContent = total;
+}
+
+var parentFilter = 'all';
+function renderParentTaskList(filter) {
+  parentFilter = filter || 'all';
+  DATA = loadData();
+  var tasks = DATA.tasks || [];
+  var filtered = tasks;
+  if (parentFilter === 'todo') filtered = tasks.filter(function(t) { return t.status === 'todo'; });
+  else if (parentFilter === 'doing') filtered = tasks.filter(function(t) { return t.status === 'doing'; });
+  else if (parentFilter === 'done') filtered = tasks.filter(function(t) { return t.status === 'done'; });
+  else if (parentFilter === 'parent') filtered = tasks.filter(function(t) { return t.addedBy === 'parent'; });
+
+  var filterEl = $('parentTaskFilter');
+  if (filterEl) {
+    filterEl.querySelectorAll('.sub-tab').forEach(function(t) { t.classList.remove('active'); });
+    var activeTab = filterEl.querySelector('.sub-tab[data-filter="' + parentFilter + '"]');
+    if (activeTab) activeTab.classList.add('active');
+  }
+
+  $('parentTaskList').innerHTML = filtered.length === 0
+    ? '<div class="empty" style="font-size:12px;">暂无任务</div>'
+    : filtered.map(function(t) {
+        var isDone = t.status === 'done';
+        var isParent = t.addedBy === 'parent';
+        var statusLabel = {todo:'📋 待办', doing:'🔄 进行中', done:'✅ 已完成'};
+        var catLabel = {course:'📚', exam:'📝', personal:'🎯', life:'🏠'};
+        return '<div style="padding:10px;margin-bottom:6px;background:#fff;border-radius:10px;border:1px solid #f0f0f0;' + (isParent?'border-left:3px solid #FFB347;':'') + '">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+            '<span style="font-weight:500;font-size:13px;' + (isDone?'text-decoration:line-through;color:#aaa;':'') + '">' + (catLabel[t.category]||'') + ' ' + t.title + '</span>' +
+            (isParent ? '<span class="parent-badge">👨‍👩‍👧 家长</span>' : '') +
+          '</div>' +
+          '<div style="font-size:10px;color:var(--text-light);margin-top:2px;">' + (statusLabel[t.status]||t.status) +
+            (t.dueDate ? ' · 📅 ' + t.dueDate : '') +
+            (t.completedAt ? ' · ✅ ' + t.completedAt : '') +
+            (t.photo ? ' · 📸 有照片' : '') +
+          '</div>' +
+          (t.note ? '<div style="font-size:11px;color:var(--text-light);margin-top:2px;font-style:italic;">💬 ' + t.note + '</div>' : '') +
+          '<div style="margin-top:6px;display:flex;gap:4px;">' +
+            (!isDone ? '<button class="btn btn-sm btn-mint" style="font-size:10px;padding:2px 8px;" onclick="parentToggleTask(\'' + t.id + '\')">✅ 标记完成</button>' : '<button class="btn btn-sm" style="font-size:10px;padding:2px 8px;background:#f0f0f0;" onclick="parentToggleTask(\'' + t.id + '\')">↩ 恢复</button>') +
+            '<button class="btn btn-sm btn-danger" style="font-size:10px;padding:2px 8px;" onclick="parentDeleteTask(\'' + t.id + '\')">🗑</button>' +
+          '</div></div>';
+      }).join('');
+
+  // Bind filter clicks
+  if (filterEl) {
+    filterEl.querySelectorAll('.sub-tab').forEach(function(tab) {
+      tab.onclick = function() { renderParentTaskList(this.dataset.filter); };
+    });
+  }
+}
+
+function parentToggleTask(id) {
+  DATA = loadData();
+  var tk = DATA.tasks.find(function(t) { return t.id === id; });
+  if (!tk) return;
+  tk.status = tk.status === 'done' ? 'todo' : 'done';
+  if (tk.status === 'done') tk.completedAt = today();
+  else tk.completedAt = null;
+  saveData(DATA);
+  renderParentTaskList(parentFilter);
+  renderParentPage();
+  if (tk.status === 'done') spawnConfetti();
+}
+
+function parentDeleteTask(id) {
+  if (!confirm('确定删除此任务？')) return;
+  DATA = loadData();
+  DATA.tasks = DATA.tasks.filter(function(t) { return t.id !== id; });
+  saveData(DATA);
+  renderParentTaskList(parentFilter);
+  renderParentPage();
+  showToast('已删除');
+}
+
+function openParentTaskModal() { openModal('parentTaskModal'); }
+function openParentEventModal() { openModal('parentEventModal'); }
+
+function saveParentTask() {
+  DATA = loadData();
+  var tk = {
+    id: 'pt' + Date.now(),
+    title: $('ptkTitle').value.trim(),
+    category: $('ptkCategory').value,
+    status: 'todo',
+    pomodoroCount: 0, pomodoroGoal: 0,
+    dueDate: $('ptkDueDate').value,
+    note: $('ptkNote').value.trim(),
+    addedBy: 'parent',
+    completedAt: null, photo: null,
+  };
+  if (!tk.title) { showToast('请填写任务标题'); return; }
+  DATA.tasks.push(tk);
+  saveData(DATA);
+  closeModal();
+  renderParentPage();
+  showToast('✅ 家长任务已添加');
+}
+
+function saveParentEvent() {
+  DATA = loadData();
+  var ev = {
+    id: 'pe' + Date.now(),
+    title: $('pevTitle').value.trim(),
+    date: $('pevDate').value,
+    time: $('pevTime').value,
+    type: $('pevType').value,
+    category: 'main',
+    desc: $('pevDesc').value.trim(),
+    addedBy: 'parent',
+  };
+  if (!ev.title || !ev.date) { showToast('请填写标题和日期'); return; }
+  DATA.events.push(ev);
+  saveData(DATA);
+  closeModal();
+  renderParentPage();
+  renderHome(); renderCalendar();
+  showToast('✅ 家长日程已添加');
+}
+
+function deleteParentEvent(id) {
+  if (!confirm('确定删除此日程？')) return;
+  DATA = loadData();
+  DATA.events = DATA.events.filter(function(e) { return e.id !== id; });
+  saveData(DATA);
+  renderParentPage();
+  renderHome(); renderCalendar();
+  showToast('已删除');
+}
+
 function renderAll() {
   renderHome();
   if ($('page-schedule').classList.contains('active')) renderCalendar();
   if ($('page-tasks').classList.contains('active')) { renderKanban(); renderFinance(); renderPieChart(); }
   if ($('page-study').classList.contains('active')) renderStudyProgress();
   if ($('page-review').classList.contains('active')) loadReflection();
+  if ($('page-parent').classList.contains('active')) renderParentPage();
 }
 
 // ==================== INIT ====================
