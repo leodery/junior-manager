@@ -1,0 +1,3023 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="初中全能管家">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23A8D8EA' width='100' height='100' rx='20'/><text x='50' y='65' text-anchor='middle' font-size='45'>🌟</text></svg>">
+<title>我的初中全能管家</title>
+<style>
+:root {
+  --blue: #A8D8EA; --blue-light: #C5E8F7; --blue-bg: #EEF7FB;
+  --pink: #FFB7B2; --pink-light: #FFD1DC; --pink-bg: #FFF0F3;
+  --yellow: #FFF1C1; --yellow-light: #FFF8E1; --yellow-bg: #FFFDF5;
+  --mint: #B5EAD7; --mint-light: #D4F5E8; --mint-bg: #F0FBF7;
+  --lavender: #C7CEEA; --lavender-light: #E0E4F5; --lavender-bg: #F5F6FC;
+  --white: #FFFFFF; --bg: #F5F3F0; --card: #FFFFFF;
+  --text: #4A4A4A; --text-light: #8A8A8A; --text-lighter: #B0B0B0;
+  --shadow: 0 2px 12px rgba(0,0,0,0.06); --shadow-lg: 0 4px 24px rgba(0,0,0,0.1);
+  --radius: 16px; --radius-sm: 10px; --radius-xs: 8px;
+  --nav-height: 72px; --safe-bottom: env(safe-area-inset-bottom, 16px);
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 16px; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: var(--font); background: var(--bg); color: var(--text);
+  max-width: 480px; margin: 0 auto; min-height: 100vh; min-height: 100dvh;
+  overflow-x: hidden; position: relative; padding-bottom: calc(var(--nav-height) + var(--safe-bottom) + 12px);
+  -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none;
+}
+/* Nav Bar */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 480px; height: calc(var(--nav-height) + var(--safe-bottom));
+  background: rgba(255,255,255,0.82); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(0,0,0,0.06); display: flex; padding-bottom: var(--safe-bottom);
+  z-index: 100; border-radius: 20px 20px 0 0;
+}
+.nav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; cursor: pointer; transition: all 0.2s; position: relative; -webkit-tap-highlight-color: transparent;
+}
+.nav-item .icon { font-size: 22px; transition: transform 0.2s; }
+.nav-item .label { font-size: 10px; color: var(--text-light); font-weight: 500; transition: color 0.2s; }
+.nav-item.active .label { color: var(--text); font-weight: 600; }
+.nav-item.active .icon { transform: scale(1.15); }
+.nav-item.active::before {
+  content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 24px; height: 3px; border-radius: 0 0 3px 3px; background: var(--blue);
+}
+/* Pages */
+.page { display: none; padding: 16px 14px; animation: fadeIn 0.3s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes confetti { 0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(-120px) rotate(720deg)} }
+@keyframes popIn { 0%{transform:scale(0.8);opacity:0}60%{transform:scale(1.05)}100%{transform:scale(1);opacity:1} }
+/* Cards */
+.card { background: var(--card); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); margin-bottom: 12px; }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.card-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.badge { font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+.badge-blue { background: var(--blue-bg); color: #5B9BD5; }
+.badge-pink { background: var(--pink-bg); color: #E88B85; }
+.badge-yellow { background: var(--yellow); color: #C9A030; }
+.badge-mint { background: var(--mint-bg); color: #5BAA8A; }
+.badge-gray { background: #F0F0F0; color: #888; }
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 4px; padding: 8px 16px; border-radius: 20px;
+  font-size: 13px; font-weight: 500; border: none; cursor: pointer; transition: all 0.2s; font-family: var(--font);
+}
+.btn-primary { background: var(--blue); color: #fff; }
+.btn-primary:active { background: #8DC8DD; transform: scale(0.96); }
+.btn-sm { padding: 5px 12px; font-size: 11px; border-radius: 14px; }
+.btn-outline { background: transparent; border: 1.5px solid var(--blue); color: #5B9BD5; }
+.btn-danger { background: var(--pink); color: #fff; }
+.btn-danger:active { background: #F0A09B; }
+.btn-mint { background: var(--mint); color: #3A7D5F; }
+/* Input */
+.input {
+  width: 100%; padding: 10px 14px; border: 1.5px solid #E8E8E8; border-radius: var(--radius-xs);
+  font-size: 14px; font-family: var(--font); background: #FAFAFA; transition: border 0.2s;
+}
+.input:focus { outline: none; border-color: var(--blue); background: #fff; }
+select.input { appearance: none; padding-right: 32px; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888'%3e%3cpath d='M6 8L1 3h10z'/%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; }
+/* Modal */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.35);
+  z-index: 200; display: flex; align-items: flex-end; justify-content: center;
+}
+.modal {
+  background: #fff; width: 100%; max-width: 480px; border-radius: 20px 20px 0 0;
+  padding: 20px 16px 32px; max-height: 80vh; overflow-y: auto; animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal h3 { font-size: 17px; margin-bottom: 16px; text-align: center; }
+.modal .close-btn { position: absolute; right: 16px; top: 16px; font-size: 24px; cursor: pointer; color: #999; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+/* Checkbox */
+.checkbox-wrap { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 4px 0; }
+.checkbox-wrap input[type="checkbox"] { display: none; }
+.check-circle {
+  width: 22px; height: 22px; border-radius: 50%; border: 2px solid #D0D0D0; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; transition: all 0.3s; font-size: 12px; color: #fff;
+}
+.checkbox-wrap input:checked + .check-circle { background: var(--mint); border-color: var(--mint); animation: popIn 0.3s; }
+.checkbox-wrap input:checked ~ .check-label { text-decoration: line-through; color: #B0B0B0; }
+/* Timeline */
+.timeline { position: relative; padding-left: 28px; }
+.timeline::before { content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 2px; background: #E8E8E8; }
+.tl-item { position: relative; margin-bottom: 16px; padding: 12px; background: #FAFAFA; border-radius: var(--radius-sm); }
+.tl-item::before { content: ''; position: absolute; left: -22px; top: 16px; width: 10px; height: 10px; border-radius: 50%; background: var(--blue); border: 2px solid #fff; box-shadow: 0 0 0 2px var(--blue); }
+.tl-item.exam::before { background: var(--blue); box-shadow: 0 0 0 2px var(--blue); }
+.tl-item.homework::before { background: #FFB347; box-shadow: 0 0 0 2px #FFB347; }
+.tl-item.personal::before { background: var(--mint); box-shadow: 0 0 0 2px var(--mint); }
+.tl-item.life::before { background: #C0C0C0; box-shadow: 0 0 0 2px #C0C0C0; }
+.tl-time { font-size: 11px; color: var(--text-light); font-weight: 500; }
+.tl-title { font-size: 14px; font-weight: 600; margin: 2px 0; }
+.tl-desc { font-size: 12px; color: var(--text-light); }
+/* Progress */
+.progress-bar { height: 8px; background: #EEEEEE; border-radius: 4px; overflow: hidden; margin: 4px 0; }
+.progress-fill { height: 100%; border-radius: 4px; transition: width 0.5s; background: var(--blue); }
+.progress-fill.pink { background: var(--pink); }
+.progress-fill.mint { background: var(--mint); }
+.progress-fill.yellow { background: #FFD166; }
+/* Confetti */
+.confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 300; }
+.confetti-piece { position: absolute; width: 10px; height: 10px; border-radius: 2px; animation: confetti 1.2s ease-out forwards; }
+/* Pomodoro */
+.pomodoro-ring { width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; margin: 0 auto; }
+.pomodoro-ring svg { transform: rotate(-90deg); }
+.pomodoro-ring .time-text { position: absolute; font-size: 22px; font-weight: 700; }
+/* Tabs */
+.sub-tabs { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.sub-tabs::-webkit-scrollbar { display: none; }
+.sub-tab {
+  padding: 6px 14px; border-radius: 20px; font-size: 12px; white-space: nowrap; cursor: pointer;
+  background: #F0F0F0; color: var(--text-light); font-weight: 500; transition: all 0.2s;
+}
+.sub-tab.active { background: var(--blue); color: #fff; }
+/* Kanban */
+.kanban-col { background: #FAFAFA; border-radius: var(--radius-sm); padding: 10px; min-height: 120px; margin-bottom: 10px; }
+.kanban-title { font-size: 12px; font-weight: 600; color: var(--text-light); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+.kanban-card { background: #fff; padding: 10px 12px; border-radius: var(--radius-xs); margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: grab; font-size: 13px; border-left: 3px solid transparent; }
+.kanban-card:active { cursor: grabbing; }
+.kanban-card.course { border-left-color: var(--blue); }
+.kanban-card.exam { border-left-color: var(--pink); }
+.kanban-card.personal { border-left-color: var(--mint); }
+.kanban-card.life { border-left-color: #D0D0D0; }
+.kanban-card .kc-title { font-weight: 500; margin-bottom: 4px; }
+.kanban-card .kc-meta { font-size: 10px; color: var(--text-lighter); display: flex; gap: 8px; }
+/* Pie chart */
+.pie-wrap { display: flex; align-items: center; gap: 20px; justify-content: center; }
+.pie-legend { display: flex; flex-direction: column; gap: 6px; }
+.pie-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+.pie-legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+/* Quiz */
+.quiz-card { background: #FAFAFA; border-radius: var(--radius-sm); padding: 16px; margin-bottom: 10px; }
+.quiz-option { display: block; padding: 10px 14px; margin: 6px 0; border-radius: var(--radius-xs); border: 1.5px solid #E8E8E8; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+.quiz-option:active { background: #F0F0F0; }
+.quiz-option.selected { border-color: var(--blue); background: var(--blue-bg); }
+.quiz-option.correct { border-color: var(--mint); background: var(--mint-bg); }
+.quiz-option.wrong { border-color: var(--pink); background: var(--pink-bg); }
+/* Reflection grid */
+.reflect-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.reflect-box { background: #FAFAFA; border-radius: var(--radius-sm); padding: 12px; min-height: 80px; }
+.reflect-box .rb-title { font-size: 11px; font-weight: 600; color: var(--text-light); margin-bottom: 6px; }
+.reflect-box textarea { width: 100%; border: none; background: transparent; font-size: 13px; font-family: var(--font); resize: none; outline: none; min-height: 50px; }
+/* Countdown */
+.countdown-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F0F0F0; }
+.countdown-item:last-child { border-bottom: none; }
+.cd-icon { font-size: 28px; flex-shrink: 0; }
+.cd-info { flex: 1; }
+.cd-name { font-size: 13px; font-weight: 500; }
+.cd-days { font-size: 20px; font-weight: 700; color: var(--pink); }
+/* Toast */
+.toast {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #333; color: #fff;
+  padding: 10px 20px; border-radius: 20px; font-size: 13px; z-index: 400; animation: toastIn 0.3s ease;
+  pointer-events: none;
+}
+@keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(-10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+/* Scrollable x */
+.scroll-x { display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 4px; }
+.scroll-x::-webkit-scrollbar { display: none; }
+/* Stat card */
+.stat-row { display: flex; gap: 8px; }
+.stat-card { flex: 1; background: #FAFAFA; border-radius: var(--radius-sm); padding: 12px; text-align: center; }
+.stat-card .stat-val { font-size: 24px; font-weight: 700; }
+.stat-card .stat-label { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+/* Tag */
+.tag { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 10px; margin: 2px; }
+/* DDL warn */
+.ddl-warn { padding: 8px 12px; border-radius: var(--radius-xs); font-size: 12px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.ddl-warn.urgent { background: #FFF0F0; border-left: 3px solid #FF6B6B; }
+.ddl-warn.soon { background: #FFF8ED; border-left: 3px solid #FFB347; }
+.ddl-warn.normal { background: #F0F7FF; border-left: 3px solid var(--blue); }
+/* Empty state */
+.empty { text-align: center; padding: 32px 16px; color: var(--text-lighter); }
+.empty .empty-icon { font-size: 40px; margin-bottom: 8px; }
+/* Word card */
+.word-card { background: linear-gradient(135deg, var(--yellow-light), #fff); padding: 16px; border-radius: var(--radius-sm); margin-bottom: 8px; cursor: pointer; }
+.word-card .word-front { font-size: 22px; font-weight: 700; }
+.word-card .word-back { font-size: 14px; color: var(--text-light); margin-top: 4px; display: none; }
+.word-card.flipped .word-back { display: block; }
+.word-card.flipped .word-front { font-size: 16px; }
+/* Month calendar */
+.cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.cal-header .month-label { font-size: 16px; font-weight: 700; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; }
+.cal-day-name { font-size: 10px; color: var(--text-lighter); padding: 4px 0; }
+.cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 13px; border-radius: 50%; cursor: pointer; position: relative; }
+.cal-day.today { background: var(--blue); color: #fff; font-weight: 600; }
+.cal-day.has-event::after { content: ''; position: absolute; bottom: 2px; width: 4px; height: 4px; border-radius: 50%; background: var(--pink); }
+.cal-day.other-month { color: #D0D0D0; }
+/* Section title */
+.section-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.section-sub { font-size: 12px; color: var(--text-light); margin-bottom: 14px; }
+
+/* Camera check-in */
+.camera-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 50%; background: #F5F5F5;
+  font-size: 16px; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+  border: 1.5px dashed #D0D0D0;
+}
+.camera-btn:active { background: var(--blue-bg); border-color: var(--blue); transform: scale(0.9); }
+.camera-btn.has-photo { border-style: solid; border-color: var(--mint); background: var(--mint-bg); }
+/* Photo thumbnail */
+.photo-thumb {
+  width: 44px; height: 44px; border-radius: 10px; object-fit: cover; flex-shrink: 0;
+  border: 1.5px solid #E8E8E8; cursor: pointer; transition: transform 0.2s;
+}
+.photo-thumb:active { transform: scale(1.15); }
+/* Task row */
+.task-row {
+  display: flex; align-items: center; gap: 8px; padding: 6px 0;
+  border-bottom: 1px solid #F8F8F8; transition: background 0.2s;
+}
+.task-row:last-child { border-bottom: none; }
+.task-row.done { background: #FAFFFB; border-radius: var(--radius-xs); padding: 6px 4px; }
+.task-row .check-label { flex: 1; font-size: 13px; min-width: 0; }
+.task-row .task-actions { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
+/* Completion stamp */
+.completion-stamp {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%) rotate(-15deg);
+  font-size: 48px; pointer-events: none; z-index: 50; animation: stampIn 0.5s ease-out;
+  opacity: 0.9;
+}
+@keyframes stampIn {
+  0% { transform: translate(-50%,-50%) rotate(-15deg) scale(3); opacity: 0; }
+  60% { transform: translate(-50%,-50%) rotate(-15deg) scale(0.9); opacity: 1; }
+  100% { transform: translate(-50%,-50%) rotate(-15deg) scale(1); opacity: 0.85; }
+}
+/* Photo modal */
+.photo-modal-img {
+  width: 100%; border-radius: var(--radius); margin-bottom: 12px;
+}
+.photo-meta { font-size: 12px; color: var(--text-light); text-align: center; }
+/* Check-in prompt */
+.checkin-prompt {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5); z-index: 250; display: flex; align-items: center; justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+.checkin-dialog {
+  background: #fff; border-radius: 20px; padding: 24px 20px; width: 85%; max-width: 360px;
+  text-align: center; box-shadow: var(--shadow-lg);
+}
+.checkin-dialog h4 { font-size: 16px; margin-bottom: 6px; }
+.checkin-dialog p { font-size: 12px; color: var(--text-light); margin-bottom: 16px; }
+.checkin-dialog .btn-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.checkin-dialog .btn-big {
+  padding: 12px 24px; border-radius: 16px; font-size: 14px; font-weight: 600;
+  border: none; cursor: pointer; font-family: var(--font); transition: all 0.2s;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.checkin-dialog .btn-big .emoji { font-size: 28px; }
+.checkin-dialog .btn-big:active { transform: scale(0.94); }
+.btn-big-check { background: var(--mint); color: #3A7D5F; }
+.btn-big-photo { background: var(--blue-bg); color: #5B9BD5; }
+.btn-big-cancel { background: #F5F5F5; color: #888; }
+/* Check circle larger */
+.check-circle-lg {
+  width: 28px; height: 28px; border-radius: 50%; border: 2.5px solid #D0D0D0; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; transition: all 0.3s; font-size: 14px; color: #fff;
+  cursor: pointer;
+}
+.check-circle-lg.checked { background: var(--mint); border-color: var(--mint); animation: popIn 0.3s; }
+/* Wrong book enhanced */
+.wb-card { background: #fff; border-radius: var(--radius-sm); padding: 12px; margin-bottom: 8px; border-left: 4px solid var(--pink); position: relative; }
+.wb-card.reviewed { opacity: 0.7; border-left-color: var(--mint); }
+.wb-card .wb-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+.wb-card .wb-subject { font-size: 11px; font-weight: 600; }
+.wb-card .wb-question { font-size: 13px; font-weight: 500; margin: 6px 0; }
+.wb-card .wb-answer { font-size: 12px; color: var(--mint); margin-bottom: 4px; }
+.wb-card .wb-tags { display: flex; gap: 4px; flex-wrap: wrap; margin: 6px 0; }
+.wb-card .wb-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.wb-card .difficulty-stars { font-size: 11px; }
+/* AI explanation */
+.ai-section { margin-bottom: 10px; }
+.ai-section h5 { font-size: 13px; margin-bottom: 4px; color: #6B7DB3; }
+.ai-section p, .ai-section li { font-size: 12px; line-height: 1.6; color: var(--text); }
+.ai-section ul { padding-left: 16px; }
+.ai-section .step { background: #fff; padding: 8px 10px; border-radius: 8px; margin: 4px 0; border: 1px solid #E8E8F0; }
+.ai-explanation-tabs { display: flex; gap: 4px; margin-bottom: 10px; }
+.ai-tab { padding: 5px 10px; border-radius: 12px; font-size: 11px; cursor: pointer; background: #F0F0F5; border: none; font-family: var(--font); }
+.ai-tab.active { background: var(--lavender); color: #4A5599; font-weight: 600; }
+/* Loading spinner */
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #ddd; border-top-color: var(--blue); border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: middle; margin-right: 4px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+/* API key input */
+.api-key-row { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; }
+.api-key-row input { flex: 1; font-size: 11px; padding: 6px 10px; border-radius: 14px; border: 1px solid #E0E0E0; font-family: var(--font); }
+.api-key-row input:focus { outline: none; border-color: var(--lavender); }
+/* Similar quiz */
+.similar-quiz .quiz-card { background: #fff; }
+.similar-badge { display: inline-block; background: var(--blue); color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 10px; margin-bottom: 6px; }
+/* Knowledge tag */
+.k-tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; background: #F0F0F5; color: #6B6B6B; cursor: pointer; }
+.k-tag.selected { background: var(--lavender); color: #4A5599; font-weight: 600; }
+/* Scroll to card highlight */
+@keyframes highlightPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(168,216,234,0.5); } 50% { box-shadow: 0 0 0 8px rgba(168,216,234,0); } }
+.highlight-pulse { animation: highlightPulse 1.5s ease-in-out 3; }
+/* OCR & Smart toolbar */
+.smart-toolbar { display: flex; gap: 8px; margin-bottom: 10px; }
+.smart-btn { flex: 1; padding: 10px; border-radius: 14px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; font-family: var(--font); transition: all 0.2s; text-align: center; }
+.smart-btn:active { transform: scale(0.95); }
+.smart-btn-ocr { background: linear-gradient(135deg, #FFD1DC, #FFB7B2); color: #C06060; }
+.smart-btn-classify { background: linear-gradient(135deg, #E0E4F5, #C7CEEA); color: #4A5599; }
+.smart-btn-loading { opacity: 0.7; pointer-events: none; }
+.img-preview-wrap { position: relative; margin-bottom: 10px; text-align: center; border-radius: 12px; overflow: hidden; background: #F5F5F5; }
+.img-preview-wrap img { max-height: 200px; max-width: 100%; object-fit: contain; }
+.img-preview-wrap .clear-img { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.5); color: #fff; border: none; width: 28px; height: 28px; border-radius: 50%; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.ocr-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; }
+.ocr-badge.ok { background: var(--mint-bg); color: #3A7D5F; }
+.ocr-badge.loading { background: var(--blue-bg); color: #5B9BD5; }
+.ocr-badge.error { background: var(--pink-bg); color: #C06060; }
+/* Field highlight animation */
+@keyframes fieldFlash { 0% { background: #fff; } 50% { background: var(--blue-bg); } 100% { background: #fff; } }
+.field-filled { animation: fieldFlash 0.6s ease; }
+</style>
+</head>
+<body>
+
+<!-- Toast -->
+<div id="toast" class="toast" style="display:none"></div>
+
+<!-- Confetti Container -->
+<div id="confettiContainer" class="confetti-container"></div>
+
+<!-- ==================== PAGE 0: 首页 (今日聚焦) ==================== -->
+<div class="page active" id="page-home">
+  <div class="section-title" id="greetingText">👋 早上好！</div>
+  <div class="section-sub" id="dateText"></div>
+
+  <!-- 今日日程 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">📋 今日日程时间轴</span>
+      <button class="btn btn-sm btn-outline" onclick="openModal('eventModal')">+ 添加</button>
+    </div>
+    <div class="timeline" id="todayTimeline"></div>
+  </div>
+
+  <!-- 游戏任务式展示 -->
+  <div class="card" style="background: linear-gradient(135deg, #FFFDF5, #FFFAF0);">
+    <div class="card-header">
+      <span class="card-title">🎯 主线任务</span>
+      <span class="badge badge-pink" id="mainTaskCount">0/0</span>
+    </div>
+    <div id="mainQuestList"></div>
+  </div>
+  <div class="card" style="background: linear-gradient(135deg, #F5F6FC, #F0F4FF);">
+    <div class="card-header">
+      <span class="card-title">🌿 支线任务</span>
+      <span class="badge badge-blue" id="sideQuestCount">0/0</span>
+    </div>
+    <div id="sideQuestList"></div>
+  </div>
+
+  <!-- 倒计时 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">⏳ 最近倒计时</span>
+      <button class="btn btn-sm btn-outline" onclick="openModal('countdownModal')">+ 添加</button>
+    </div>
+    <div id="countdownList"></div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 1: 日程与课表中心 ==================== -->
+<div class="page" id="page-schedule">
+  <div class="sub-tabs" id="scheduleSubTabs">
+    <div class="sub-tab active" data-tab="month">📅 月视图</div>
+    <div class="sub-tab" data-tab="week">📆 周视图</div>
+    <div class="sub-tab" data-tab="ddl">⚠️ DDL预警</div>
+  </div>
+
+  <!-- 月视图 -->
+  <div id="scheduleMonthView">
+    <div class="card">
+      <div class="cal-header">
+        <button class="btn btn-sm" onclick="changeMonth(-1)">◀</button>
+        <span class="month-label" id="monthLabel"></span>
+        <button class="btn btn-sm" onclick="changeMonth(1)">▶</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+    <div class="card" id="selectedDayEvents">
+      <div style="text-align:center;color:var(--text-lighter);font-size:13px">👆 点击日期查看当日事件</div>
+    </div>
+  </div>
+
+  <!-- 周视图 -->
+  <div id="scheduleWeekView" style="display:none;">
+    <div class="card">
+      <div class="cal-header">
+        <button class="btn btn-sm" onclick="changeWeek(-1)">◀</button>
+        <span class="month-label" id="weekLabel"></span>
+        <button class="btn btn-sm" onclick="changeWeek(1)">▶</button>
+      </div>
+      <div id="weekTimetable"></div>
+    </div>
+  </div>
+
+  <!-- DDL预警 -->
+  <div id="scheduleDDL" style="display:none;">
+    <div class="card">
+      <div class="card-header"><span class="card-title">⚠️ 未来7天DDL预警</span></div>
+      <div id="ddlWarningList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 2: 任务与账本看板 ==================== -->
+<div class="page" id="page-tasks">
+  <div class="sub-tabs" id="taskSubTabs">
+    <div class="sub-tab active" data-tab="kanban">📌 看板</div>
+    <div class="sub-tab" data-tab="pomodoro">🍅 番茄钟</div>
+    <div class="sub-tab" data-tab="finance">💰 账本</div>
+  </div>
+
+  <!-- 看板 -->
+  <div id="taskKanban">
+    <div class="card-header" style="padding:0 0 10px 0;">
+      <span class="card-title">任务看板</span>
+      <button class="btn btn-sm btn-outline" onclick="openModal('taskModal')">+ 新任务</button>
+    </div>
+    <div class="scroll-x" style="margin-bottom:8px;">
+      <div class="sub-tab active" style="white-space:nowrap" data-filter="all">全部</div>
+      <div class="sub-tab" data-filter="course">📚 课程</div>
+      <div class="sub-tab" data-filter="exam">📝 考试</div>
+      <div class="sub-tab" data-filter="personal">🎯 个人</div>
+      <div class="sub-tab" data-filter="life">🏠 生活</div>
+    </div>
+    <div id="kanbanBoard">
+      <div class="kanban-col"><div class="kanban-title">📋 待办</div><div id="kanban-todo"></div></div>
+      <div class="kanban-col"><div class="kanban-title">🔄 进行中</div><div id="kanban-doing"></div></div>
+      <div class="kanban-col"><div class="kanban-title">✅ 已完成</div><div id="kanban-done"></div></div>
+    </div>
+  </div>
+
+  <!-- 番茄钟 -->
+  <div id="taskPomodoro" style="display:none;">
+    <div class="card" style="text-align:center;">
+      <div class="card-title" style="justify-content:center;margin-bottom:16px;">🍅 番茄钟</div>
+      <div class="pomodoro-ring" id="pomoRing">
+        <svg width="110" height="110" viewBox="0 0 110 110">
+          <circle cx="55" cy="55" r="48" fill="none" stroke="#EEEEEE" stroke-width="6"/>
+          <circle cx="55" cy="55" r="48" fill="none" stroke="var(--pink)" stroke-width="6"
+            stroke-dasharray="301.6" stroke-dashoffset="0" id="pomoProgress"/>
+        </svg>
+        <span class="time-text" id="pomoTime">25:00</span>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;justify-content:center;">
+        <button class="btn btn-primary" onclick="startPomodoro()" id="pomoStartBtn">▶ 开始</button>
+        <button class="btn btn-outline" onclick="pausePomodoro()" id="pomoPauseBtn" style="display:none;">⏸ 暂停</button>
+        <button class="btn btn-sm" onclick="resetPomodoro()">↺ 重置</button>
+      </div>
+      <div style="margin-top:8px;font-size:12px;color:var(--text-light);">
+        模式：<span id="pomoMode">工作 25分钟</span> | 已完成：<span id="pomoCount">0</span> 个番茄
+      </div>
+    </div>
+  </div>
+
+  <!-- 账本 -->
+  <div id="taskFinance" style="display:none;">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">💰 本月汇总</span>
+        <button class="btn btn-sm btn-outline" onclick="openModal('financeModal')">+ 记账</button>
+      </div>
+      <div class="stat-row">
+        <div class="stat-card"><div class="stat-val" style="color:var(--mint);" id="finIncome">¥0</div><div class="stat-label">收入</div></div>
+        <div class="stat-card"><div class="stat-val" style="color:var(--pink);" id="finExpense">¥0</div><div class="stat-label">支出</div></div>
+        <div class="stat-card"><div class="stat-val" id="finBalance">¥0</div><div class="stat-label">结余</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:10px;">📊 支出分类</div>
+      <div class="pie-wrap">
+        <canvas id="pieChart" width="120" height="120"></canvas>
+        <div class="pie-legend" id="pieLegend"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:8px;">📝 最近记录</div>
+      <div id="financeList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 3: 学习与刷题区 ==================== -->
+<div class="page" id="page-study">
+  <div class="sub-tabs" id="studySubTabs">
+    <div class="sub-tab active" data-tab="progress">📊 进度</div>
+    <div class="sub-tab" data-tab="quiz">📝 刷题</div>
+    <div class="sub-tab" data-tab="wrongbook">❌ 错题集</div>
+    <div class="sub-tab" data-tab="vocab">📖 背单词</div>
+  </div>
+
+  <!-- 进度 -->
+  <div id="studyProgress">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">📊 科目进度</span>
+        <button class="btn btn-sm btn-outline" onclick="openModal('subjectModal')">+ 科目</button>
+      </div>
+      <div id="subjectProgressList"></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">📅 重点考试倒计时</span>
+        <button class="btn btn-sm btn-outline" onclick="openModal('examModal')">+ 考试</button>
+      </div>
+      <div id="examCountdownList"></div>
+    </div>
+  </div>
+
+  <!-- 刷题 -->
+  <div id="studyQuiz" style="display:none;">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">📝 刷题练习</span>
+        <button class="btn btn-sm btn-outline" onclick="openModal('quizModal')">+ 录入题目</button>
+      </div>
+      <div style="margin-bottom:8px;">
+        <select class="input" id="quizSubjectFilter" onchange="loadQuiz()" style="width:auto;display:inline-block;">
+          <option value="all">全部科目</option>
+        </select>
+      </div>
+      <div id="quizArea"><div class="empty"><div class="empty-icon">📝</div>还没有题目，点击"录入题目"开始吧</div></div>
+    </div>
+  </div>
+
+  <!-- 错题集 -->
+  <div id="studyWrongbook" style="display:none;">
+    <!-- Stats -->
+    <div class="stat-row" style="margin-bottom:10px;" id="wrongStats"></div>
+    <!-- Filter tabs -->
+    <div class="scroll-x" style="margin-bottom:8px;" id="wrongSubjectFilter">
+      <div class="sub-tab active" data-filter="all">全部</div>
+    </div>
+    <div class="scroll-x" style="margin-bottom:10px;" id="wrongDifficultyFilter">
+      <div class="sub-tab active" data-filter="all">全部难度</div>
+      <div class="sub-tab" data-filter="easy">⭐ 简单</div>
+      <div class="sub-tab" data-filter="medium">⭐⭐ 中等</div>
+      <div class="sub-tab" data-filter="hard">⭐⭐⭐ 困难</div>
+    </div>
+    <!-- Wrong book list -->
+    <div id="wrongBookList"><div class="empty"><div class="empty-icon">🎉</div>还没有错题，太棒了！</div></div>
+
+    <!-- Similar Question Modal (in-page) -->
+    <div class="card" id="similarQuizCard" style="display:none;border:2px solid var(--blue);background:var(--blue-bg);">
+      <div class="card-header">
+        <span class="card-title">🔄 同类题练习</span>
+        <div style="display:flex;gap:4px;">
+          <button class="btn btn-sm btn-outline" onclick="regenerateSimilar()">🔄 换一题</button>
+          <button class="btn btn-sm" style="background:#ddd;" onclick="$('similarQuizCard').style.display='none'">✕</button>
+        </div>
+      </div>
+      <div id="similarQuizArea"></div>
+    </div>
+
+    <!-- AI Explanation Panel -->
+    <div class="card" id="aiExplainCard" style="display:none;border:2px solid var(--lavender);background:var(--lavender-bg);">
+      <div class="card-header">
+        <span class="card-title">🤖 AI 深度讲解</span>
+        <button class="btn btn-sm" style="background:#ddd;" onclick="$('aiExplainCard').style.display='none'">✕</button>
+      </div>
+      <div id="aiExplainContent"></div>
+      <div style="margin-top:10px;font-size:10px;color:var(--text-lighter);text-align:center;" id="aiExplainSource"></div>
+    </div>
+  </div>
+
+  <!-- 背单词 -->
+  <div id="studyVocab" style="display:none;">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">📖 单词打卡</span>
+        <button class="btn btn-sm btn-outline" onclick="openModal('vocabModal')">+ 添加单词</button>
+      </div>
+      <div class="stat-row" style="margin-bottom:12px;">
+        <div class="stat-card"><div class="stat-val" id="vocabTotal">0</div><div class="stat-label">总单词</div></div>
+        <div class="stat-card"><div class="stat-val" id="vocabToday">0</div><div class="stat-label">今日已复习</div></div>
+        <div class="stat-card"><div class="stat-val" id="vocabStreak">0</div><div class="stat-label">连续打卡天</div></div>
+      </div>
+      <div id="vocabList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 4: 复盘与素材库 ==================== -->
+<div class="page" id="page-review">
+  <div class="sub-tabs" id="reviewSubTabs">
+    <div class="sub-tab active" data-tab="reflect">🧘 每日复盘</div>
+    <div class="sub-tab" data-tab="notes">📒 灵感笔记</div>
+  </div>
+
+  <!-- 复盘 -->
+  <div id="reviewReflect">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">🧘 今日复盘 - <span id="reflectDate"></span></span>
+        <button class="btn btn-sm btn-primary" onclick="saveReflection()">💾 保存</button>
+      </div>
+      <div class="reflect-grid">
+        <div class="reflect-box" style="border-left:3px solid #FFD166;">
+          <div class="rb-title">🌟 今日高光</div>
+          <textarea id="reflectHighlight" placeholder="今天最棒的事..."></textarea>
+        </div>
+        <div class="reflect-box" style="border-left:3px solid var(--pink);">
+          <div class="rb-title">💪 不足之处</div>
+          <textarea id="reflectShortcoming" placeholder="需要改进的地方..."></textarea>
+        </div>
+        <div class="reflect-box" style="border-left:3px solid var(--blue);">
+          <div class="rb-title">🎯 明日计划</div>
+          <textarea id="reflectTomorrow" placeholder="明天要做的事..."></textarea>
+        </div>
+        <div class="reflect-box" style="border-left:3px solid var(--mint);">
+          <div class="rb-title">😊 今日心情</div>
+          <textarea id="reflectMood" placeholder="😄😢😤😴..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">📅 历史复盘</span></div>
+      <div id="reflectHistory"></div>
+    </div>
+  </div>
+
+  <!-- 笔记 -->
+  <div id="reviewNotes" style="display:none;">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">📒 灵感笔记</span>
+        <button class="btn btn-sm btn-outline" onclick="openModal('noteModal')">+ 新笔记</button>
+      </div>
+      <div id="notesList"><div class="empty"><div class="empty-icon">📒</div>还没有笔记</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODALS ==================== -->
+<div class="modal-overlay" id="modalOverlay" style="display:none;" onclick="if(event.target===this)closeModal()">
+
+  <!-- Photo Preview Modal -->
+  <div class="modal" id="photoModal" style="display:none;">
+    <span class="close-btn" onclick="closeModal()">✕</span>
+    <h3>📸 打卡照片</h3>
+    <img class="photo-modal-img" id="photoModalImg" src="" alt="打卡照片">
+    <div class="photo-meta" id="photoModalMeta"></div>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button class="btn btn-sm btn-danger" style="flex:1;" id="photoModalDeleteBtn" onclick="deleteCurrentPhoto()">🗑 删除照片</button>
+      <button class="btn btn-sm btn-outline" style="flex:1;" id="photoModalRetakeBtn" onclick="retakeCurrentPhoto()">📷 重拍</button>
+    </div>
+  </div>
+
+  <!-- Event Modal -->
+  <div class="modal" id="eventModal" style="display:none;">
+    <span class="close-btn" onclick="closeModal()">✕</span>
+    <h3>添加日程事件</h3>
+    <input class="input" id="evTitle" placeholder="事件标题" style="margin-bottom:8px;">
+    <input class="input" type="date" id="evDate" style="margin-bottom:8px;">
+    <input class="input" type="time" id="evTime" style="margin-bottom:8px;">
+    <select class="input" id="evType" style="margin-bottom:8px;">
+      <option value="exam">🔵 考试</option><option value="homework">🟠 作业</option>
+      <option value="personal">🟢 个人任务</option><option value="life">⚪ 生活</option>
+    </select>
+    <select class="input" id="evCategory" style="margin-bottom:8px;">
+      <option value="main">🎯 主线任务</option><option value="side">🌿 支线任务</option>
+    </select>
+    <input class="input" id="evDesc" placeholder="备注（可选）" style="margin-bottom:12px;">
+    <button class="btn btn-primary" style="width:100%;" onclick="saveEvent()">保存事件</button>
+  </div>
+
+  <!-- Task Modal -->
+  <div class="modal" id="taskModal" style="display:none;">
+    <span class="close-btn" onclick="closeModal()">✕</span>
+    <h3>添加任务</h3>
+    <input class="input" id="tkTitle" placeholder="任务标题" style="margin-bottom:8px;">
+    <select class="input" id="tkCategory" style="margin-bottom:8px;">
+      <option value="course">📚 课程</option><option value="exam">📝 考试</option>
+      <option value="personal">🎯 个人</option><option value="life">🏠 生活</option>
+    </select>
+    <input class="input" type="date" id="tkDueDate" style="margin-bottom:8px;">
+    <input class="input" type="number" id="tkPomoGoal" placeholder="番茄钟目标数（可选）" min="0" style="margin-bottom:12px;">
+    <button class="btn btn-primary" style="width:100%;" onclick="saveTask()">保存任务</button>
+  </div>
+
+  <!-- Finance Modal -->
+  <div class="modal" id="financeModal" style="display:none;">
+    <span class="close-btn" onclick="closeModal()">✕</span>
+    <h3>记账</h3>
+    <input class="input" type="number" id="finAmount" placeholder="金额" style="margin-bottom:8px;">
+    <select class="input" id="finType" style="margin-bottom:8px;">
+      <option value="expense">支出</option><option value="income">收入</option>
+    </select>
+    <select class="input" id="finCategory" style="margin-bottom:8px;">
+      <option value="food">🍔 餐饮</option><option value="transport">🚌 交通</option>
+      <option value="study">📚 学习</option><option value="entertainment">🎮 娱乐</option>
+      <option value="other">📦 其他</option>
+    </select>
+    <input class="input" id="finNote" placeholder="备注" style="margin-bottom:12px;">
+    <button class="btn btn-primary" style="width:100%;" onclick="saveFinance()">保存记录</button>
+  </div>
+
+  <!-- Subject Modal -->
+  <div class="modal" id="subjectModal" style="display:none;">
+    <span class="close-btn" onclick="closeModal()">✕</span>
+    <h3>添加科目</h3>
+    <input class="input" id="subName" placeholder="科目名称" style="margin-bottom:8px;">
+    <select class="input" id="subColor" style="margin-bottom:12px;">
+      <option value="blue">🔵 蓝色</option><option value="pink">🌸 粉色</option>
+      <option value="mint">🌿 绿色</option><option value="yellow">⭐ 黄色</option>
+    </select>
+    <button class="btn btn-primary" style="width:100%;" onclick="saveSubject()">保存科目</button>
+  </div>
+
+  <!-- Exam Countdown Modal -->
+  <div class="modal" id="examModal" style="display:none;">
+    <span class="close-btn" onclick="closeModal()">✕</span>
+    <h3>添加考试</h3>
+    <input class="input" id="exName" placeholder="考试名称" style="margin-bottom:8px;">
+    <input class="input" type="date" id="exDate" style="margin-bottom:8px;">
+    <input class="input" id="exSubject" placeholder="科目" style="margin-bottom:12px;">
+    <button class="btn btn-primary" style="width:100%;" onclick="saveExam()">保存考试</button>
+  </div>
+
+  <!-- Countdown Modal -->
+  <div class="modal" id="countdownModal" style="display:none;">
+    <span class="close-btn" onclick="closeModal()">✕</span>
+    <h3>添加倒计时</h3>
+    <input class="input" id="cdName" placeholder="事件名称" style="margin-bottom:8px;">
+    <input class="input" type="date" id="cdDate" style="margin-bottom:8px;">
+    <input class="input" id="cdIcon" placeholder="图标emoji（如🎂）" style="margin-bottom:12px;" value="📅">
+    <button class="btn btn-primary" style="width:100%;" onclick="saveCountdown()">保存倒计时</button>
+  </div>
+
+  <!-- Quiz Modal -->
+  <div class="modal" id="quizModal" style="display:none;">
+    <span class="close-btn" onclick="closeModal()">✕</span>
+    <h3>📝 录入题目</h3>
+    <!-- Smart toolbar -->
+    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+      <button class="btn btn-sm" style="background:var(--pink-light);color:#C06060;font-weight:600;flex:1;" onclick="captureQuizImage()">
+        📷 拍照识别
+      </button>
+      <button class="btn btn-sm" style="background:var(--lavender);color:#4A5599;font-weight:600;flex:1;" onclick="autoClassifyQuiz()" id="autoClassifyBtn">
+        🤖 自动分类
+      </button>
+    </div>
+    <!-- Image preview -->
+    <div id="quizImagePreview" style="display:none;position:relative;margin-bottom:8px;text-align:center;">
+      <img id="quizPreviewImg" style="width:100%;max-height:180px;object-fit:contain;border-radius:10px;border:2px solid #E0E0E0;">
+      <div id="quizOcrStatus" style="font-size:11px;color:var(--text-light);margin-top:4px;"></div>
+      <button class="btn btn-sm btn-danger" style="position:absolute;top:4px;right:4px;font-size:10px;padding:2px 8px;" onclick="clearQuizImage()">✕ 清除</button>
+    </div>
+    <!-- Fields -->
+    <div style="display:flex;gap:6px;margin-bottom:6px;">
+      <input class="input" id="qzSubject" placeholder="科目（自动识别）" style="flex:1;">
+      <input class="input" id="qzTopic" placeholder="知识点" style="flex:1;">
+    </div>
+    <textarea class="input" id="qzQuestion" placeholder="题目内容（可直接粘贴或拍照识别）" style="min-height:56px;margin-bottom:6px;"></textarea>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px;">
+      <input class="input" id="qzOptA" placeholder="选项A" style="font-size:13px;">
+      <input class="input" id="qzOptB" placeholder="选项B" style="font-size:13px;">
+      <input class="input" id="qzOptC" placeholder="选项C" style="font-size:13px;">
+      <input class="input" id="qzOptD" placeholder="选项D" style="font-size:13px;">
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:8px;">
+      <select class="input" id="qzAnswer" style="flex:1;">
+        <option value="0">正确答案：A</option><option value="1">正确答案：B</option><option value="2">正确答案：C</option><option value="3">正确答案：D</option>
+      </select>
+      <select class="input" id="qzDifficulty" style="flex:1;">
+        <option value="medium">难度：⭐⭐ 中等</option><option value="easy">难度：⭐ 简单</option><option value="hard">难度：⭐⭐⭐ 困难</option>
+      </select>
+    </div>
+    <textarea class="input" id="qzExplain" placeholder="解析（AI可自动生成）" style="min-height:50px;margin-bottom:12px;"></textarea>
+    <button class="btn btn-primary" style="width:100%;" onclick="saveQuizQuestion()">💾 保存题目</button>
+  </div>
+
+  <!-- Hidden OCR camera input -->
+  <input type="file" id="ocrCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleOCRImage(event)">
+
+  <!-- Vocab Modal -->
+  <div class="modal" id="vocabModal" style="display:none;">
+    <span class="close-btn" onclick="closeModal()">✕</span>
+    <h3>添加单词</h3>
+    <input class="input" id="vbWord" placeholder="单词" style="margin-bottom:8px;">
+    <input class="input" id="vbMeaning" placeholder="释义" style="margin-bottom:12px;">
+    <button class="btn btn-primary" style="width:100%;" onclick="saveVocab()">保存单词</button>
+  </div>
+
+  <!-- Note Modal -->
+  <div class="modal" id="noteModal" style="display:none;">
+    <span class="close-btn" onclick="closeModal()">✕</span>
+    <h3>新建笔记</h3>
+    <input class="input" id="ntTitle" placeholder="标题" style="margin-bottom:8px;">
+    <textarea class="input" id="ntContent" placeholder="内容..." style="min-height:100px;margin-bottom:8px;"></textarea>
+    <input class="input" id="ntTags" placeholder="标签（用逗号分隔）" style="margin-bottom:12px;">
+    <button class="btn btn-primary" style="width:100%;" onclick="saveNote()">保存笔记</button>
+  </div>
+</div>
+
+<!-- Check-in Prompt Dialog -->
+<div class="checkin-prompt" id="checkinPrompt" style="display:none;" onclick="if(event.target===this)closeCheckinPrompt()">
+  <div class="checkin-dialog">
+    <h4 id="checkinTaskTitle">完成任务</h4>
+    <p>选择打卡方式</p>
+    <div class="btn-row">
+      <button class="btn-big btn-big-check" onclick="confirmCheckin('check')">
+        <span class="emoji">✅</span>打勾完成
+      </button>
+      <button class="btn-big btn-big-photo" onclick="confirmCheckin('photo')">
+        <span class="emoji">📷</span>拍照打卡
+      </button>
+      <button class="btn-big btn-big-cancel" onclick="confirmCheckin('both')">
+        <span class="emoji">🎯</span>打勾+拍照
+      </button>
+      <button class="btn-big btn-big-cancel" onclick="closeCheckinPrompt()" style="flex-direction:row;width:100%;justify-content:center;margin-top:4px;">
+        取消
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== Bottom Navigation ==================== -->
+<nav class="bottom-nav">
+  <div class="nav-item active" data-page="home">
+    <span class="icon">🏠</span><span class="label">首页</span>
+  </div>
+  <div class="nav-item" data-page="schedule">
+    <span class="icon">📅</span><span class="label">日程</span>
+  </div>
+  <div class="nav-item" data-page="tasks">
+    <span class="icon">📌</span><span class="label">任务</span>
+  </div>
+  <div class="nav-item" data-page="study">
+    <span class="icon">📚</span><span class="label">学习</span>
+  </div>
+  <div class="nav-item" data-page="review">
+    <span class="icon">📝</span><span class="label">复盘</span>
+  </div>
+</nav>
+
+<!-- Actions bar -->
+<div style="position:fixed;top:8px;right:8px;z-index:50;display:flex;gap:4px;">
+  <button class="btn btn-sm" style="background:rgba(255,255,255,0.9);backdrop-filter:blur(10px);font-size:11px;" onclick="exportData()">📤 导出</button>
+  <button class="btn btn-sm" style="background:rgba(255,255,255,0.9);backdrop-filter:blur(10px);font-size:11px;" onclick="document.getElementById('importFile').click()">📥 导入</button>
+  <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)">
+  <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleCameraCapture(event)">
+  <input type="file" id="cameraInputFront" accept="image/*" capture="user" style="display:none;" onchange="handleCameraCapture(event)">
+</div>
+
+<script>
+// ==================== DATA LAYER ====================
+const STORAGE_KEY = 'junior_manager_data';
+
+function getDefaultData() {
+  const today = new Date().toISOString().split('T')[0];
+  return {
+    events: [
+      {id:'e1',title:'数学单元测验',date:today,time:'09:00',type:'exam',category:'main',desc:'第三章 一元一次方程'},
+      {id:'e2',title:'语文作文提交',date:today,time:'14:00',type:'homework',category:'main',desc:'800字议论文'},
+      {id:'e3',title:'英语单词听写',date:today,time:'10:30',type:'exam',category:'side',desc:'Unit 5 单词'},
+      {id:'e4',title:'体育锻炼',date:today,time:'17:00',type:'personal',category:'side',desc:'跑步30分钟'},
+    ],
+    tasks: [
+      {id:'t1',title:'完成数学练习册P30-35',category:'course',status:'todo',pomodoroCount:0,pomodoroGoal:2,dueDate:today},
+      {id:'t2',title:'复习英语Unit5语法',category:'exam',status:'doing',pomodoroCount:1,pomodoroGoal:3,dueDate:today},
+      {id:'t3',title:'整理房间',category:'life',status:'todo',pomodoroCount:0,pomodoroGoal:1,dueDate:today},
+    ],
+    finances: [],
+    subjects: [
+      {name:'数学',homeworkProgress:60,selfProgress:40,color:'blue'},
+      {name:'语文',homeworkProgress:80,selfProgress:30,color:'pink'},
+      {name:'英语',homeworkProgress:50,selfProgress:50,color:'mint'},
+    ],
+    exams: [
+      {id:'ex1',name:'期中考试',date:getFutureDate(14),subject:'数学'},
+      {id:'ex2',name:'英语月考',date:getFutureDate(7),subject:'英语'},
+    ],
+    countdowns: [
+      {id:'cd1',name:'期中考试',date:getFutureDate(14),icon:'📝'},
+      {id:'cd2',name:'好朋友生日',date:getFutureDate(5),icon:'🎂'},
+    ],
+    quizQuestions: [],
+    wrongBook: [],
+    vocabWords: [],
+    reflections: {},
+    notes: [],
+    version: 1,
+  };
+}
+function getFutureDate(days) { const d=new Date(); d.setDate(d.getDate()+days); return d.toISOString().split('T')[0]; }
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) { const d = JSON.parse(raw); if (d.version >= 1) return d; }
+  } catch(e) {}
+  return getDefaultData();
+}
+function saveData(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+
+let DATA = loadData();
+saveData(DATA);
+
+// ==================== HELPERS ====================
+function $(id) { return document.getElementById(id); }
+function $$(sel) { return document.querySelectorAll(sel); }
+function today() { return new Date().toISOString().split('T')[0]; }
+function formatDate(d) { const dt=new Date(d+'T00:00:00'); return `${dt.getMonth()+1}月${dt.getDate()}日 周${'日一二三四五六'[dt.getDay()]}`; }
+function daysBetween(d1,d2) { return Math.ceil((new Date(d2+'T00:00:00')-new Date(d1+'T00:00:00'))/(86400000)); }
+
+function showToast(msg) {
+  const t = $('toast'); t.textContent = msg; t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 2000);
+}
+
+function spawnConfetti() {
+  const container = $('confettiContainer');
+  const colors = ['#FFB7B2','#A8D8EA','#FFF1C1','#B5EAD7','#C7CEEA','#FFD166','#FF9AA2'];
+  for (let i=0;i<60;i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.left = Math.random()*100+'%';
+    p.style.top = (40+Math.random()*30)+'%';
+    p.style.background = colors[Math.floor(Math.random()*colors.length)];
+    p.style.animationDelay = Math.random()*0.6+'s';
+    p.style.animationDuration = (1+Math.random()*1.5)+'s';
+    p.style.width = (6+Math.random()*10)+'px';
+    p.style.height = (6+Math.random()*10)+'px';
+    container.appendChild(p);
+    setTimeout(() => p.remove(), 2000);
+  }
+}
+
+function openModal(id) {
+  $('modalOverlay').style.display = 'flex';
+  $$('.modal').forEach(m => m.style.display = 'none');
+  $(id).style.display = 'block';
+}
+function closeModal() { $('modalOverlay').style.display = 'none'; $$('.modal').forEach(m => m.style.display = 'none'); }
+
+// ==================== NAVIGATION ====================
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    $('page-'+item.dataset.page).classList.add('active');
+    if (item.dataset.page === 'schedule') renderCalendar();
+    if (item.dataset.page === 'tasks') { renderKanban(); renderFinance(); renderPieChart(); }
+    if (item.dataset.page === 'study') renderStudyProgress();
+    if (item.dataset.page === 'review') loadReflection();
+  });
+});
+
+// Sub-tabs
+document.querySelectorAll('.sub-tabs').forEach(tabs => {
+  tabs.addEventListener('click', (e) => {
+    if (!e.target.classList.contains('sub-tab')) return;
+    tabs.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+    e.target.classList.add('active');
+    const tab = e.target.dataset.tab;
+
+    // Schedule sub-tabs
+    if (tabs.id === 'scheduleSubTabs') {
+      $('scheduleMonthView').style.display = tab==='month'?'block':'none';
+      $('scheduleWeekView').style.display = tab==='week'?'block':'none';
+      $('scheduleDDL').style.display = tab==='ddl'?'block':'none';
+      if (tab==='month') renderCalendar();
+      if (tab==='week') renderWeekView();
+      if (tab==='ddl') renderDDL();
+    }
+    // Task sub-tabs
+    if (tabs.id === 'taskSubTabs') {
+      $('taskKanban').style.display = tab==='kanban'?'block':'none';
+      $('taskPomodoro').style.display = tab==='pomodoro'?'block':'none';
+      $('taskFinance').style.display = tab==='finance'?'block':'none';
+      if (tab==='kanban') renderKanban();
+      if (tab==='finance') { renderFinance(); renderPieChart(); }
+    }
+    // Study sub-tabs
+    if (tabs.id === 'studySubTabs') {
+      $('studyProgress').style.display = tab==='progress'?'block':'none';
+      $('studyQuiz').style.display = tab==='quiz'?'block':'none';
+      $('studyWrongbook').style.display = tab==='wrongbook'?'block':'none';
+      $('studyVocab').style.display = tab==='vocab'?'block':'none';
+      if (tab==='progress') renderStudyProgress();
+      if (tab==='quiz') loadQuiz();
+      if (tab==='wrongbook') renderWrongBook();
+      if (tab==='vocab') renderVocab();
+    }
+    // Review sub-tabs
+    if (tabs.id === 'reviewSubTabs') {
+      $('reviewReflect').style.display = tab==='reflect'?'block':'none';
+      $('reviewNotes').style.display = tab==='notes'?'block':'none';
+      if (tab==='reflect') loadReflection();
+      if (tab==='notes') renderNotes();
+    }
+  });
+});
+
+// Task filter tabs (kanban)
+document.querySelector('#taskKanban .scroll-x')?.addEventListener('click', (e) => {
+  if (!e.target.classList.contains('sub-tab') && !e.target.dataset.filter) return;
+  const el = e.target.classList.contains('sub-tab') ? e.target : e.target.closest('.sub-tab');
+  if (!el) return;
+  const container = document.querySelector('#taskKanban .scroll-x');
+  container.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderKanban(el.dataset.filter);
+});
+
+// ==================== PAGE 0: HOME ====================
+function renderHome() {
+  const now = new Date();
+  const h = now.getHours();
+  let greet = h<6?'🌙 夜深了，早点休息':h<12?'👋 早上好！':h<14?'☀️ 中午好！':h<18?'🌤 下午好！':'🌙 晚上好！';
+  $('greetingText').textContent = greet;
+  $('dateText').textContent = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 周${'日一二三四五六'[now.getDay()]} · 新的一天加油！💪`;
+
+  const t = today();
+  DATA = loadData();
+
+  // Timeline
+  const todayEvents = DATA.events.filter(e => e.date === t).sort((a,b) => (a.time||'').localeCompare(b.time||''));
+  const tl = $('todayTimeline');
+  if (todayEvents.length === 0) {
+    tl.innerHTML = '<div style="text-align:center;color:var(--text-lighter);padding:16px;">今天还没有日程，点击右上角添加吧 ✨</div>';
+  } else {
+    tl.innerHTML = todayEvents.map(e => {
+      const typeMap = {exam:'考试',homework:'作业',personal:'个人',life:'生活'};
+      return `<div class="tl-item ${e.type}">
+        <div class="tl-time">⏰ ${e.time||'全天'} · ${typeMap[e.type]||e.type}</div>
+        <div class="tl-title">${e.title}</div>
+        ${e.desc?`<div class="tl-desc">${e.desc}</div>`:''}
+        <span class="badge badge-${e.category==='main'?'pink':'blue'}">${e.category==='main'?'🎯 主线':'🌿 支线'}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // Quest tasks (主线/支线)
+  const mainQuests = DATA.tasks.filter(tk => tk.status !== 'done' && (tk.category==='exam'||tk.category==='course'));
+  const sideQuests = DATA.tasks.filter(tk => tk.status !== 'done' && (tk.category==='personal'||tk.category==='life'));
+  const doneMain = DATA.tasks.filter(tk => tk.status==='done' && (tk.category==='exam'||tk.category==='course')).length;
+  const doneSide = DATA.tasks.filter(tk => tk.status==='done' && (tk.category==='personal'||tk.category==='life')).length;
+
+  $('mainTaskCount').textContent = `${doneMain}/${mainQuests.length+doneMain}`;
+  $('sideQuestCount').textContent = `${doneSide}/${sideQuests.length+doneSide}`;
+
+  function renderQuestList(list, containerId, color) {
+    const container = $(containerId);
+    if (list.length === 0) {
+      container.innerHTML = '<div style="text-align:center;color:var(--text-lighter);font-size:12px;padding:8px;">暂无任务 🎮</div>';
+      return;
+    }
+    container.innerHTML = list.map(tk => {
+      const isDone = tk.status === 'done';
+      const hasPhoto = !!tk.photo;
+      return `<div class="task-row${isDone?' done':''}" style="position:relative;">
+        <div class="check-circle-lg${isDone?' checked':''}" onclick="event.stopPropagation();toggleTask('${tk.id}', this)" title="点击打勾完成">${isDone?'✓':''}</div>
+        <span class="check-label" style="font-size:13px;" onclick="toggleTask('${tk.id}', this)">${isDone?'<s>'+tk.title+'</s>':tk.title}</span>
+        <div class="task-actions">
+          ${tk.pomodoroGoal?`<span style="font-size:10px;color:var(--text-lighter);margin-right:2px;">🍅x${tk.pomodoroGoal}</span>`:''}
+          ${hasPhoto
+            ? `<img class="photo-thumb" src="${tk.photo}" onclick="event.stopPropagation();showTaskPhoto('${tk.id}')" title="查看打卡照片">`
+            : (isDone
+              ? `<div class="camera-btn" onclick="event.stopPropagation();takePhotoForTask('${tk.id}')" title="补拍打卡照">📷</div>`
+              : '')
+          }
+          ${!isDone
+            ? `<div class="camera-btn" onclick="event.stopPropagation();checkinTaskId='${tk.id}';$('checkinTaskTitle').textContent='✅ ${tk.title.replace(/'/g,"\\'")}';$('checkinPrompt').style.display='flex';" title="打卡完成">📷</div>`
+            : ''
+          }
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  renderQuestList(mainQuests.filter(t=>t.status!=='done'), 'mainQuestList', 'pink');
+  renderQuestList(sideQuests.filter(t=>t.status!=='done'), 'sideQuestList', 'blue');
+
+  // Countdowns
+  const cds = DATA.countdowns.sort((a,b) => daysBetween(t,a.date) - daysBetween(t,b.date));
+  $('countdownList').innerHTML = cds.length === 0
+    ? '<div style="text-align:center;color:var(--text-lighter);padding:8px;">还没有倒计时</div>'
+    : cds.map(c => {
+      const d = daysBetween(t, c.date);
+      return `<div class="countdown-item">
+        <div class="cd-icon">${c.icon||'📅'}</div>
+        <div class="cd-info"><div class="cd-name">${c.name}</div><div style="font-size:11px;color:var(--text-light);">${formatDate(c.date)}</div></div>
+        <div class="cd-days">${d<0?'已过':'D-'+d}</div>
+      </div>`;
+    }).join('');
+}
+
+// Current task being checked in
+let checkinTaskId = null;
+let checkinMode = null;
+
+function toggleTask(id, labelEl) {
+  DATA = loadData();
+  const tk = DATA.tasks.find(t => t.id === id);
+  if (!tk) return;
+  // If already done, undo
+  if (tk.status === 'done') {
+    tk.status = 'todo';
+    tk.photo = null;
+    tk.completedAt = null;
+    saveData(DATA);
+    renderHome();
+    if ($('page-tasks').classList.contains('active')) renderKanban();
+    showToast('已撤销完成');
+    return;
+  }
+  // Open check-in prompt
+  checkinTaskId = id;
+  $('checkinTaskTitle').textContent = '✅ ' + tk.title;
+  $('checkinPrompt').style.display = 'flex';
+}
+
+function closeCheckinPrompt() {
+  $('checkinPrompt').style.display = 'none';
+  checkinTaskId = null;
+  checkinMode = null;
+}
+
+function confirmCheckin(mode) {
+  checkinMode = mode; // 'check', 'photo', or 'both'
+  if (mode === 'check') {
+    completeTaskCheckin(null);
+  } else if (mode === 'photo') {
+    $('checkinPrompt').style.display = 'none'; // hide prompt but keep checkinTaskId
+    try { $('cameraInput').click(); } catch(e) { $('cameraInputFront').click(); }
+  } else if (mode === 'both') {
+    // Mark done first, hide prompt, then open camera
+    markTaskDone();
+    $('checkinPrompt').style.display = 'none'; // hide but keep checkinTaskId for photo
+    renderHome();
+    spawnConfetti();
+    showCompletionStamp();
+    setTimeout(() => {
+      try { $('cameraInput').click(); } catch(e) { $('cameraInputFront').click(); }
+    }, 600);
+  }
+}
+
+function markTaskDone() {
+  if (!checkinTaskId) return;
+  DATA = loadData();
+  const tk = DATA.tasks.find(t => t.id === checkinTaskId);
+  if (!tk) return;
+  tk.status = 'done';
+  tk.completedAt = today();
+  saveData(DATA);
+}
+
+function completeTaskCheckin(photoDataUrl) {
+  if (!checkinTaskId) return;
+  DATA = loadData();
+  const tk = DATA.tasks.find(t => t.id === checkinTaskId);
+  if (!tk) { checkinTaskId = null; return; }
+  // Track if this is a new completion (before changing status)
+  const isNewCompletion = tk.status !== 'done';
+  // If task isn't done yet, mark it done
+  if (isNewCompletion) {
+    tk.status = 'done';
+    tk.completedAt = today();
+  }
+  if (photoDataUrl) {
+    tk.photo = photoDataUrl;
+  }
+  saveData(DATA);
+  // Show celebration for new completions (but not for 'both' - already shown)
+  if (isNewCompletion && checkinMode !== 'both') {
+    spawnConfetti();
+    showCompletionStamp();
+  }
+  // For 'both' mode with photo, show extra stamp
+  if (checkinMode === 'both' && photoDataUrl) {
+    showCompletionStamp();
+  }
+  // For adding photo to already-done task, just a subtle toast
+  if (!isNewCompletion && photoDataUrl) {
+    showToast('📸 打卡照片已保存');
+  }
+  closeCheckinPrompt();
+  renderHome();
+  if ($('page-tasks').classList.contains('active')) renderKanban();
+}
+
+function showCompletionStamp() {
+  const stamp = document.createElement('div');
+  stamp.className = 'completion-stamp';
+  stamp.textContent = '✅';
+  stamp.style.position = 'fixed';
+  stamp.style.top = '40%';
+  stamp.style.left = '50%';
+  stamp.style.zIndex = '350';
+  document.body.appendChild(stamp);
+  setTimeout(() => stamp.remove(), 1200);
+}
+
+function handleCameraCapture(event) {
+  const file = event.target.files[0];
+  if (!file) { closeCheckinPrompt(); return; }
+  // Compress and convert to data URL
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    // Resize image to max 800px to save storage
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const maxW = 800;
+      const scale = Math.min(1, maxW / Math.max(img.width, img.height));
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const compressed = canvas.toDataURL('image/jpeg', 0.7);
+      completeTaskCheckin(compressed);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+// Show photo in modal
+let photoModalTaskId = null;
+function showTaskPhoto(taskId) {
+  DATA = loadData();
+  const tk = DATA.tasks.find(t => t.id === taskId);
+  if (!tk || !tk.photo) return;
+  photoModalTaskId = taskId;
+  $('photoModalImg').src = tk.photo;
+  $('photoModalMeta').textContent = '📅 完成于 ' + (tk.completedAt || '未知日期');
+  $('photoModalDeleteBtn').style.display = 'inline-flex';
+  $('photoModalRetakeBtn').style.display = 'inline-flex';
+  openModal('photoModal');
+}
+
+function deleteCurrentPhoto() {
+  if (!photoModalTaskId) return;
+  DATA = loadData();
+  const tk = DATA.tasks.find(t => t.id === photoModalTaskId);
+  if (tk) { tk.photo = null; saveData(DATA); }
+  closeModal();
+  renderHome();
+  if ($('page-tasks').classList.contains('active')) renderKanban();
+  showToast('照片已删除');
+}
+
+function retakeCurrentPhoto() {
+  if (!photoModalTaskId) return;
+  checkinTaskId = photoModalTaskId;
+  checkinMode = 'photo';
+  closeModal();
+  try { $('cameraInput').click(); } catch(e) { $('cameraInputFront').click(); }
+}
+
+// Take photo for an existing done task (from camera button)
+function takePhotoForTask(taskId) {
+  checkinTaskId = taskId;
+  checkinMode = 'photo';
+  try { $('cameraInput').click(); } catch(e) { $('cameraInputFront').click(); }
+}
+
+// ==================== PAGE 1: SCHEDULE ====================
+let calYear, calMonth, calSelectedDate;
+let weekStart;
+
+function initCalendar() {
+  const now = new Date();
+  calYear = now.getFullYear();
+  calMonth = now.getMonth();
+  calSelectedDate = today();
+  weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - now.getDay());
+}
+
+function renderCalendar() {
+  if (!calYear) initCalendar();
+  $('monthLabel').textContent = `${calYear}年 ${calMonth+1}月`;
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const daysInPrev = new Date(calYear, calMonth, 0).getDate();
+  const t = today();
+
+  DATA = loadData();
+  const eventDates = new Set(DATA.events.map(e => e.date));
+
+  let html = '<div class="cal-day-name">日</div><div class="cal-day-name">一</div><div class="cal-day-name">二</div><div class="cal-day-name">三</div><div class="cal-day-name">四</div><div class="cal-day-name">五</div><div class="cal-day-name">六</div>';
+
+  // Prev month
+  for (let i=firstDay-1;i>=0;i--) {
+    const d = daysInPrev - i;
+    const ds = `${calYear}-${String(calMonth===0?12:calMonth).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    html += `<div class="cal-day other-month" onclick="selectCalDate('${ds}')">${d}</div>`;
+  }
+  // Current month
+  for (let d=1;d<=daysInMonth;d++) {
+    const ds = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const cls = ['cal-day'];
+    if (ds === t) cls.push('today');
+    if (eventDates.has(ds)) cls.push('has-event');
+    if (ds === calSelectedDate) cls.push('today');
+    html += `<div class="${cls.join(' ')}" onclick="selectCalDate('${ds}')">${d}</div>`;
+  }
+  // Next month
+  const remaining = 42 - (firstDay + daysInMonth);
+  for (let d=1;d<=remaining;d++) {
+    const ds = `${calYear}-${String(calMonth+2>12?1:calMonth+2).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    html += `<div class="cal-day other-month" onclick="selectCalDate('${ds}')">${d}</div>`;
+  }
+
+  $('calGrid').innerHTML = html;
+  selectCalDate(calSelectedDate);
+}
+
+function selectCalDate(ds) {
+  calSelectedDate = ds;
+  DATA = loadData();
+  const events = DATA.events.filter(e => e.date === ds);
+  const container = $('selectedDayEvents');
+  if (events.length === 0) {
+    container.innerHTML = `<div style="text-align:center;color:var(--text-lighter);font-size:13px;padding:12px;">
+      📅 ${formatDate(ds)}<br>暂无事件，<span style="color:var(--blue);cursor:pointer;text-decoration:underline;" onclick="openModal('eventModal');$('evDate').value='${ds}';">点击添加</span>
+    </div>`;
+  } else {
+    container.innerHTML = `<div style="font-weight:600;font-size:14px;margin-bottom:8px;">📅 ${formatDate(ds)}</div>`
+      + events.map(e => `<div class="tl-item ${e.type}" style="margin-bottom:8px;">
+        <div class="tl-time">⏰ ${e.time||'全天'} · ${e.type}</div>
+        <div class="tl-title">${e.title}</div>
+        ${e.desc?`<div class="tl-desc">${e.desc}</div>`:''}
+        <button class="btn btn-sm btn-danger" style="margin-top:4px;font-size:10px;" onclick="deleteEvent('${e.id}')">删除</button>
+      </div>`).join('');
+  }
+  renderCalendar();
+}
+
+function changeMonth(d) {
+  calMonth += d;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+}
+
+function renderWeekView() {
+  if (!weekStart) { const now = new Date(); weekStart = new Date(now); weekStart.setDate(now.getDate()-now.getDay()); }
+  const end = new Date(weekStart);
+  end.setDate(weekStart.getDate()+6);
+  $('weekLabel').textContent = `${weekStart.getMonth()+1}/${weekStart.getDate()} - ${end.getMonth()+1}/${end.getDate()}`;
+
+  DATA = loadData();
+  let html = '';
+  for (let i=0;i<7;i++) {
+    const d = new Date(weekStart);
+    d.setDate(weekStart.getDate()+i);
+    const ds = d.toISOString().split('T')[0];
+    const dayEvents = DATA.events.filter(e => e.date === ds);
+    const dow = '日一二三四五六'[d.getDay()];
+    html += `<div class="card" style="margin-bottom:6px;">
+      <div style="font-weight:600;font-size:13px;margin-bottom:6px;">周${dow} ${d.getMonth()+1}/${d.getDate()}</div>
+      ${dayEvents.length===0?'<div style="font-size:11px;color:var(--text-lighter);">无安排</div>':dayEvents.map(e=>`<div style="font-size:12px;padding:4px 0;border-bottom:1px solid #f5f5f5;">${e.time||'全天'} ${e.title}</div>`).join('')}
+    </div>`;
+  }
+  $('weekTimetable').innerHTML = html;
+}
+
+function changeWeek(d) {
+  weekStart.setDate(weekStart.getDate()+d*7);
+  renderWeekView();
+}
+
+function renderDDL() {
+  DATA = loadData();
+  const t = today();
+  const sevenDays = new Date(); sevenDays.setDate(sevenDays.getDate()+7);
+  const endDS = sevenDays.toISOString().split('T')[0];
+
+  const upcomingEvents = DATA.events
+    .filter(e => e.date >= t && e.date <= endDS)
+    .sort((a,b) => a.date.localeCompare(b.date));
+  const upcomingTasks = DATA.tasks
+    .filter(tk => tk.status !== 'done' && tk.dueDate && tk.dueDate >= t && tk.dueDate <= endDS)
+    .sort((a,b) => a.dueDate.localeCompare(b.dueDate));
+
+  let html = '';
+  upcomingEvents.forEach(e => {
+    const d = daysBetween(t, e.date);
+    const cls = d <= 1 ? 'urgent' : d <= 3 ? 'soon' : 'normal';
+    html += `<div class="ddl-warn ${cls}">${d<=1?'🔴':d<=3?'🟡':'🔵'} <b>${e.title}</b> · ${formatDate(e.date)} · ${e.time||'全天'}</div>`;
+  });
+  upcomingTasks.forEach(tk => {
+    const d = daysBetween(t, tk.dueDate);
+    const cls = d <= 1 ? 'urgent' : d <= 3 ? 'soon' : 'normal';
+    html += `<div class="ddl-warn ${cls}">${d<=1?'🔴':d<=3?'🟡':'🔵'} <b>📋 ${tk.title}</b> · ${formatDate(tk.dueDate)}</div>`;
+  });
+
+  $('ddlWarningList').innerHTML = html || '<div class="empty"><div class="empty-icon">🎉</div>未来7天没有DDL！</div>';
+}
+
+// Event CRUD
+function saveEvent() {
+  DATA = loadData();
+  const ev = {
+    id: 'e'+Date.now(),
+    title: $('evTitle').value.trim(),
+    date: $('evDate').value,
+    time: $('evTime').value,
+    type: $('evType').value,
+    category: $('evCategory').value,
+    desc: $('evDesc').value.trim(),
+  };
+  if (!ev.title || !ev.date) { showToast('请填写标题和日期'); return; }
+  DATA.events.push(ev);
+  saveData(DATA);
+  closeModal();
+  renderHome(); renderCalendar();
+  showToast('✅ 事件已添加');
+}
+function deleteEvent(id) {
+  DATA = loadData();
+  DATA.events = DATA.events.filter(e => e.id !== id);
+  saveData(DATA);
+  renderCalendar();
+  selectCalDate(calSelectedDate);
+  showToast('已删除');
+}
+
+// ==================== PAGE 2: TASKS ====================
+function renderKanban(filter='all') {
+  DATA = loadData();
+  const filtered = filter==='all' ? DATA.tasks : DATA.tasks.filter(t => t.category===filter);
+
+  ['todo','doing','done'].forEach(status => {
+    const col = $('kanban-'+status);
+    const tasks = filtered.filter(t => t.status===status);
+    col.innerHTML = tasks.length===0
+      ? '<div style="text-align:center;color:var(--text-lighter);font-size:11px;padding:12px;">空</div>'
+      : tasks.map(t => {
+        const isDone = t.status === 'done';
+        const hasPhoto = !!t.photo;
+        return `<div class="kanban-card ${t.category}" draggable="true" data-id="${t.id}" ondragstart="dragTask(event,'${t.id}')" style="position:relative;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div style="flex:1;min-width:0;">
+              <div class="kc-title" style="${isDone?'text-decoration:line-through;color:#aaa;':''}">${t.title}</div>
+              <div class="kc-meta">
+                <span>${t.category==='course'?'📚':t.category==='exam'?'📝':t.category==='personal'?'🎯':'🏠'} ${t.category}</span>
+                ${t.pomodoroGoal?`<span>🍅 ${t.pomodoroCount}/${t.pomodoroGoal}</span>`:''}
+                ${t.dueDate?`<span>📅 ${t.dueDate}</span>`:''}
+              </div>
+            </div>
+            ${hasPhoto
+              ? `<img class="photo-thumb" src="${t.photo}" style="width:36px;height:36px;" onclick="event.stopPropagation();showTaskPhoto('${t.id}')" title="查看打卡照片">`
+              : (isDone
+                ? `<div class="camera-btn" style="width:28px;height:28px;font-size:13px;" onclick="event.stopPropagation();takePhotoForTask('${t.id}')" title="补拍打卡照">📷</div>`
+                : '')
+            }
+            ${!isDone
+              ? `<div class="camera-btn" style="width:28px;height:28px;font-size:13px;" onclick="event.stopPropagation();checkinTaskId='${t.id}';$('checkinTaskTitle').textContent='✅ ${t.title.replace(/'/g,"\\'")}';$('checkinPrompt').style.display='flex';" title="打卡">📷</div>`
+              : ''
+            }
+          </div>
+        </div>`;
+      }).join('');
+  });
+}
+
+let dragTaskId = null;
+function dragTask(e, id) { dragTaskId = id; e.dataTransfer.effectAllowed = 'move'; }
+
+['kanban-todo','kanban-doing','kanban-done'].forEach(colId => {
+  const col = $(colId);
+  if (!col) return;
+  col.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
+  col.addEventListener('drop', e => {
+    e.preventDefault();
+    if (!dragTaskId) return;
+    const newStatus = colId.replace('kanban-','');
+    DATA = loadData();
+    const task = DATA.tasks.find(t => t.id === dragTaskId);
+    if (task) { task.status = newStatus; saveData(DATA); renderKanban(); renderHome(); }
+    dragTaskId = null;
+  });
+});
+
+function saveTask() {
+  DATA = loadData();
+  const tk = {
+    id: 't'+Date.now(),
+    title: $('tkTitle').value.trim(),
+    category: $('tkCategory').value,
+    status: 'todo',
+    pomodoroCount: 0,
+    pomodoroGoal: parseInt($('tkPomoGoal').value) || 0,
+    dueDate: $('tkDueDate').value,
+  };
+  if (!tk.title) { showToast('请填写任务标题'); return; }
+  DATA.tasks.push(tk);
+  saveData(DATA);
+  closeModal();
+  renderKanban(); renderHome();
+  showToast('✅ 任务已添加');
+}
+
+// Pomodoro
+let pomoInterval = null;
+let pomoSeconds = 25*60;
+let pomoIsWork = true;
+let pomoRunning = false;
+
+function updatePomoDisplay() {
+  const m = Math.floor(pomoSeconds/60);
+  const s = pomoSeconds%60;
+  $('pomoTime').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  const total = pomoIsWork ? 25*60 : 5*60;
+  const progress = 301.6 * (1 - pomoSeconds/total);
+  $('pomoProgress').setAttribute('stroke-dashoffset', progress);
+}
+
+function startPomodoro() {
+  if (pomoRunning) return;
+  pomoRunning = true;
+  $('pomoStartBtn').style.display = 'none';
+  $('pomoPauseBtn').style.display = 'inline-flex';
+  pomoInterval = setInterval(() => {
+    pomoSeconds--;
+    updatePomoDisplay();
+    if (pomoSeconds <= 0) {
+      clearInterval(pomoInterval);
+      pomoRunning = false;
+      if (pomoIsWork) {
+        const cnt = parseInt($('pomoCount').textContent)+1;
+        $('pomoCount').textContent = cnt;
+        spawnConfetti();
+        // Auto break
+        pomoIsWork = false;
+        pomoSeconds = 5*60;
+        $('pomoMode').textContent = '休息 5分钟 ☕';
+        showToast('🍅 番茄完成！休息一下吧~');
+        startPomodoro();
+      } else {
+        pomoIsWork = true;
+        pomoSeconds = 25*60;
+        $('pomoMode').textContent = '工作 25分钟';
+        $('pomoStartBtn').style.display = 'inline-flex';
+        $('pomoPauseBtn').style.display = 'none';
+        showToast('休息结束，继续加油！💪');
+      }
+      updatePomoDisplay();
+    }
+  }, 1000);
+}
+
+function pausePomodoro() {
+  clearInterval(pomoInterval);
+  pomoRunning = false;
+  $('pomoStartBtn').style.display = 'inline-flex';
+  $('pomoPauseBtn').style.display = 'none';
+}
+
+function resetPomodoro() {
+  clearInterval(pomoInterval);
+  pomoRunning = false;
+  pomoIsWork = true;
+  pomoSeconds = 25*60;
+  $('pomoMode').textContent = '工作 25分钟';
+  $('pomoStartBtn').style.display = 'inline-flex';
+  $('pomoPauseBtn').style.display = 'none';
+  updatePomoDisplay();
+}
+
+// Finance
+function saveFinance() {
+  DATA = loadData();
+  const fin = {
+    id: 'f'+Date.now(),
+    amount: parseFloat($('finAmount').value) || 0,
+    type: $('finType').value,
+    category: $('finCategory').value,
+    note: $('finNote').value.trim(),
+    date: today(),
+  };
+  if (!fin.amount) { showToast('请输入金额'); return; }
+  DATA.finances.push(fin);
+  saveData(DATA);
+  closeModal();
+  renderFinance(); renderPieChart();
+  showToast('✅ 已记账');
+}
+
+function renderFinance() {
+  DATA = loadData();
+  const tm = today().substring(0,7);
+  const monthFin = DATA.finances.filter(f => f.date.startsWith(tm));
+  const income = monthFin.filter(f=>f.type==='income').reduce((s,f)=>s+f.amount,0);
+  const expense = monthFin.filter(f=>f.type==='expense').reduce((s,f)=>s+f.amount,0);
+  $('finIncome').textContent = '¥'+income.toFixed(2);
+  $('finExpense').textContent = '¥'+expense.toFixed(2);
+  $('finBalance').textContent = '¥'+(income-expense).toFixed(2);
+
+  const recent = DATA.finances.slice(-10).reverse();
+  $('financeList').innerHTML = recent.length===0
+    ? '<div style="text-align:center;color:var(--text-lighter);font-size:12px;">暂无记录</div>'
+    : recent.map(f => `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f5f5f5;font-size:12px;">
+      <span>${f.type==='income'?'💰':'💸'} ${f.note||f.category}</span>
+      <span style="color:${f.type==='income'?'var(--mint)':'var(--pink)'};font-weight:500;">${f.type==='income'?'+':'-'}¥${f.amount.toFixed(2)}</span>
+    </div>`).join('');
+}
+
+function renderPieChart() {
+  DATA = loadData();
+  const tm = today().substring(0,7);
+  const expenses = DATA.finances.filter(f => f.date.startsWith(tm) && f.type==='expense');
+  const catMap = {};
+  expenses.forEach(f => { catMap[f.category] = (catMap[f.category]||0) + f.amount; });
+  const cats = Object.entries(catMap);
+  const total = cats.reduce((s,[,v])=>s+v,0);
+
+  const catLabels = {food:'🍔 餐饮',transport:'🚌 交通',study:'📚 学习',entertainment:'🎮 娱乐',other:'📦 其他'};
+  const colors = ['#FFB7B2','#A8D8EA','#B5EAD7','#FFF1C1','#D0D0D0'];
+
+  const canvas = $('pieChart');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,120,120);
+
+  if (cats.length === 0) {
+    ctx.beginPath(); ctx.arc(60,60,45,0,Math.PI*2); ctx.fillStyle='#F0F0F0'; ctx.fill();
+    $('pieLegend').innerHTML = '<div style="font-size:12px;color:var(--text-lighter);">本月无支出</div>';
+    return;
+  }
+
+  let angle = -Math.PI/2;
+  let legendHtml = '';
+  cats.forEach(([cat,amt],i) => {
+    const slice = (amt/total)*Math.PI*2;
+    ctx.beginPath(); ctx.moveTo(60,60); ctx.arc(60,60,45,angle,angle+slice);
+    ctx.fillStyle = colors[i%colors.length]; ctx.fill();
+    angle += slice;
+    const pct = Math.round(amt/total*100);
+    legendHtml += `<div class="pie-legend-item"><div class="pie-legend-dot" style="background:${colors[i%colors.length]};"></div>${catLabels[cat]||cat} ${pct}%</div>`;
+  });
+  $('pieLegend').innerHTML = legendHtml;
+}
+
+// ==================== PAGE 3: STUDY ====================
+function renderStudyProgress() {
+  DATA = loadData();
+  $('subjectProgressList').innerHTML = DATA.subjects.length===0
+    ? '<div class="empty"><div class="empty-icon">📊</div>还没有科目</div>'
+    : DATA.subjects.map((s,i) => `
+      <div style="margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:2px;">
+          <span>${s.name}</span><span style="color:var(--text-light);">作业 ${s.homeworkProgress}% | 自主 ${s.selfProgress}%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill ${s.color}" style="width:${s.homeworkProgress}%;"></div></div>
+        <div style="margin-top:2px;"></div>
+        <div class="progress-bar"><div class="progress-fill ${s.color}" style="width:${s.selfProgress}%;opacity:0.5;"></div></div>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <input type="range" min="0" max="100" value="${s.homeworkProgress}" style="flex:1;height:4px;" onchange="updateSubjectProgress(${i},'homework',this.value)">
+          <input type="range" min="0" max="100" value="${s.selfProgress}" style="flex:1;height:4px;" onchange="updateSubjectProgress(${i},'self',this.value)">
+          <button class="btn btn-sm btn-danger" style="font-size:10px;padding:2px 6px;" onclick="deleteSubject(${i})">✕</button>
+        </div>
+      </div>
+    `).join('');
+
+  // Exam countdowns
+  $('examCountdownList').innerHTML = DATA.exams.length===0
+    ? '<div style="text-align:center;color:var(--text-lighter);padding:8px;">还没有考试</div>'
+    : DATA.exams.map(ex => {
+      const d = daysBetween(today(), ex.date);
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f5f5f5;">
+        <span>📝 ${ex.name} · ${ex.subject}</span>
+        <span style="font-weight:700;color:${d<=7?'var(--pink)':'var(--text)'};">${d<0?'已结束':'D-'+d}</span>
+        <button class="btn btn-sm btn-danger" style="font-size:10px;padding:2px 6px;" onclick="deleteExam('${ex.id}')">✕</button>
+      </div>`;
+    }).join('');
+}
+
+function updateSubjectProgress(i, type, val) {
+  DATA = loadData();
+  if (type==='homework') DATA.subjects[i].homeworkProgress = parseInt(val);
+  else DATA.subjects[i].selfProgress = parseInt(val);
+  saveData(DATA);
+  renderStudyProgress();
+}
+
+function saveSubject() {
+  DATA = loadData();
+  DATA.subjects.push({name:$('subName').value.trim(),homeworkProgress:0,selfProgress:0,color:$('subColor').value});
+  saveData(DATA);
+  closeModal();
+  renderStudyProgress();
+  showToast('✅ 科目已添加');
+}
+
+function deleteSubject(i) { DATA = loadData(); DATA.subjects.splice(i,1); saveData(DATA); renderStudyProgress(); }
+
+function saveExam() {
+  DATA = loadData();
+  DATA.exams.push({id:'ex'+Date.now(),name:$('exName').value.trim(),date:$('exDate').value,subject:$('exSubject').value.trim()});
+  saveData(DATA);
+  closeModal();
+  renderStudyProgress();
+  showToast('✅ 考试已添加');
+}
+
+function deleteExam(id) { DATA = loadData(); DATA.exams = DATA.exams.filter(e=>e.id!==id); saveData(DATA); renderStudyProgress(); }
+
+// Quiz
+let currentQuiz = null;
+let quizAnswered = false;
+
+function loadQuiz() {
+  DATA = loadData();
+  const filter = $('quizSubjectFilter').value;
+  const subjects = [...new Set(DATA.quizQuestions.map(q=>q.subject))];
+  $('quizSubjectFilter').innerHTML = '<option value="all">全部科目</option>'+subjects.map(s=>`<option value="${s}">${s}</option>`).join('');
+
+  const questions = filter==='all' ? DATA.quizQuestions : DATA.quizQuestions.filter(q=>q.subject===filter);
+  if (questions.length === 0) {
+    $('quizArea').innerHTML = '<div class="empty"><div class="empty-icon">📝</div>还没有题目，点击"录入题目"开始吧</div>';
+    return;
+  }
+
+  // Pick a random question
+  const q = questions[Math.floor(Math.random()*questions.length)];
+  currentQuiz = q;
+  quizAnswered = false;
+
+  const labels = ['A','B','C','D'];
+  $('quizArea').innerHTML = `
+    <div class="quiz-card">
+      <div style="font-size:11px;color:var(--text-light);margin-bottom:4px;">📘 ${q.subject} | 题库共${questions.length}题</div>
+      <div style="font-weight:500;margin-bottom:12px;font-size:14px;">${q.question}</div>
+      ${q.options.map((opt,i) => `
+        <div class="quiz-option" data-idx="${i}" onclick="selectQuizOption(${i}, this)">${labels[i]}. ${opt}</div>
+      `).join('')}
+      <div id="quizFeedback" style="margin-top:8px;font-size:13px;"></div>
+      <div style="margin-top:12px;display:flex;gap:8px;">
+        <button class="btn btn-primary btn-sm" onclick="submitQuiz()">✅ 提交答案</button>
+        <button class="btn btn-outline btn-sm" onclick="loadQuiz()">🔄 换一题</button>
+      </div>
+    </div>
+  `;
+}
+
+function selectQuizOption(idx, el) {
+  if (quizAnswered) return;
+  document.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  currentQuiz._selectedIdx = idx;
+}
+
+function submitQuiz() {
+  if (quizAnswered || !currentQuiz || currentQuiz._selectedIdx === undefined) { showToast('请先选择一个选项'); return; }
+  quizAnswered = true;
+  DATA = loadData();
+  const correct = currentQuiz._selectedIdx === currentQuiz.answer;
+  const opts = document.querySelectorAll('.quiz-option');
+  opts[currentQuiz.answer].classList.add('correct');
+
+  if (correct) {
+    $('quizFeedback').innerHTML = '<div style="color:var(--mint);font-weight:600;">🎉 回答正确！太棒了！</div>';
+    spawnConfetti();
+    // If was in wrong book and now correct, optionally mark as reviewed
+    const wb = DATA.wrongBook.find(w=>w.questionId===currentQuiz.id && !w.reviewed);
+    if (wb) { wb.reviewed = true; wb.lastCorrectDate = today(); saveData(DATA); }
+  } else {
+    opts[currentQuiz._selectedIdx].classList.add('wrong');
+    $('quizFeedback').innerHTML = `<div style="color:var(--pink);font-weight:600;">❌ 不对哦，正确答案是 ${['A','B','C','D'][currentQuiz.answer]}</div>
+      ${currentQuiz.explanation?`<div style="margin-top:4px;font-size:12px;color:var(--text-light);">💡 ${currentQuiz.explanation}</div>`:''}
+      <button class="btn btn-sm btn-outline" style="margin-top:8px;" onclick="showAIForCurrent()">🤖 AI深度讲解</button>
+      <button class="btn btn-sm btn-mint" style="margin-top:4px;" onclick="generateSimilarForCurrent()">🔄 生成同类题</button>`;
+
+    // Add to wrong book with enriched data
+    if (!DATA.wrongBook.find(w=>w.questionId===currentQuiz.id)) {
+      DATA.wrongBook.push({
+        id:'w'+Date.now(),
+        questionId:currentQuiz.id,
+        wrongDate:today(),
+        reviewed:false,
+        wrongCount:1,
+        difficulty: currentQuiz.difficulty || guessDifficulty(currentQuiz),
+        topic: currentQuiz.topic || guessTopic(currentQuiz),
+      });
+    } else {
+      const wb = DATA.wrongBook.find(w=>w.questionId===currentQuiz.id);
+      if (wb) wb.wrongCount = (wb.wrongCount||1)+1;
+    }
+    saveData(DATA);
+  }
+}
+
+function showAIForCurrent() {
+  if (!currentQuiz) return;
+  $('page-study').classList.add('active');
+  document.querySelectorAll('#studySubTabs .sub-tab').forEach(t=>t.classList.remove('active'));
+  const wrongTab = document.querySelector('#studySubTabs .sub-tab[data-tab="wrongbook"]');
+  if (wrongTab) wrongTab.classList.add('active');
+  ['studyProgress','studyQuiz','studyWrongbook','studyVocab'].forEach(id=>{ if($(id)) $(id).style.display='none'; });
+  if ($('studyWrongbook')) $('studyWrongbook').style.display = 'block';
+  renderWrongBook();
+  setTimeout(() => { showAIExplanation(currentQuiz.id); }, 300);
+}
+function generateSimilarForCurrent() {
+  if (!currentQuiz) return;
+  $('page-study').classList.add('active');
+  document.querySelectorAll('#studySubTabs .sub-tab').forEach(t=>t.classList.remove('active'));
+  const wrongTab = document.querySelector('#studySubTabs .sub-tab[data-tab="wrongbook"]');
+  if (wrongTab) wrongTab.classList.add('active');
+  ['studyProgress','studyQuiz','studyWrongbook','studyVocab'].forEach(id=>{ if($(id)) $(id).style.display='none'; });
+  if ($('studyWrongbook')) $('studyWrongbook').style.display = 'block';
+  renderWrongBook();
+  setTimeout(() => { generateSimilarQuestion(currentQuiz.id); }, 300);
+}
+
+function guessDifficulty(q) {
+  const txt = q.question + q.options.join(' ');
+  if (txt.length > 120 || /\b(证明|求证|若|设|已知.*求|综合)\b/.test(txt)) return 'hard';
+  if (txt.length > 60 || /\b(计算|化简|解答|翻译|完形|阅读)\b/.test(txt)) return 'medium';
+  return 'easy';
+}
+function guessTopic(q) {
+  const subj = q.subject || '';
+  const txt = q.question;
+  if (/数学|math/i.test(subj)) {
+    if (/方程|解|x\s*=|未知数/.test(txt)) return '方程';
+    if (/三角|sin|cos|tan|角度/.test(txt)) return '三角函数';
+    if (/几何|面积|体积|圆|三角|四边|平行/.test(txt)) return '几何';
+    if (/函数|y\s*=|f\(/.test(txt)) return '函数';
+    if (/概率|统计|排列|组合/.test(txt)) return '统计概率';
+    return '代数运算';
+  }
+  if (/英语|english/i.test(subj)) {
+    if (/语法|时态|从句|虚拟/.test(txt)) return '语法';
+    if (/单词|词汇|meaning|synonym/.test(txt)) return '词汇';
+    if (/阅读|passage|read/.test(txt)) return '阅读理解';
+    if (/完形|cloze/.test(txt)) return '完形填空';
+    return '综合';
+  }
+  if (/语文|chinese/i.test(subj)) {
+    if (/古诗|文言|诗词|作者/.test(txt)) return '古诗文';
+    if (/阅读|理解|赏析/.test(txt)) return '阅读理解';
+    if (/作文|写作/.test(txt)) return '写作';
+    if (/字词|拼音|成语|病句/.test(txt)) return '基础知识';
+    return '综合';
+  }
+  if (/物理|physics/i.test(subj)) return /电|力|运动|光|热/.test(txt)?'力学电学':'物理综合';
+  if (/化学|chemistry/i.test(subj)) return /反应|方程|元素|化合/.test(txt)?'化学反应':'化学综合';
+  return '综合';
+}
+
+function saveQuizQuestion() {
+  DATA = loadData();
+  const q = {
+    id: 'q'+Date.now(),
+    subject: $('qzSubject').value.trim(),
+    topic: $('qzTopic').value.trim(),
+    question: $('qzQuestion').value.trim(),
+    options: [$('qzOptA').value.trim(),$('qzOptB').value.trim(),$('qzOptC').value.trim(),$('qzOptD').value.trim()],
+    answer: parseInt($('qzAnswer').value),
+    difficulty: $('qzDifficulty').value,
+    explanation: $('qzExplain').value.trim(),
+  };
+  if (!q.subject||!q.question||q.options.some(o=>!o)) { showToast('请填写完整信息'); return; }
+  DATA.quizQuestions.push(q);
+  saveData(DATA);
+  closeModal();
+  loadQuiz();
+  showToast('✅ 题目已录入');
+}
+
+// ==================== 初中全科知识库 ====================
+const MIDDLE_SCHOOL_KB = {
+  '数学': {
+    keywords: ['方程','解','x=','y=','不等式','函数','f(','图像','几何','三角形','四边','圆','面积','体积','角','度','平行','垂直','相似','全等','勾股','三角','sin','cos','tan','概率','统计','平均数','中位','方差','排列','组合','数列','等差','等比','根号','平方','立方','因式','分解','多项式','坐标','向量'],
+    topics: {
+      '代数运算': ['计算','化简','求值','因式','分解','多项式','根式','分式','幂'],
+      '方程与不等式': ['方程','解','x=','y=','不等式','一元一次','二元一次','一元二次','根的','配方'],
+      '函数': ['函数','f(','图像','y=','一次函数','二次函数','反比例','自变量','因变量','定义域','值域','单调'],
+      '几何': ['三角形','四边','圆','面积','体积','角','度','平行','垂直','相似','全等','勾股','矩形','菱形','正方形','梯形','扇形','弧','弦'],
+      '三角函数': ['sin','cos','tan','三角','角度','正弦','余弦','正切','余切'],
+      '统计概率': ['概率','统计','平均数','中位','方差','排列','组合','频率','样本','总体','随机'],
+    },
+    difficultyPatterns: [
+      {pattern: /证明|求证|综合|压轴|若.*则.*求/g, diff: 'hard'},
+      {pattern: /计算|化简|解答|求解/g, diff: 'medium'},
+      {pattern: /填空|选择|判断|下列/g, diff: 'easy'},
+    ]
+  },
+  '语文': {
+    keywords: ['古诗','文言','诗词','作者','阅读','理解','赏析','作文','写作','字词','拼音','成语','病句','修辞','比喻','拟人','排比','夸张','描写','叙述','议论','说明','论点','论据','主旨','中心','思想','情感','意境','手法','表达','标点','语法','句子','成分','修改'],
+    topics: {
+      '基础知识': ['字词','拼音','成语','病句','标点','修辞','语法','句子','成分','修改','错别字'],
+      '古诗文': ['古诗','文言','诗词','作者','朝代','名句','背诵','默写','鉴赏','意象','意境','典故'],
+      '阅读理解': ['阅读','理解','赏析','主旨','中心','思想','情感','手法','表达','描写','人物','情节','环境'],
+      '写作': ['作文','写作','记叙','议论','说明','材料','命题','话题','审题','立意','结构','开头','结尾'],
+    },
+    difficultyPatterns: [
+      {pattern: /赏析|鉴赏|文言文|综合|开放/g, diff: 'hard'},
+      {pattern: /阅读|理解|古诗/g, diff: 'medium'},
+      {pattern: /字词|拼音|默写|填空/g, diff: 'easy'},
+    ]
+  },
+  '英语': {
+    keywords: ['语法','时态','从句','虚拟','单词','词汇','meaning','synonym','antonym','阅读','passage','read','完形','cloze','听力','listen','写作','write','翻译','translate','选择','choose','填空','fill','correct','wrong','tense','voice','article','preposition','conjunction','verb','noun','adjective','adverb','pronoun'],
+    topics: {
+      '语法': ['语法','时态','从句','虚拟','语态','冠词','介词','连词','动词','名词','形容词','副词','代词','主谓','倒装','强调','省略','情态'],
+      '词汇': ['单词','词汇','meaning','synonym','antonym','拼写','词性','词根','词缀','搭配','短语','习语'],
+      '阅读理解': ['阅读','passage','read','理解','主旨','细节','推断','词义','作者'],
+      '完形填空': ['完形','cloze','填空','上下文','逻辑','词义','语法'],
+      '写作': ['写作','write','作文','书信','日记','通知','议论文'],
+    },
+    difficultyPatterns: [
+      {pattern: /虚拟|倒装|强调|完形|阅读.*理解|综合/g, diff: 'hard'},
+      {pattern: /从句|时态|翻译|写作/g, diff: 'medium'},
+      {pattern: /单词|词汇|拼写|选择|填空/g, diff: 'easy'},
+    ]
+  },
+  '物理': {
+    keywords: ['力','牛顿','加速','速度','位移','质量','密度','压强','浮力','功','能','功率','电','电流','电压','电阻','欧姆','磁场','光','反射','折射','透镜','热','温度','比热','物态','声','振动','频率','波','运动','静止','摩擦','弹性','重力','万有'],
+    topics: {
+      '力学': ['力','牛顿','加速','速度','位移','质量','重力','摩擦','弹性','压强','浮力','功','能','功率','机械','杠杆','滑轮'],
+      '电学': ['电','电流','电压','电阻','欧姆','电路','串联','并联','电功率','电能','磁场','电磁'],
+      '光学': ['光','反射','折射','透镜','凸透','凹透','焦距','成像','色散'],
+      '热学': ['热','温度','比热','物态','融化','凝固','汽化','液化','升华','凝华','内能'],
+      '声学': ['声','振动','频率','波','音调','响度','音色','回声'],
+    },
+    difficultyPatterns: [
+      {pattern: /证明|推导|综合|计算.*求/g, diff: 'hard'},
+      {pattern: /计算|公式|解答/g, diff: 'medium'},
+      {pattern: /概念|定义|填空|选择/g, diff: 'easy'},
+    ]
+  },
+  '化学': {
+    keywords: ['反应','方程','元素','化合','分解','置换','复分解','氧化','还原','酸','碱','盐','pH','溶液','浓度','溶解','沉淀','气体','催化','周期','原子','分子','离子','电子','化学键','质量守恒','摩尔','计算'],
+    topics: {
+      '化学反应': ['反应','方程','化合','分解','置换','复分解','氧化','还原','配平'],
+      '物质性质': ['酸','碱','盐','pH','溶液','浓度','溶解','沉淀','气体','金属','非金属'],
+      '化学计算': ['质量','守恒','摩尔','浓度','计算','配比'],
+      '结构化学': ['周期','原子','分子','离子','电子','化学键','结构'],
+    },
+    difficultyPatterns: [
+      {pattern: /推断|综合|工业流程|实验设计/g, diff: 'hard'},
+      {pattern: /计算|配平|方程/g, diff: 'medium'},
+      {pattern: /概念|元素|符号|填空/g, diff: 'easy'},
+    ]
+  },
+  '生物': {
+    keywords: ['细胞','遗传','DNA','基因','进化','生态','光合','呼吸','消化','循环','神经','免疫','激素','酶','繁殖','发育','分类','物种','种群','群落','生态系统'],
+    topics: {
+      '细胞与遗传': ['细胞','遗传','DNA','基因','染色体','变异'],
+      '人体生理': ['消化','循环','呼吸','神经','免疫','激素','酶'],
+      '生态': ['生态','种群','群落','生态系统','食物链','环境'],
+      '植物': ['光合','呼吸','蒸腾','植物','种子','花'],
+    },
+    difficultyPatterns: [
+      {pattern: /遗传.*计算|基因.*推断|综合/g, diff: 'hard'},
+      {pattern: /过程|解释|分析/g, diff: 'medium'},
+      {pattern: /概念|定义|填空|选择/g, diff: 'easy'},
+    ]
+  },
+  '历史': {
+    keywords: ['朝代','皇帝','战争','革命','改革','条约','制度','文化','经济','政治','社会','民族','疆域','年号','公元','世纪','古代','近代','现代'],
+    topics: {
+      '中国古代史': ['朝代','皇帝','先秦','秦汉','三国','隋唐','宋元','明清','科举','封建'],
+      '中国近现代史': ['鸦片','战争','革命','改革','条约','抗日','解放','建国','文革','改革开放'],
+      '世界史': ['罗马','希腊','中世纪','工业革命','世界大战','冷战','殖民'],
+    },
+    difficultyPatterns: [
+      {pattern: /论述|分析.*原因|比较|综合/g, diff: 'hard'},
+      {pattern: /简答|列举|说明/g, diff: 'medium'},
+      {pattern: /选择|填空|判断|时间/g, diff: 'easy'},
+    ]
+  },
+  '地理': {
+    keywords: ['气候','地形','河流','海洋','板块','经纬','地图','人口','城市','农业','工业','资源','环境','区域','国家','洲','省','市'],
+    topics: {
+      '自然地理': ['气候','地形','河流','海洋','板块','经纬','地球','大气','水文'],
+      '人文地理': ['人口','城市','农业','工业','交通','贸易'],
+      '区域地理': ['区域','国家','洲','省','市','中国','世界'],
+    },
+    difficultyPatterns: [
+      {pattern: /分析.*原因|综合|读图.*判断/g, diff: 'hard'},
+      {pattern: /简答|解释|说明/g, diff: 'medium'},
+      {pattern: /填空|选择|记忆/g, diff: 'easy'},
+    ]
+  },
+  '政治': {
+    keywords: ['宪法','法律','权利','义务','公民','国家','政府','制度','民主','法治','道德','价值观','社会','经济','文化','教育','环保'],
+    topics: {
+      '法律': ['宪法','法律','权利','义务','违法','犯罪','保护','责任'],
+      '国情': ['国家','政府','制度','民主','法治','改革','发展'],
+      '道德': ['道德','价值观','社会','责任','诚信','友善'],
+    },
+    difficultyPatterns: [
+      {pattern: /分析|评析|综合|论述/g, diff: 'hard'},
+      {pattern: /简答|说明|列举/g, diff: 'medium'},
+      {pattern: /选择|判断|填空/g, diff: 'easy'},
+    ]
+  }
+};
+
+// ==================== 初中考点关键词（无分类识别用） ====================
+const ALL_SUBJECT_PATTERNS = Object.entries(MIDDLE_SCHOOL_KB).map(([subject, data]) => ({
+  subject,
+  keywords: data.keywords,
+  totalWeight: data.keywords.length
+}));
+
+// ==================== OCR 拍照识别 ====================
+let ocrImageData = null;
+
+function captureQuizImage() {
+  try { $('ocrCameraInput').click(); } catch(e) {
+    // Fallback: try front camera
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.capture = 'environment';
+    input.onchange = handleOCRImage;
+    input.click();
+  }
+}
+
+function handleOCRImage(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    ocrImageData = e.target.result;
+    // Show preview
+    $('quizPreviewImg').src = ocrImageData;
+    $('quizImagePreview').style.display = 'block';
+    $('quizOcrStatus').innerHTML = '<span class="ocr-badge loading"><span class="spinner"></span> 正在识别...</span>';
+
+    // Try OCR
+    const apiKey = localStorage.getItem('gemini_api_key');
+    if (apiKey) {
+      performGeminiOCR(ocrImageData, apiKey);
+    } else {
+      $('quizOcrStatus').innerHTML = `
+        <span class="ocr-badge error">⚠️ 未配置API Key，无法OCR识别</span>
+        <div style="margin-top:6px;font-size:11px;color:var(--text-light);">
+          请配置Gemini API Key后重试，或手动填写下方内容后使用"🤖 自动分类"
+        </div>
+        <div class="api-key-row" style="margin-top:6px;">
+          <input type="password" id="ocrApiKeyInput" placeholder="输入 Gemini API Key..." style="flex:1;">
+          <button class="btn btn-sm btn-primary" onclick="saveOcrApiKey()">保存并识别</button>
+        </div>
+      `;
+    }
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+function clearQuizImage() {
+  ocrImageData = null;
+  $('quizImagePreview').style.display = 'none';
+  $('quizPreviewImg').src = '';
+  $('quizOcrStatus').innerHTML = '';
+}
+
+async function performGeminiOCR(imageDataUrl, apiKey) {
+  try {
+    // Strip data URL prefix to get base64
+    const base64Data = imageDataUrl.split(',')[1];
+    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            {text: `你是一个OCR和题目分析专家。请分析这张图片中的题目内容，严格按以下JSON格式输出（不要输出其他内容）：
+{
+  "subject": "科目（数学/语文/英语/物理/化学/生物/历史/地理/政治）",
+  "topic": "具体知识点（如：一元一次方程）",
+  "question": "完整题目内容",
+  "options": ["选项A","选项B","选项C","选项D"],
+  "answer": 0,
+  "difficulty": "easy/medium/hard",
+  "explanation": "详细解题步骤和解析（200字以内）"
+}
+其中answer是正确选项的索引（0=A,1=B,2=C,3=D）。如果题目没有选项（如填空题），options数组填空字符串，answer填-1。
+请根据初中知识点准确分类。`},
+            {inlineData: {mimeType: 'image/jpeg', data: base64Data}}
+          ]
+        }],
+        generationConfig: {temperature: 0.2, maxOutputTokens: 1000}
+      })
+    });
+
+    const data = await resp.json();
+    if (data.error) {
+      $('quizOcrStatus').innerHTML = `<span class="ocr-badge error">❌ ${data.error.message||'识别失败'}</span>`;
+      return;
+    }
+
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    // Extract JSON from response
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      $('quizOcrStatus').innerHTML = '<span class="ocr-badge error">❌ 未能解析题目，请手动输入</span>';
+      return;
+    }
+
+    const result = JSON.parse(jsonMatch[0]);
+    autoFillQuizFields(result);
+    $('quizOcrStatus').innerHTML = '<span class="ocr-badge ok">✅ 识别成功！已自动填入</span>';
+
+  } catch(e) {
+    $('quizOcrStatus').innerHTML = `<span class="ocr-badge error">❌ 网络错误：${e.message}</span>`;
+  }
+}
+
+function saveOcrApiKey() {
+  const key = $('ocrApiKeyInput')?.value?.trim();
+  if (!key) { showToast('请输入API Key'); return; }
+  localStorage.setItem('gemini_api_key', key);
+  showToast('✅ 已保存，正在识别...');
+  if (ocrImageData) performGeminiOCR(ocrImageData, key);
+}
+
+function autoFillQuizFields(result) {
+  if (result.subject) { $('qzSubject').value = result.subject; flashField('qzSubject'); }
+  if (result.topic) { $('qzTopic').value = result.topic; flashField('qzTopic'); }
+  if (result.question) { $('qzQuestion').value = result.question; flashField('qzQuestion'); }
+  if (result.options && result.options.length >= 4) {
+    $('qzOptA').value = result.options[0]||''; flashField('qzOptA');
+    $('qzOptB').value = result.options[1]||''; flashField('qzOptB');
+    $('qzOptC').value = result.options[2]||''; flashField('qzOptC');
+    $('qzOptD').value = result.options[3]||''; flashField('qzOptD');
+  }
+  if (result.answer !== undefined && result.answer >= 0 && result.answer <= 3) {
+    $('qzAnswer').value = String(result.answer);
+  }
+  if (result.difficulty) { $('qzDifficulty').value = result.difficulty; }
+  if (result.explanation) { $('qzExplain').value = result.explanation; flashField('qzExplain'); }
+}
+
+function flashField(id) {
+  const el = $(id);
+  if (!el) return;
+  el.classList.add('field-filled');
+  setTimeout(() => el.classList.remove('field-filled'), 600);
+}
+
+// ==================== AI 自动分类 ====================
+function autoClassifyQuiz() {
+  const question = $('qzQuestion').value.trim();
+  const options = [$('qzOptA').value.trim(),$('qzOptB').value.trim(),$('qzOptC').value.trim(),$('qzOptD').value.trim()];
+  const allText = question + ' ' + options.join(' ');
+
+  if (!question && options.every(o=>!o)) {
+    showToast('请先输入题目内容或拍照识别');
+    return;
+  }
+
+  const btn = $('autoClassifyBtn');
+  btn.textContent = '⏳ 分析中...';
+  btn.classList.add('smart-btn-loading');
+
+  const apiKey = localStorage.getItem('gemini_api_key');
+  if (apiKey) {
+    classifyWithAPI(allText, question, apiKey).finally(() => {
+      btn.textContent = '🤖 自动分类';
+      btn.classList.remove('smart-btn-loading');
+    });
+  } else {
+    // Use local classifier
+    setTimeout(() => {
+      const result = classifyLocally(allText, question);
+      autoFillQuizFields(result);
+      if (!result._noApi) {
+        showToast('✅ 本地智能分类完成（配置API Key可更精准）');
+      }
+      btn.textContent = '🤖 自动分类';
+      btn.classList.remove('smart-btn-loading');
+    }, 300);
+  }
+}
+
+async function classifyWithAPI(allText, question, apiKey) {
+  try {
+    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        contents: [{parts: [{text: `你是一个初中题库分类专家。请分析以下题目，输出JSON：
+{
+  "subject": "数学/语文/英语/物理/化学/生物/历史/地理/政治",
+  "topic": "最精确的知识点（如：一元一次方程、现在完成时、光的反射定律）",
+  "difficulty": "easy/medium/hard",
+  "explanation": "简短解析思路（50字以内）"
+}
+题目内容：${allText}
+只输出JSON，不要其他文字。`}]}],
+        generationConfig: {temperature: 0.1, maxOutputTokens: 300}
+      })
+    });
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error.message);
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      const result = JSON.parse(jsonMatch[0]);
+      autoFillQuizFields(result);
+      showToast('🤖 AI分类完成！');
+    }
+  } catch(e) {
+    // Fallback to local
+    const result = classifyLocally(allText, question);
+    autoFillQuizFields(result);
+    showToast('⚠️ API不可用，已使用本地分类');
+  }
+}
+
+function classifyLocally(allText, question) {
+  const lower = allText.toLowerCase();
+  const result = {};
+
+  // Step 1: Find best matching subject
+  let bestSubject = '';
+  let bestScore = 0;
+  const subjectScores = {};
+
+  for (const [subject, data] of Object.entries(MIDDLE_SCHOOL_KB)) {
+    let score = 0;
+    for (const kw of data.keywords) {
+      if (lower.includes(kw.toLowerCase())) {
+        score += 1;
+        // Bonus for longer keyword matches
+        if (kw.length >= 3) score += 0.5;
+      }
+    }
+    // Normalize by keyword count to avoid bias toward subjects with more keywords
+    const normalizedScore = score / Math.sqrt(data.keywords.length);
+    subjectScores[subject] = normalizedScore;
+    if (normalizedScore > bestScore) {
+      bestScore = normalizedScore;
+      bestSubject = subject;
+    }
+  }
+
+  // Step 2: If confidence too low, try to guess from context
+  if (bestScore < 0.5) {
+    if (/[a-z]{3,}/i.test(question) && /[a-z]/i.test(question)) bestSubject = '英语';
+    else if (/\d/.test(question) && /[=＋＋—－×÷]/.test(question)) bestSubject = '数学';
+    else if (/[①-⑩\d]+[．.、]\s*[A-D]/.test(question)) bestSubject = '综合';
+    else bestSubject = bestSubject || '综合';
+  }
+
+  result.subject = bestSubject;
+
+  // Step 3: Find best topic within subject
+  const subjectData = MIDDLE_SCHOOL_KB[bestSubject];
+  if (subjectData && subjectData.topics) {
+    let bestTopic = '';
+    let bestTopicScore = 0;
+    for (const [topic, topicKws] of Object.entries(subjectData.topics)) {
+      let score = 0;
+      for (const kw of topicKws) {
+        if (lower.includes(kw.toLowerCase())) score += 1;
+      }
+      if (score > bestTopicScore) { bestTopicScore = score; bestTopic = topic; }
+    }
+    result.topic = bestTopic || '';
+  }
+
+  // Step 4: Guess difficulty
+  if (subjectData && subjectData.difficultyPatterns) {
+    for (const {pattern, diff} of subjectData.difficultyPatterns) {
+      if (pattern.test(allText)) { result.difficulty = diff; break; }
+    }
+  }
+  if (!result.difficulty) {
+    result.difficulty = allText.length > 100 ? 'medium' : 'easy';
+  }
+
+  // Step 5: Generate basic explanation if none
+  if (!result.explanation) {
+    result.explanation = `本题考察${result.subject}中"${result.topic||'综合'}"的知识点。建议先回顾相关概念，再逐一分析选项。`;
+  }
+
+  // If no match at all
+  if (!bestSubject || bestScore < 0.3) {
+    result._noApi = true;
+  }
+
+  return result;
+}
+
+// ==================== 智能粘贴：粘贴时自动触发分类 ====================
+(function initSmartPaste() {
+  const qzQuestion = $('qzQuestion');
+  if (qzQuestion) {
+    let pasteTimer = null;
+    qzQuestion.addEventListener('paste', () => {
+      clearTimeout(pasteTimer);
+      pasteTimer = setTimeout(() => {
+        const txt = $('qzQuestion').value.trim();
+        if (txt.length > 20) {
+          const apiKey = localStorage.getItem('gemini_api_key');
+          if (apiKey) {
+            const opts = [$('qzOptA').value.trim(),$('qzOptB').value.trim(),$('qzOptC').value.trim(),$('qzOptD').value.trim()];
+            classifyWithAPI(txt + ' ' + opts.join(' '), txt, apiKey).catch(()=>{});
+          } else {
+            const result = classifyLocally(txt, txt);
+            if (result.subject && result.subject !== '综合') {
+              autoFillQuizFields(result);
+            }
+          }
+        }
+      }, 800);
+    });
+  }
+})();
+
+let wrongFilterSubject = 'all';
+let wrongFilterDifficulty = 'all';
+let currentSimilarOriginId = null;
+
+function renderWrongBook() {
+  DATA = loadData();
+  const items = DATA.wrongBook.map(w => {
+    const q = DATA.quizQuestions.find(q=>q.id===w.questionId);
+    return q ? { ...w, question: q } : null;
+  }).filter(Boolean);
+
+  // Stats
+  const total = items.length;
+  const unreviewed = items.filter(w=>!w.reviewed).length;
+  const reviewedToday = items.filter(w=>w.lastCorrectDate===today()).length;
+  $('wrongStats').innerHTML = `
+    <div class="stat-card"><div class="stat-val" style="color:var(--pink);">${total}</div><div class="stat-label">总错题</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:#FFB347;">${unreviewed}</div><div class="stat-label">待复习</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--mint);">${reviewedToday}</div><div class="stat-label">今日攻克</div></div>
+  `;
+
+  // Build subject filter tabs
+  const subjects = [...new Set(items.map(w=>w.question.subject).filter(Boolean))];
+  $('wrongSubjectFilter').innerHTML = '<div class="sub-tab'+(wrongFilterSubject==='all'?' active':'')+'" data-filter="all">全部</div>'
+    + subjects.map(s => `<div class="sub-tab${wrongFilterSubject===s?' active':''}" data-filter="${s}">📘 ${s}</div>`).join('');
+
+  // Apply filters
+  let filtered = items;
+  if (wrongFilterSubject !== 'all') filtered = filtered.filter(w=>w.question.subject===wrongFilterSubject);
+  if (wrongFilterDifficulty !== 'all') filtered = filtered.filter(w=>w.difficulty===wrongFilterDifficulty);
+
+  // Sort: unreviewed first, then by wrongCount desc
+  filtered.sort((a,b)=>(a.reviewed?1:0)-(b.reviewed?1:0) || (b.wrongCount||1)-(a.wrongCount||1));
+
+  $('wrongBookList').innerHTML = filtered.length===0
+    ? '<div class="empty"><div class="empty-icon">🎉</div>该分类下没有错题，太棒了！</div>'
+    : filtered.map(w => {
+      const diffLabels = {easy:'⭐',medium:'⭐⭐',hard:'⭐⭐⭐'};
+      const diffLabel = diffLabels[w.difficulty]||'⭐⭐';
+      const diffColor = {easy:'var(--mint)',medium:'#FFB347',hard:'var(--pink)'};
+      return `<div class="wb-card${w.reviewed?' reviewed':''}" id="wb-${w.id}">
+        <div class="wb-header">
+          <span class="wb-subject" style="color:${diffColor[w.difficulty]||'#888'};">📘 ${w.question.subject||'未分类'}</span>
+          <span style="display:flex;gap:4px;align-items:center;">
+            <span class="difficulty-stars">${diffLabel}</span>
+            ${w.reviewed?'<span class="badge badge-mint">✅ 已复习</span>':`<span class="badge badge-pink">错${w.wrongCount||1}次</span>`}
+          </span>
+        </div>
+        ${w.topic?`<span class="k-tag">🏷 ${w.topic}</span>`:''}
+        <div class="wb-question">${w.question.question}</div>
+        <div class="wb-answer">✅ 正确答案：${['A','B','C','D'][w.question.answer]}. ${w.question.options[w.question.answer]}</div>
+        ${w.question.explanation?`<div style="font-size:11px;color:var(--text-light);margin-bottom:4px;">💡 ${w.question.explanation}</div>`:''}
+        <div class="wb-actions">
+          ${!w.reviewed?`<button class="btn btn-sm btn-mint" onclick="markWrongReviewed('${w.id}')">✅ 标记复习</button>`:''}
+          <button class="btn btn-sm btn-outline" onclick="generateSimilarQuestion('${w.question.id}')">🔄 同类题</button>
+          <button class="btn btn-sm" style="background:var(--lavender);color:#4A5599;" onclick="showAIExplanation('${w.question.id}')">🤖 AI讲解</button>
+        </div>
+      </div>`;
+    }).join('');
+
+  // Bind filter events
+  $('wrongSubjectFilter').querySelectorAll('.sub-tab').forEach(tab => {
+    tab.onclick = function() {
+      wrongFilterSubject = this.dataset.filter;
+      $('wrongSubjectFilter').querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));
+      this.classList.add('active');
+      renderWrongBook();
+    };
+  });
+  $('wrongDifficultyFilter').querySelectorAll('.sub-tab').forEach(tab => {
+    tab.onclick = function() {
+      wrongFilterDifficulty = this.dataset.filter;
+      $('wrongDifficultyFilter').querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));
+      this.classList.add('active');
+      renderWrongBook();
+    };
+  });
+}
+
+function markWrongReviewed(id) {
+  DATA = loadData();
+  const w = DATA.wrongBook.find(w=>w.id===id);
+  if (w) { w.reviewed = true; w.lastCorrectDate = today(); saveData(DATA); renderWrongBook(); showToast('✅ 已标记复习'); }
+}
+
+// ==================== SIMILAR QUESTION GENERATOR ====================
+function generateSimilarQuestion(questionId) {
+  DATA = loadData();
+  const q = DATA.quizQuestions.find(q=>q.id===questionId);
+  if (!q) { showToast('题目不存在'); return; }
+  currentSimilarOriginId = questionId;
+
+  // Scroll to similar quiz card
+  $('similarQuizCard').style.display = 'block';
+  $('similarQuizCard').scrollIntoView({behavior:'smooth',block:'center'});
+  $('similarQuizCard').classList.add('highlight-pulse');
+  setTimeout(()=>$('similarQuizCard').classList.remove('highlight-pulse'), 4500);
+
+  renderSimilarQuiz(q);
+}
+
+function renderSimilarQuiz(originalQ) {
+  const similar = generateVariant(originalQ);
+  // Store the generated question data for answering
+  window._similarQuizData = similar;
+
+  const labels = ['A','B','C','D'];
+  $('similarQuizArea').innerHTML = `
+    <div class="similar-badge">🔄 基于「${originalQ.topic||originalQ.subject||'错题'}」生成</div>
+    <div class="quiz-card">
+      <div style="font-weight:500;margin-bottom:10px;font-size:13px;">${similar.question}</div>
+      ${similar.options.map((opt,i) => `
+        <div class="quiz-option" data-idx="${i}" onclick="selectSimilarOption(${i}, this)">${labels[i]}. ${opt}</div>
+      `).join('')}
+      <div id="similarFeedback" style="margin-top:8px;font-size:13px;"></div>
+      <div style="margin-top:10px;display:flex;gap:8px;">
+        <button class="btn btn-primary btn-sm" onclick="submitSimilarQuiz()">✅ 提交</button>
+        <button class="btn btn-outline btn-sm" onclick="regenerateSimilar()">🔄 再换一题</button>
+      </div>
+    </div>
+  `;
+}
+
+function selectSimilarOption(idx, el) {
+  if (window._similarQuizAnswered) return;
+  document.querySelectorAll('#similarQuizArea .quiz-option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  window._similarSelectedIdx = idx;
+}
+
+function submitSimilarQuiz() {
+  if (window._similarQuizAnswered || window._similarSelectedIdx === undefined) { showToast('请先选择答案'); return; }
+  window._similarQuizAnswered = true;
+  const data = window._similarQuizData;
+  const correct = window._similarSelectedIdx === data.answer;
+  const opts = document.querySelectorAll('#similarQuizArea .quiz-option');
+  opts[data.answer].classList.add('correct');
+
+  if (correct) {
+    $('similarFeedback').innerHTML = '<div style="color:var(--mint);font-weight:600;">🎉 回答正确！同类题已掌握！</div>';
+    spawnConfetti();
+  } else {
+    opts[window._similarSelectedIdx].classList.add('wrong');
+    $('similarFeedback').innerHTML = `<div style="color:var(--pink);font-weight:600;">❌ 还需要练习，正确答案是 ${['A','B','C','D'][data.answer]}</div>
+      <div style="margin-top:4px;font-size:12px;color:var(--text-light);">💡 ${data.explanation||'回顾原题知识点，注意审题'}</div>
+      <button class="btn btn-sm btn-outline" style="margin-top:6px;" onclick="regenerateSimilar()">🔄 再来一题同类题</button>`;
+  }
+}
+
+function regenerateSimilar() {
+  if (!currentSimilarOriginId) { showToast('请先从错题集选择题目'); return; }
+  DATA = loadData();
+  const q = DATA.quizQuestions.find(q=>q.id===currentSimilarOriginId);
+  if (!q) { showToast('原题已删除'); return; }
+  window._similarQuizAnswered = false;
+  window._similarSelectedIdx = undefined;
+  renderSimilarQuiz(q);
+}
+
+function generateVariant(q) {
+  const subject = (q.subject||'').toLowerCase();
+  const question = q.question;
+  const options = [...q.options];
+  const correctIdx = q.answer;
+
+  // Strategy varies by subject
+  if (/数学|math/i.test(subject)) {
+    return generateMathVariant(question, options, correctIdx, q);
+  } else if (/英语|english/i.test(subject)) {
+    return generateEnglishVariant(question, options, correctIdx, q);
+  } else {
+    return generateGenericVariant(question, options, correctIdx, q);
+  }
+}
+
+function generateMathVariant(question, options, correctIdx, q) {
+  // Replace numbers with similar ones
+  let newQ = question.replace(/(\d+\.?\d*)/g, (match) => {
+    const n = parseFloat(match);
+    if (isNaN(n) || n === 0) return match;
+    const factor = 0.5 + Math.random() * 1.5; // 0.5x to 2x
+    if (Number.isInteger(n) && n < 100) {
+      return String(Math.max(1, Math.round(n * factor)));
+    }
+    return (Math.round(n * factor * 100) / 100).toString();
+  });
+  // Replace names
+  const names = ['小明','小红','小华','小刚','小丽','小军','小李','小王','小张','小陈'];
+  newQ = newQ.replace(/小明|小红|小华|小刚|小丽/g, ()=>names[Math.floor(Math.random()*names.length)]);
+
+  let newOpts = options.map(opt => {
+    return opt.replace(/(\d+\.?\d*)/g, (match) => {
+      const n = parseFloat(match);
+      if (isNaN(n) || n === 0) return match;
+      const factor = 0.5 + Math.random() * 1.5;
+      if (Number.isInteger(n) && n < 100) {
+        return String(Math.max(1, Math.round(n * factor)));
+      }
+      return (Math.round(n * factor * 100) / 100).toString();
+    });
+  });
+
+  // Ensure the correct answer index stays valid
+  const newAns = Math.min(correctIdx, newOpts.length - 1);
+
+  return {
+    question: newQ,
+    options: newOpts,
+    answer: newAns,
+    explanation: `同类题变式，考察相同知识点「${q.topic||q.subject}」。原题思路同样适用，注意数值变化后的计算。`,
+    topic: q.topic, subject: q.subject
+  };
+}
+
+function generateEnglishVariant(question, options, correctIdx, q) {
+  let newQ = question;
+  // Swap time expressions
+  newQ = newQ.replace(/yesterday/gi, ()=>Math.random()>0.5?'last week':'two days ago');
+  newQ = newQ.replace(/tomorrow/gi, ()=>Math.random()>0.5?'next week':'in two days');
+  newQ = newQ.replace(/often/gi, ()=>['usually','sometimes','frequently'][Math.floor(Math.random()*3)]);
+
+  // For word meaning questions, keep the correct answer, shuffle distractors
+  let newOpts = [...options];
+  // Slightly modify non-correct options
+  newOpts = newOpts.map((opt, i) => {
+    if (i === correctIdx) return opt; // Keep correct answer
+    if (Math.random() > 0.5) return opt; // Keep some distractors
+    return opt.split('').reverse().join(''); // Jumble one distractor (simple)
+  });
+
+  return {
+    question: newQ,
+    options: newOpts,
+    answer: correctIdx,
+    explanation: `同类题变式，考察相同语法/词汇点「${q.topic||q.subject}」。注意时态/语境变化，核心知识点不变。`,
+    topic: q.topic, subject: q.subject
+  };
+}
+
+function generateGenericVariant(question, options, correctIdx, q) {
+  // Shuffle options (keep correct answer position tracked)
+  let indices = [0,1,2,3];
+  // Fisher-Yates shuffle
+  for (let i = indices.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+  const newOpts = indices.map(i=>options[i]);
+  const newAns = indices.indexOf(correctIdx);
+
+  return {
+    question: question + '（变式）',
+    options: newOpts,
+    answer: newAns,
+    explanation: `选项顺序已调整，考察对「${q.topic||q.subject}」知识点的理解。排除干扰项，选择最符合题意的答案。`,
+    topic: q.topic, subject: q.subject
+  };
+}
+
+// ==================== AI EXPLANATION ENGINE ====================
+let aiExplainMode = 'local'; // 'local' or 'api'
+
+function showAIExplanation(questionId) {
+  DATA = loadData();
+  const q = DATA.quizQuestions.find(q=>q.id===questionId);
+  if (!q) { showToast('题目不存在'); return; }
+
+  $('aiExplainCard').style.display = 'block';
+  $('aiExplainCard').scrollIntoView({behavior:'smooth',block:'center'});
+  $('aiExplainCard').classList.add('highlight-pulse');
+  setTimeout(()=>$('aiExplainCard').classList.remove('highlight-pulse'), 4500);
+
+  $('aiExplainContent').innerHTML = '<div style="text-align:center;padding:16px;"><span class="spinner"></span> 正在生成深度讲解...</div>';
+  $('aiExplainSource').textContent = '';
+
+  // Try local first (fast), then offer API option
+  setTimeout(() => {
+    const explanation = generateLocalExplanation(q);
+    $('aiExplainContent').innerHTML = explanation;
+    $('aiExplainSource').textContent = '📋 本地智能解析 · 可配置AI API获取更深度讲解';
+
+    // Add API key config if not set
+    if (!localStorage.getItem('gemini_api_key')) {
+      $('aiExplainContent').innerHTML += `
+        <div style="margin-top:12px;padding:10px;background:#fff;border-radius:10px;border:1px dashed #ccc;">
+          <div style="font-size:12px;color:var(--text-light);margin-bottom:6px;">🔑 配置Google Gemini API Key可启用真实AI讲解（免费）</div>
+          <div class="api-key-row">
+            <input type="password" id="apiKeyInput" placeholder="输入 Gemini API Key...">
+            <button class="btn btn-sm btn-primary" onclick="saveApiKey()">保存</button>
+          </div>
+          <div style="font-size:10px;color:var(--text-lighter);">获取免费Key：<a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--blue);">aistudio.google.com</a></div>
+        </div>
+      `;
+    } else {
+      $('aiExplainContent').innerHTML += `
+        <div style="margin-top:12px;text-align:center;">
+          <button class="btn btn-sm" style="background:var(--lavender);color:#4A5599;" onclick="callGeminiExplanation('${questionId}')">🚀 调用AI深度分析</button>
+        </div>
+      `;
+    }
+  }, 500);
+}
+
+function saveApiKey() {
+  const key = $('apiKeyInput').value.trim();
+  if (!key) { showToast('请输入API Key'); return; }
+  localStorage.setItem('gemini_api_key', key);
+  showToast('✅ API Key已保存');
+  // Refresh explanation view
+  if (currentSimilarOriginId) showAIExplanation(currentSimilarOriginId);
+  else {
+    const wbId = document.querySelector('.wb-card')?.id?.replace('wb-','');
+    if (wbId) {
+      const wb = DATA.wrongBook.find(w=>w.id===wbId);
+      if (wb) showAIExplanation(wb.questionId);
+    }
+  }
+}
+
+function generateLocalExplanation(q) {
+  const subject = q.subject || '未知科目';
+  const topic = q.topic || '';
+  const question = q.question;
+  const correctAnswer = q.options[q.answer];
+  const correctLabel = ['A','B','C','D'][q.answer];
+  const wrongLabels = ['A','B','C','D'].filter((_,i)=>i!==q.answer);
+  const wrongAnswers = q.options.filter((_,i)=>i!==q.answer);
+
+  let html = '';
+
+  // 1. Knowledge point analysis
+  html += `<div class="ai-section"><h5>📌 知识点定位</h5>`;
+  html += `<p>科目：<b>${subject}</b>${topic?' · 知识点：<b>'+topic+'</b>':''}</p>`;
+  html += `<p>难度：${q.difficulty==='hard'?'⭐⭐⭐ 困难':q.difficulty==='easy'?'⭐ 简单':'⭐⭐ 中等'}</p>`;
+  html += `</div>`;
+
+  // 2. Step-by-step solution
+  html += `<div class="ai-section"><h5>🧩 解题步骤</h5>`;
+  if (/数学|math/i.test(subject)) {
+    html += mathExplanation(q);
+  } else if (/英语|english/i.test(subject)) {
+    html += englishExplanation(q);
+  } else if (/物理|physics/i.test(subject)) {
+    html += physicsExplanation(q);
+  } else {
+    html += genericExplanation(q);
+  }
+  html += `</div>`;
+
+  // 3. Answer analysis
+  html += `<div class="ai-section"><h5>🎯 选项分析</h5>`;
+  html += `<div class="step" style="border-left:3px solid var(--mint);"><b>✅ ${correctLabel}</b>：${correctAnswer} — <span style="color:var(--mint);">正确答案</span></div>`;
+  wrongLabels.forEach((label, i) => {
+    html += `<div class="step" style="border-left:3px solid #eee;"><b>❌ ${label}</b>：${wrongAnswers[i]} — <span style="color:#999;">干扰项</span></div>`;
+  });
+  html += `</div>`;
+
+  // 4. Common mistakes
+  html += `<div class="ai-section"><h5>⚠️ 易错提醒</h5>`;
+  html += `<ul>`;
+  html += `<li>仔细审题，区分题目中的关键条件和干扰信息</li>`;
+  html += `<li>${q.difficulty==='hard'?'本题难度较高，建议多做同类练习巩固':q.difficulty==='easy'?'基础题要确保100%正确率':'中等难度题是考试拉开差距的关键'}</li>`;
+  html += `<li>错题要定期复习，建议间隔1天、3天、7天各复习一次</li>`;
+  html += `</ul></div>`;
+
+  // 5. Study tips
+  html += `<div class="ai-section"><h5>💡 学习建议</h5><p>`;
+  html += `本题考察${topic||subject}的核心知识点。建议：<br>`;
+  html += `① 回顾课本相关章节的基础概念<br>`;
+  html += `② 做3-5道同类题巩固（可使用"同类题"功能）<br>`;
+  html += `③ 用自己的话把解题思路讲出来（费曼学习法）`;
+  html += `</p></div>`;
+
+  return html;
+}
+
+function mathExplanation(q) {
+  const steps = [];
+  steps.push(`<b>步骤1：理解题意</b><br>仔细读题，明确已知条件和所求。`);
+  steps.push(`<b>步骤2：列式/建模</b><br>将文字转化为数学表达式或方程。`);
+  steps.push(`<b>步骤3：计算求解</b><br>按运算规则逐步计算，注意符号和单位。`);
+  steps.push(`<b>步骤4：验证答案</b><br>代入原题检验，确保结果合理。`);
+  return steps.map(s=>`<div class="step">${s}</div>`).join('');
+}
+
+function englishExplanation(q) {
+  const steps = [];
+  steps.push(`<b>步骤1：识别考点</b><br>判断本题考察的是语法、词汇还是阅读理解。`);
+  steps.push(`<b>步骤2：分析语境</b><br>理解句子的时态、语态和上下文含义。`);
+  steps.push(`<b>步骤3：排除干扰</b><br>逐个排除明显错误的选项，缩小范围。`);
+  steps.push(`<b>步骤4：确定答案</b><br>选择最符合语法规则和语境的选项。`);
+  return steps.map(s=>`<div class="step">${s}</div>`).join('');
+}
+
+function physicsExplanation(q) {
+  const steps = [];
+  steps.push(`<b>步骤1：分析物理过程</b><br>明确研究对象和物理情景。`);
+  steps.push(`<b>步骤2：选择公式/定律</b><br>根据已知条件选择合适的物理规律。`);
+  steps.push(`<b>步骤3：代入计算</b><br>注意单位统一和有效数字。`);
+  steps.push(`<b>步骤4：检验合理性</b><br>判断结果是否符合物理常识。`);
+  return steps.map(s=>`<div class="step">${s}</div>`).join('');
+}
+
+function genericExplanation(q) {
+  const steps = [];
+  steps.push(`<b>步骤1：审题</b><br>仔细阅读，划出关键词和限定条件。`);
+  steps.push(`<b>步骤2：知识匹配</b><br>回想相关知识点和解题方法。`);
+  steps.push(`<b>步骤3：逐一排除</b><br>对比选项，消除明显错误的干扰项。`);
+  steps.push(`<b>步骤4：确认答案</b><br>选择最全面、最准确的选项。`);
+  return steps.map(s=>`<div class="step">${s}</div>`).join('');
+}
+
+// ==================== GEMINI API INTEGRATION ====================
+async function callGeminiExplanation(questionId) {
+  const apiKey = localStorage.getItem('gemini_api_key');
+  if (!apiKey) { showToast('请先配置API Key'); return; }
+
+  DATA = loadData();
+  const q = DATA.quizQuestions.find(q=>q.id===questionId);
+  if (!q) return;
+
+  $('aiExplainContent').innerHTML = '<div style="text-align:center;padding:20px;"><span class="spinner"></span> AI正在深度分析中...</div>';
+  $('aiExplainSource').textContent = '';
+
+  const prompt = `你是一位资深的中学教师。请对以下题目进行深度讲解：
+科目：${q.subject||'未知'}
+知识点：${q.topic||'未知'}
+题目：${q.question}
+选项：${q.options.map((o,i)=>String.fromCharCode(65+i)+'. '+o).join('；')}
+正确答案：${String.fromCharCode(65+q.answer)}. ${q.options[q.answer]}
+难度：${q.difficulty||'中等'}
+
+请从以下角度分析（用markdown格式，简体中文）：
+1. 📌 知识点定位（涉及哪些考点）
+2. 🧩 解题步骤（分步骤详细推导）
+3. 🎯 各选项分析（为什么对/为什么错）
+4. ⚠️ 易错点提醒
+5. 💡 学习建议和同类题方向
+总计300-500字，语言亲和、适合初中生阅读。`;
+
+  try {
+    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        contents: [{parts: [{text: prompt}]}],
+        generationConfig: {temperature: 0.7, maxOutputTokens: 800}
+      })
+    });
+    const data = await resp.json();
+    if (data.error) {
+      $('aiExplainContent').innerHTML = `<div style="color:var(--pink);">❌ API错误：${data.error.message||'未知错误'}</div>`;
+      $('aiExplainSource').textContent = '请检查API Key是否正确';
+      return;
+    }
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '未获得回复';
+    // Simple markdown to HTML
+    const html = text
+      .replace(/###?\s*(.+)/g, '<h5>$1</h5>')
+      .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+      .replace(/\n- /g, '\n<li>')
+      .replace(/\n(\d+)\.\s/g, '\n<b>$1.</b> ')
+      .replace(/\n\n/g, '<br><br>')
+      .replace(/\n/g, '<br>');
+
+    $('aiExplainContent').innerHTML = `<div class="ai-section">${html}</div>
+      <div style="margin-top:10px;padding:8px;background:#fff;border-radius:8px;font-size:12px;color:var(--text-light);">
+        ⚡ 以上内容由 AI (Gemini) 生成，仅供参考。建议结合课本和老师讲解理解。
+      </div>`;
+    $('aiExplainSource').textContent = '🤖 由 Google Gemini AI 生成 · 仅供参考';
+
+    // Save the AI explanation to the question for offline access
+    if (text) {
+      q.aiExplanation = text;
+      saveData(DATA);
+    }
+  } catch(e) {
+    $('aiExplainContent').innerHTML = `<div style="color:var(--pink);">❌ 网络错误：${e.message}</div>`;
+    $('aiExplainSource').textContent = '请检查网络连接（Gemini API可能需要代理）';
+  }
+}
+
+// Vocab
+function renderVocab() {
+  DATA = loadData();
+  const t = today();
+  $('vocabTotal').textContent = DATA.vocabWords.length;
+  $('vocabToday').textContent = DATA.vocabWords.filter(v=>v.reviewedDates&&v.reviewedDates.includes(t)).length;
+  $('vocabStreak').textContent = DATA.vocabWords.length>0 ? Math.max(...DATA.vocabWords.map(v=>v.streak||0)) : 0;
+
+  $('vocabList').innerHTML = DATA.vocabWords.length===0
+    ? '<div class="empty"><div class="empty-icon">📖</div>还没有单词</div>'
+    : DATA.vocabWords.map((v,i) => `
+      <div class="word-card ${v._flipped?'flipped':''}" onclick="flipWord(${i})" id="wordCard${i}">
+        <div class="word-front">${v.word}</div>
+        <div class="word-back">${v.meaning}</div>
+        <div style="display:flex;gap:4px;margin-top:6px;font-size:10px;">
+          <span class="badge badge-blue">📅 ${v.reviewedDates?.length||0}次复习</span>
+          <span class="badge badge-mint">🔥 ${v.streak||0}天</span>
+          <button class="btn btn-sm btn-mint" style="font-size:9px;padding:2px 6px;" onclick="event.stopPropagation();reviewWord(${i})">✅ 打卡</button>
+        </div>
+      </div>
+    `).join('');
+}
+
+function flipWord(i) {
+  DATA = loadData();
+  DATA.vocabWords[i]._flipped = !DATA.vocabWords[i]._flipped;
+  const card = document.getElementById('wordCard'+i);
+  if (card) card.classList.toggle('flipped');
+}
+
+function reviewWord(i) {
+  DATA = loadData();
+  const t = today();
+  if (!DATA.vocabWords[i].reviewedDates) DATA.vocabWords[i].reviewedDates = [];
+  if (!DATA.vocabWords[i].reviewedDates.includes(t)) {
+    DATA.vocabWords[i].reviewedDates.push(t);
+    DATA.vocabWords[i].streak = (DATA.vocabWords[i].streak||0)+1;
+    saveData(DATA);
+    renderVocab();
+    showToast('✅ 打卡成功！');
+  } else {
+    showToast('今天已经打过卡了哦~');
+  }
+}
+
+function saveVocab() {
+  DATA = loadData();
+  DATA.vocabWords.push({word:$('vbWord').value.trim(),meaning:$('vbMeaning').value.trim(),reviewedDates:[],streak:0});
+  saveData(DATA);
+  closeModal();
+  renderVocab();
+  showToast('✅ 单词已添加');
+}
+
+// ==================== PAGE 4: REVIEW ====================
+function loadReflection() {
+  const t = today();
+  $('reflectDate').textContent = formatDate(t);
+  DATA = loadData();
+  const ref = DATA.reflections[t];
+  $('reflectHighlight').value = ref?.highlight||'';
+  $('reflectShortcoming').value = ref?.shortcoming||'';
+  $('reflectTomorrow').value = ref?.tomorrow||'';
+  $('reflectMood').value = ref?.mood||'';
+
+  const history = Object.entries(DATA.reflections).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,10);
+  $('reflectHistory').innerHTML = history.length===0
+    ? '<div style="text-align:center;color:var(--text-lighter);font-size:12px;">还没有复盘记录</div>'
+    : history.map(([date,r]) => `
+      <div style="padding:8px 0;border-bottom:1px solid #f5f5f5;">
+        <div style="font-weight:500;font-size:12px;">📅 ${formatDate(date)}</div>
+        <div style="font-size:11px;color:var(--text-light);margin-top:2px;">🌟 ${r.highlight?.substring(0,30)||'...'} | 😊 ${r.mood||'...'}</div>
+      </div>
+    `).join('');
+}
+
+function saveReflection() {
+  DATA = loadData();
+  const t = today();
+  DATA.reflections[t] = {
+    highlight: $('reflectHighlight').value.trim(),
+    shortcoming: $('reflectShortcoming').value.trim(),
+    tomorrow: $('reflectTomorrow').value.trim(),
+    mood: $('reflectMood').value.trim(),
+  };
+  saveData(DATA);
+  loadReflection();
+  spawnConfetti();
+  showToast('✅ 复盘已保存');
+}
+
+function renderNotes() {
+  DATA = loadData();
+  $('notesList').innerHTML = DATA.notes.length===0
+    ? '<div class="empty"><div class="empty-icon">📒</div>还没有笔记</div>'
+    : DATA.notes.slice().reverse().map((n,i) => `
+      <div class="card" style="margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:start;">
+          <div style="font-weight:600;font-size:14px;">${n.title}</div>
+          <button class="btn btn-sm btn-danger" style="font-size:9px;padding:2px 6px;" onclick="deleteNote(${i})">✕</button>
+        </div>
+        <div style="font-size:11px;color:var(--text-light);margin:4px 0;">${n.date}</div>
+        <div style="font-size:12px;white-space:pre-wrap;">${n.content?.substring(0,150)}${n.content?.length>150?'...':''}</div>
+        ${n.tags?`<div style="margin-top:4px;">${n.tags.split(',').map(t=>`<span class="tag badge-blue">${t.trim()}</span>`).join('')}</div>`:''}
+      </div>
+    `).join('');
+}
+
+function saveNote() {
+  DATA = loadData();
+  DATA.notes.push({
+    title: $('ntTitle').value.trim(),
+    content: $('ntContent').value.trim(),
+    tags: $('ntTags').value.trim(),
+    date: today(),
+  });
+  saveData(DATA);
+  closeModal();
+  renderNotes();
+  showToast('✅ 笔记已保存');
+}
+
+function deleteNote(i) { DATA = loadData(); DATA.notes.splice(DATA.notes.length-1-i,1); saveData(DATA); renderNotes(); }
+
+// Save countdown
+function saveCountdown() {
+  DATA = loadData();
+  DATA.countdowns.push({id:'cd'+Date.now(),name:$('cdName').value.trim(),date:$('cdDate').value,icon:$('cdIcon').value||'📅'});
+  saveData(DATA);
+  closeModal();
+  renderHome();
+  showToast('✅ 倒计时已添加');
+}
+
+// ==================== IMPORT / EXPORT ====================
+function exportData() {
+  DATA = loadData();
+  const blob = new Blob([JSON.stringify(DATA, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `初中全能管家_备份_${today()}.json`; a.click();
+  URL.revokeObjectURL(url);
+  showToast('📤 数据已导出');
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const imported = JSON.parse(ev.target.result);
+      if (!imported.version) { showToast('❌ 文件格式不正确'); return; }
+      if (!confirm('确定要导入数据吗？这将覆盖当前数据。')) return;
+      saveData(imported);
+      DATA = imported;
+      renderAll();
+      showToast('✅ 数据已导入');
+    } catch(ex) { showToast('❌ 文件解析失败'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ==================== RENDER ALL ====================
+function renderAll() {
+  renderHome();
+  if ($('page-schedule').classList.contains('active')) renderCalendar();
+  if ($('page-tasks').classList.contains('active')) { renderKanban(); renderFinance(); renderPieChart(); }
+  if ($('page-study').classList.contains('active')) renderStudyProgress();
+  if ($('page-review').classList.contains('active')) loadReflection();
+}
+
+// ==================== INIT ====================
+initCalendar();
+renderAll();
+
+// Init pomodoro display
+updatePomoDisplay();
+
+// Periodically refresh home (every 30s for time-based updates)
+setInterval(() => {
+  if ($('page-home').classList.contains('active')) renderHome();
+}, 30000);
+
+console.log('🌟 我的初中全能管家 已就绪！');
+console.log('📱 支持添加到手机主屏幕 (Add to Home Screen)');
+console.log('💾 数据自动保存在浏览器 localStorage');
+console.log('📤 可通过右上角按钮导出/导入JSON备份');
+</script>
+</body>
+</html>
