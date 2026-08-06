@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="大学全能管家">
+<title>我的大学全能管家</title>
+<style>
+:root {
+  --ink: #2c2c2c; --ink-light: #5a5a5a; --ink-lighter: #999;
+  --paper: #f8f5f0; --card: #fefdfb; --card-border: #e5e0d8;
+  --accent: #8b1a1a; --accent-light: #c44; --gold: #8b6914;
+  --jade: #5a7a6a; --jade-light: #e8f0e8;
+  --shadow: 0 2px 12px rgba(0,0,0,0.05); --radius: 4px;
+  --nav-height: 68px; --safe-bottom: env(safe-area-inset-bottom, 12px);
+  --font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Serif SC', 'Source Han Serif SC', 'STSong', serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{font-size:16px;-webkit-tap-highlight-color:transparent;}
+body{
+  font-family:var(--font);background:var(--paper);color:var(--ink);
+  max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh;
+  overflow-x:hidden;padding-bottom:calc(var(--nav-height)+var(--safe-bottom)+12px);
+  -webkit-font-smoothing:antialiased;user-select:none;
+  background-image:radial-gradient(ellipse at 20% 20%, rgba(0,0,0,0.02) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(0,0,0,0.02) 0%, transparent 50%);
+}
+.bottom-nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;
+  height:calc(var(--nav-height)+var(--safe-bottom));background:rgba(254,253,251,0.92);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-top:1px solid var(--card-border);display:flex;padding-bottom:var(--safe-bottom);z-index:100;
+}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;transition:all 0.2s;}
+.nav-item .icon{font-size:20px;transition:transform 0.2s;}
+.nav-item .label{font-size:10px;color:var(--ink-lighter);font-weight:500;}
+.nav-item.active .label{color:var(--ink);font-weight:700;}
+.nav-item.active .icon{transform:scale(1.12);}
+.page{display:none;padding:14px 12px;animation:fadeIn 0.3s;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{0%{transform:scale(0.8);opacity:0}60%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+.card{
+  background:var(--card);border:1px solid var(--card-border);padding:14px;margin-bottom:10px;
+  box-shadow:var(--shadow);position:relative;
+}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--ink-lighter),transparent);opacity:0.15;}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.card-title{font-size:15px;font-weight:700;letter-spacing:0.5px;}
+.badge{font-size:10px;padding:2px 8px;font-weight:500;}
+.badge-red{color:var(--accent);}
+.badge-jade{color:var(--jade);}
+.badge-gold{color:var(--gold);}
+.badge-gray{color:var(--ink-lighter);}
+.btn{
+  display:inline-flex;align-items:center;gap:4px;padding:8px 14px;font-size:12px;font-weight:600;
+  border:1px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;
+  font-family:var(--font);transition:all 0.2s;letter-spacing:0.5px;
+}
+.btn:active{background:var(--ink);color:var(--paper);}
+.btn-sm{padding:5px 10px;font-size:10px;}
+.btn-primary{background:var(--ink);color:var(--paper);}
+.btn-primary:active{background:var(--ink-light);}
+.btn-danger{border-color:var(--accent);color:var(--accent);}
+.btn-danger:active{background:var(--accent);color:#fff;}
+.input{
+  width:100%;padding:10px 12px;border:1px solid var(--card-border);background:var(--paper);
+  font-size:13px;font-family:var(--font);color:var(--ink);margin-bottom:6px;
+}
+.input:focus{outline:none;border-color:var(--ink);}
+select.input{appearance:none;padding-right:28px;background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3e%3cpath d='M5 7L1 3h8z' fill='%235a5a5a'/%3e%3c/svg%3e");background-repeat:no-repeat;background-position:right 10px center;}
+.timeline{position:relative;padding-left:24px;}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:1px;background:linear-gradient(180deg,var(--ink),transparent);opacity:0.15;}
+.tl-item{position:relative;margin-bottom:12px;padding:10px 12px;background:var(--paper);border:1px solid var(--card-border);}
+.tl-item::before{content:'';position:absolute;left:-19px;top:14px;width:7px;height:7px;border-radius:50%;background:var(--ink);}
+.tl-item.exam::before{background:var(--accent);}
+.tl-item.homework::before{background:var(--gold);}
+.tl-item.personal::before{background:var(--jade);}
+.tl-time{font-size:10px;color:var(--ink-lighter);}
+.tl-title{font-size:13px;font-weight:600;}
+.check-row{display:flex;align-items:center;gap:8px;padding:5px 0;cursor:pointer;}
+.check-circle{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--ink-lighter);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;transition:all 0.3s;}
+.check-row.done .check-circle{background:var(--ink);border-color:var(--ink);color:var(--paper);animation:popIn 0.3s;}
+.check-row.done .check-label{text-decoration:line-through;color:var(--ink-lighter);}
+.countdown-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--card-border);}
+.countdown-item:last-child{border-bottom:none;}
+.cd-num{font-size:22px;font-weight:700;min-width:44px;text-align:center;}
+.progress-bar{height:6px;background:var(--card-border);overflow:hidden;margin:3px 0;}
+.progress-fill{height:100%;background:var(--ink);transition:width 0.5s;}
+.modal-overlay{position:fixed;inset:0;z-index:200;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0.4);}
+.modal{background:var(--card);width:100%;max-width:480px;border-radius:2px 2px 0 0;padding:20px 16px 32px;max-height:80vh;overflow-y:auto;animation:slideUp 0.3s;}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal h3{font-size:17px;margin-bottom:14px;text-align:center;font-weight:700;}
+.close-btn{position:absolute;right:14px;top:14px;font-size:22px;cursor:pointer;color:var(--ink-lighter);}
+.stat-row{display:flex;gap:6px;}
+.stat-card{flex:1;background:var(--paper);padding:10px;text-align:center;border:1px solid var(--card-border);}
+.stat-val{font-size:20px;font-weight:700;}
+.stat-label{font-size:10px;color:var(--ink-lighter);}
+.kanban-col{background:var(--paper);padding:8px;min-height:80px;border:1px solid var(--card-border);}
+.kanban-title{font-size:10px;font-weight:700;color:var(--ink-lighter);margin-bottom:6px;letter-spacing:1px;}
+.kanban-card{padding:8px 10px;margin-bottom:6px;cursor:grab;font-size:12px;border-left:2px solid var(--ink);background:var(--card);}
+.kanban-card.course{border-left-color:var(--ink);}
+.kanban-card.exam{border-left-color:var(--accent);}
+.kanban-card.personal{border-left-color:var(--jade);}
+.kanban-card.life{border-left-color:var(--ink-lighter);}
+.quiz-option{display:block;padding:10px 12px;margin:4px 0;border:1px solid var(--card-border);cursor:pointer;font-size:13px;background:var(--paper);}
+.quiz-option.selected{border-color:var(--ink);background:var(--card);}
+.quiz-option.correct{border-color:var(--jade);color:var(--jade);}
+.quiz-option.wrong{border-color:var(--accent);color:var(--accent);}
+.reflect-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.reflect-box{padding:10px;background:var(--paper);border:1px solid var(--card-border);min-height:60px;}
+.reflect-box .rb-title{font-size:10px;font-weight:700;color:var(--ink-lighter);margin-bottom:4px;}
+.reflect-box textarea{width:100%;border:none;background:transparent;font-size:12px;font-family:var(--font);resize:none;outline:none;min-height:40px;}
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:8px 18px;font-size:12px;z-index:400;letter-spacing:0.5px;}
+.empty{text-align:center;padding:20px;color:var(--ink-lighter);font-size:12px;}
+.confetti{position:fixed;top:40%;left:50%;font-size:40px;z-index:350;animation:confettiUp 1.2s ease-out forwards;pointer-events:none;}
+@keyframes confettiUp{0%{opacity:1;transform:translate(-50%,0) scale(1)}100%{opacity:0;transform:translate(-50%,-80px) scale(2)}}
+.section-title{font-size:20px;font-weight:700;margin-bottom:2px;letter-spacing:1px;}
+.section-sub{font-size:11px;color:var(--ink-lighter);margin-bottom:12px;}
+.scroll-x{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:8px;}
+.scroll-x::-webkit-scrollbar{display:none;}
+.sub-tab{padding:5px 12px;font-size:11px;white-space:nowrap;cursor:pointer;border:1px solid var(--card-border);background:var(--paper);}
+.sub-tab.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+/* Ink stamp */
+.stamp{position:absolute;top:8px;right:8px;border:2px solid var(--accent);color:var(--accent);padding:4px 8px;font-size:10px;font-weight:700;transform:rotate(8deg);opacity:0.7;letter-spacing:1px;pointer-events:none;}
+/* CSV export */
+.csv-btn{border-color:var(--jade);color:var(--jade);}
+.csv-btn:active{background:var(--jade);color:#fff;}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast" style="display:none"></div>
+<div id="confettiSlot"></div>
+
+<!-- ===== PAGE 0: 首页 ===== -->
+<div class="page active" id="page-home">
+  <div class="section-title" id="greetingText"></div>
+  <div class="section-sub" id="dateText"></div>
+
+  <div class="card"><div class="card-header"><span class="card-title">今日日程</span><button class="btn btn-sm" onclick="openModal('eventModal')">+</button></div><div class="timeline" id="todayTimeline"></div></div>
+
+  <div class="card"><div class="card-header"><span class="card-title">核心任务</span><span class="badge badge-red" id="taskProgress">0/0</span></div><div id="questList"></div></div>
+
+  <div class="card"><div class="card-header"><span class="card-title">最近倒计时</span><button class="btn btn-sm" onclick="openModal('countdownModal')">+</button></div><div id="countdownList"></div></div>
+</div>
+
+<!-- ===== PAGE 1: 日程 ===== -->
+<div class="page" id="page-schedule">
+  <div class="scroll-x" id="schedTabs">
+    <div class="sub-tab active" data-tab="month">月视图</div><div class="sub-tab" data-tab="week">周视图</div><div class="sub-tab" data-tab="ddl">DDL预警</div>
+  </div>
+  <div id="schedMonth"><div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><button class="btn btn-sm" onclick="chMonth(-1)">‹</button><span id="monthLabel" style="font-weight:700;"></span><button class="btn btn-sm" onclick="chMonth(1)">›</button></div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;" id="calGrid"></div></div><div class="card" id="dayEvents"><div class="empty">点击日期查看</div></div></div>
+  <div id="schedWeek" style="display:none;"><div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><button class="btn btn-sm" onclick="chWeek(-1)">‹</button><span id="weekLabel" style="font-weight:700;"></span><button class="btn btn-sm" onclick="chWeek(1)">›</button></div><div id="weekGrid"></div></div></div>
+  <div id="schedDDL" style="display:none;"><div class="card"><div class="card-title" style="margin-bottom:8px;">未来7天DDL预警</div><div id="ddlList"></div></div></div>
+</div>
+
+<!-- ===== PAGE 2: 任务 ===== -->
+<div class="page" id="page-tasks">
+  <div class="scroll-x" id="taskTabs">
+    <div class="sub-tab active" data-tab="kanban">看板</div><div class="sub-tab" data-tab="pomo">番茄钟</div><div class="sub-tab" data-tab="finance">账本</div>
+  </div>
+  <div id="taskKanban"><div class="card-header" style="padding:0 0 8px;"><span class="card-title">任务看板</span><button class="btn btn-sm" onclick="openModal('taskModal')">+</button></div><div class="scroll-x" id="kanbanFilter"><div class="sub-tab active" data-f="all">全部</div><div class="sub-tab" data-f="course">课程</div><div class="sub-tab" data-f="exam">考试</div><div class="sub-tab" data-f="personal">个人</div><div class="sub-tab" data-f="life">生活</div></div><div id="kanbanBoard"></div></div>
+  <div id="taskPomo" style="display:none;"><div class="card" style="text-align:center;"><div class="card-title" style="justify-content:center;">番茄钟</div><div style="font-size:48px;font-weight:300;margin:16px 0;letter-spacing:4px;" id="pomoTime">25:00</div><div style="display:flex;gap:6px;justify-content:center;"><button class="btn btn-primary btn-sm" id="pomoStart" onclick="startPomo()">开始</button><button class="btn btn-sm" id="pomoPause" onclick="pausePomo()" style="display:none;">暂停</button><button class="btn btn-sm" onclick="resetPomo()">重置</button></div><div style="margin-top:6px;font-size:10px;color:var(--ink-lighter);">已完成 <span id="pomoCount">0</span> 个番茄</div></div></div>
+  <div id="taskFinance" style="display:none;"><div class="card"><div class="card-header"><span class="card-title">本月汇总</span><button class="btn btn-sm" onclick="openModal('finModal')">+</button></div><div class="stat-row"><div class="stat-card"><div class="stat-val" style="color:var(--jade);" id="finIn">¥0</div><div class="stat-label">收入</div></div><div class="stat-card"><div class="stat-val" style="color:var(--accent);" id="finOut">¥0</div><div class="stat-label">支出</div></div><div class="stat-card"><div class="stat-val" id="finBal">¥0</div><div class="stat-label">结余</div></div></div></div><div class="card"><div class="card-title" style="margin-bottom:6px;">支出分类</div><canvas id="pieCanvas" width="100" height="100" style="display:block;margin:0 auto;"></canvas><div id="pieLegend" style="text-align:center;font-size:10px;"></div></div><div class="card"><div style="display:flex;justify-content:space-between;align-items:center;"><span class="card-title">最近记录</span><button class="btn btn-sm csv-btn" onclick="exportCSV()">导出CSV</button></div><div id="finList"></div></div></div>
+</div>
+
+<!-- ===== PAGE 3: 学习 ===== -->
+<div class="page" id="page-study">
+  <div class="scroll-x" id="studyTabs"><div class="sub-tab active" data-tab="progress">进度</div><div class="sub-tab" data-tab="quiz">刷题</div><div class="sub-tab" data-tab="wrong">错题</div><div class="sub-tab" data-tab="vocab">单词</div></div>
+  <div id="studyProgress"><div class="card"><div class="card-header"><span class="card-title">科目进度</span><button class="btn btn-sm" onclick="openModal('subModal')">+</button></div><div id="subList"></div></div><div class="card"><div class="card-header"><span class="card-title">考试倒计时</span><button class="btn btn-sm" onclick="openModal('examModal')">+</button></div><div id="examList"></div></div></div>
+  <div id="studyQuiz" style="display:none;"><div class="card"><div class="card-header"><span class="card-title">刷题练习</span><button class="btn btn-sm" onclick="openModal('quizModal')">+</button></div><div id="quizArea"><div class="empty">还没有题目</div></div></div></div>
+  <div id="studyWrong" style="display:none;"><div class="card"><div class="card-header"><span class="card-title">错题集</span></div><div id="wrongList"><div class="empty">暂无错题</div></div></div></div>
+  <div id="studyVocab" style="display:none;"><div class="card"><div class="card-header"><span class="card-title">单词打卡</span><button class="btn btn-sm" onclick="openModal('vocabModal')">+</button></div><div class="stat-row" style="margin-bottom:8px;"><div class="stat-card"><div class="stat-val" id="vbTotal">0</div><div class="stat-label">总单词</div></div><div class="stat-card"><div class="stat-val" id="vbToday">0</div><div class="stat-label">今日已打卡</div></div></div><div id="vocabList"></div></div></div>
+</div>
+
+<!-- ===== PAGE 4: 复盘 ===== -->
+<div class="page" id="page-review">
+  <div class="scroll-x" id="reviewTabs"><div class="sub-tab active" data-tab="reflect">复盘</div><div class="sub-tab" data-tab="notes">笔记</div><div class="sub-tab" data-tab="meeting">会议</div></div>
+  <div id="reviewReflect"><div class="card"><div class="card-header"><span class="card-title">今日复盘</span><button class="btn btn-sm btn-primary" onclick="saveReflect()">保存</button></div><div class="reflect-grid"><div class="reflect-box"><div class="rb-title">高光时刻</div><textarea id="rHighlight"></textarea></div><div class="reflect-box"><div class="rb-title">不足之处</div><textarea id="rShort"></textarea></div><div class="reflect-box"><div class="rb-title">明日计划</div><textarea id="rTomorrow"></textarea></div><div class="reflect-box"><div class="rb-title">今日心情</div><textarea id="rMood"></textarea></div></div></div><div class="card"><div class="card-title" style="margin-bottom:6px;">历史复盘</div><div id="reflectHistory"></div></div></div>
+  <div id="reviewNotes" style="display:none;"><div class="card"><div class="card-header"><span class="card-title">灵感笔记</span><button class="btn btn-sm" onclick="openModal('noteModal')">+</button></div><div id="notesList"><div class="empty">暂无笔记</div></div></div></div>
+  <div id="reviewMeeting" style="display:none;"><div class="card"><div class="card-header"><span class="card-title">会议纪要</span><button class="btn btn-sm" onclick="openModal('meetingModal')">+</button></div><div id="meetingList"><div class="empty">暂无记录</div></div></div></div>
+</div>
+
+<!-- ===== MODALS ===== -->
+<div class="modal-overlay" id="modalOverlay" style="display:none;" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="eventModal" style="display:none;"><span class="close-btn" onclick="closeModal()">✕</span><h3>添加日程</h3><input class="input" id="evTitle" placeholder="标题"><input class="input" type="date" id="evDate"><input class="input" type="time" id="evTime"><select class="input" id="evType"><option value="exam">考试</option><option value="homework">作业</option><option value="personal">个人</option><option value="life">生活</option></select><button class="btn btn-primary" style="width:100%;" onclick="saveEvent()">保存</button></div>
+  <div class="modal" id="taskModal" style="display:none;"><span class="close-btn" onclick="closeModal()">✕</span><h3>添加任务</h3><input class="input" id="tkTitle" placeholder="标题"><select class="input" id="tkCat"><option value="course">课程</option><option value="exam">考试</option><option value="personal">个人</option><option value="life">生活</option></select><input class="input" type="date" id="tkDue"><button class="btn btn-primary" style="width:100%;" onclick="saveTask()">保存</button></div>
+  <div class="modal" id="finModal" style="display:none;"><span class="close-btn" onclick="closeModal()">✕</span><h3>记账</h3><input class="input" type="number" id="finAmt" placeholder="金额"><select class="input" id="finType"><option value="expense">支出</option><option value="income">收入</option></select><select class="input" id="finCat"><option value="food">餐饮</option><option value="study">学习</option><option value="transport">交通</option><option value="entertainment">娱乐</option><option value="other">其他</option></select><input class="input" id="finNote" placeholder="备注"><button class="btn btn-primary" style="width:100%;" onclick="saveFin()">保存</button></div>
+  <div class="modal" id="subModal" style="display:none;"><span class="close-btn" onclick="closeModal()">✕</span><h3>添加科目</h3><input class="input" id="subName" placeholder="科目名"><input class="input" type="number" id="subHw" placeholder="大作业进度%"><input class="input" type="number" id="subPaper" placeholder="论文进度%"><button class="btn btn-primary" style="width:100%;" onclick="saveSub()">保存</button></div>
+  <div class="modal" id="examModal" style="display:none;"><span class="close-btn" onclick="closeModal()">✕</span><h3>添加考试</h3><input class="input" id="exName" placeholder="名称"><input class="input" type="date" id="exDate"><input class="input" id="exSub" placeholder="科目"><button class="btn btn-primary" style="width:100%;" onclick="saveExam()">保存</button></div>
+  <div class="modal" id="countdownModal" style="display:none;"><span class="close-btn" onclick="closeModal()">✕</span><h3>添加倒计时</h3><input class="input" id="cdName" placeholder="名称"><input class="input" type="date" id="cdDate"><button class="btn btn-primary" style="width:100%;" onclick="saveCountdown()">保存</button></div>
+  <div class="modal" id="quizModal" style="display:none;"><span class="close-btn" onclick="closeModal()">✕</span><h3>录入题目</h3><input class="input" id="qzSubject" placeholder="科目"><input class="input" id="qzQ" placeholder="题目"><input class="input" id="qzA" placeholder="A"><input class="input" id="qzB" placeholder="B"><input class="input" id="qzC" placeholder="C"><input class="input" id="qzD" placeholder="D"><select class="input" id="qzAns"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select><button class="btn btn-primary" style="width:100%;" onclick="saveQuiz()">保存</button></div>
+  <div class="modal" id="vocabModal" style="display:none;"><span class="close-btn" onclick="closeModal()">✕</span><h3>添加单词</h3><input class="input" id="vbWord" placeholder="单词"><input class="input" id="vbMeaning" placeholder="释义"><button class="btn btn-primary" style="width:100%;" onclick="saveVocab()">保存</button></div>
+  <div class="modal" id="noteModal" style="display:none;"><span class="close-btn" onclick="closeModal()">✕</span><h3>灵感笔记</h3><input class="input" id="ntTitle" placeholder="标题"><textarea class="input" id="ntContent" placeholder="内容..." style="min-height:80px;"></textarea><button class="btn btn-primary" style="width:100%;" onclick="saveNote()">保存</button></div>
+  <div class="modal" id="meetingModal" style="display:none;"><span class="close-btn" onclick="closeModal()">✕</span><h3>会议纪要</h3><input class="input" id="mtTitle" placeholder="会议主题"><input class="input" type="date" id="mtDate"><textarea class="input" id="mtContent" placeholder="纪要内容..." style="min-height:80px;"></textarea><button class="btn btn-primary" style="width:100%;" onclick="saveMeeting()">保存</button></div>
+</div>
+
+<!-- ===== NAV ===== -->
+<nav class="bottom-nav">
+  <div class="nav-item active" data-page="home"><span class="icon">🏠</span><span class="label">首页</span></div>
+  <div class="nav-item" data-page="schedule"><span class="icon">📅</span><span class="label">日程</span></div>
+  <div class="nav-item" data-page="tasks"><span class="icon">📌</span><span class="label">任务</span></div>
+  <div class="nav-item" data-page="study"><span class="icon">📚</span><span class="label">学习</span></div>
+  <div class="nav-item" data-page="review"><span class="icon">📝</span><span class="label">复盘</span></div>
+</nav>
+
+<div style="position:fixed;top:6px;right:6px;z-index:50;display:flex;gap:4px;">
+  <button class="btn btn-sm" style="font-size:9px;padding:3px 8px;background:var(--card);" onclick="exportData()">导出</button>
+  <button class="btn btn-sm" style="font-size:9px;padding:3px 8px;background:var(--card);" onclick="document.getElementById('importF').click()">导入</button>
+  <input type="file" id="importF" accept=".json" style="display:none;" onchange="importData(event)">
+</div>
+
+<script>
+// ======== DATA ========
+function defData(){
+  var t=today(),d7=dtAdd(7),d14=dtAdd(14),d30=dtAdd(30),d60=dtAdd(60),d90=dtAdd(90);
+  return {
+    events:[{id:'e1',title:'高等数学期中',date:d30,time:'09:00',type:'exam',desc:'第1-5章'},{id:'e2',title:'AI编程大作业提交',date:d14,time:'23:59',type:'homework',desc:'GitHub提交'},{id:'e3',title:'学生会例会',date:d7,time:'18:00',type:'personal',desc:'活动策划'}],
+    tasks:[{id:'t1',title:'天津英语高考真题重刷',category:'exam',status:'todo',due:d30},{id:'t2',title:'天津数学高考真题重刷',category:'exam',status:'todo',due:d30},{id:'t3',title:'AI编程项目',category:'course',status:'doing',due:d14},{id:'t4',title:'Python 数据分析',category:'course',status:'todo',due:d60},{id:'t5',title:'每日练字',category:'personal',status:'todo',due:t},{id:'t6',title:'瘦脸操',category:'personal',status:'todo',due:t},{id:'t7',title:'长高操',category:'personal',status:'todo',due:t},{id:'t8',title:'去补课',category:'life',status:'todo',due:t},{id:'t9',title:'练车',category:'life',status:'todo',due:d90}],
+    finances:[],subjects:[{name:'AI编程',hw:60,paper:30},{name:'Python',hw:40,paper:20},{name:'高等数学',hw:70,paper:50},{name:'英语',hw:50,paper:40}],
+    exams:[{id:'ex1',name:'高等数学期中',date:d30,sub:'数学'},{id:'ex2',name:'六级考试',date:d60,sub:'英语'}],
+    countdowns:[{id:'cd1',name:'国庆节',date:'2025-10-01',icon:'🇨🇳'},{id:'cd2',name:'高等数学期中',date:d30,icon:'📝'}],
+    quiz:[],wrongBook:[],vocab:[],reflections:{},notes:[],meetings:[],
+    version:2
+  };
+}
+function dtAdd(d){var n=new Date();n.setDate(n.getDate()+d);return n.toISOString().split('T')[0];}
+function today(){return new Date().toISOString().split('T')[0];}
+
+var KEY='uni_manager_data',DATA=JSON.parse(localStorage.getItem(KEY)||'null')||defData();
+localStorage.setItem(KEY,JSON.stringify(DATA));
+
+function load(){DATA=JSON.parse(localStorage.getItem(KEY)||'null')||defData();}
+function save(){localStorage.setItem(KEY,JSON.stringify(DATA));}
+
+function $(id){return document.getElementById(id);}
+function toast(m){var t=$('toast');t.textContent=m;t.style.display='block';setTimeout(function(){t.style.display='none';},1800);}
+function confetti(){var d=document.createElement('div');d.className='confetti';d.textContent='🎉';$('confettiSlot').appendChild(d);setTimeout(function(){d.remove();},1300);}
+function openModal(id){$('modalOverlay').style.display='flex';document.querySelectorAll('.modal').forEach(function(m){m.style.display='none';});$(id).style.display='block';}
+function closeModal(){$('modalOverlay').style.display='none';}
+function fmtDate(d){var dt=new Date(d+'T00:00:00');return(dt.getMonth()+1)+'/'+dt.getDate();}
+function daysTo(d){return Math.ceil((new Date(d+'T00:00:00')-new Date(today()+'T00:00:00'))/86400000);}
+
+// ======== NAV ========
+document.querySelectorAll('.nav-item').forEach(function(item){item.onclick=function(){
+  document.querySelectorAll('.nav-item').forEach(function(i){i.classList.remove('active');});
+  this.classList.add('active');
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  $('page-'+this.dataset.page).classList.add('active');
+  if(this.dataset.page==='home')renderHome();
+  if(this.dataset.page==='schedule')renderCal();
+  if(this.dataset.page==='tasks'){renderKanban();renderFin();}
+  if(this.dataset.page==='study')renderProgress();
+  if(this.dataset.page==='review')renderReflect();
+};});
+
+// Sub-tabs
+document.querySelectorAll('.scroll-x').forEach(function(tabs){tabs.onclick=function(e){
+  if(!e.target.classList.contains('sub-tab'))return;
+  tabs.querySelectorAll('.sub-tab').forEach(function(t){t.classList.remove('active');});
+  e.target.classList.add('active');
+  var tab=e.target.dataset.tab||e.target.dataset.f;
+  if(tabs.id==='schedTabs'){$('schedMonth').style.display=tab==='month'?'block':'none';$('schedWeek').style.display=tab==='week'?'block':'none';$('schedDDL').style.display=tab==='ddl'?'block':'none';if(tab==='month')renderCal();if(tab==='week')renderWeek();if(tab==='ddl')renderDDL();}
+  if(tabs.id==='taskTabs'){$('taskKanban').style.display=tab==='kanban'?'block':'none';$('taskPomo').style.display=tab==='pomo'?'block':'none';$('taskFinance').style.display=tab==='finance'?'block':'none';if(tab==='kanban')renderKanban();if(tab==='finance')renderFin();}
+  if(tabs.id==='kanbanFilter')renderKanban(tab);
+  if(tabs.id==='studyTabs'){$('studyProgress').style.display=tab==='progress'?'block':'none';$('studyQuiz').style.display=tab==='quiz'?'block':'none';$('studyWrong').style.display=tab==='wrong'?'block':'none';$('studyVocab').style.display=tab==='vocab'?'block':'none';if(tab==='progress')renderProgress();if(tab==='quiz')loadQuiz();if(tab==='wrong')renderWrong();if(tab==='vocab')renderVocab();}
+  if(tabs.id==='reviewTabs'){$('reviewReflect').style.display=tab==='reflect'?'block':'none';$('reviewNotes').style.display=tab==='notes'?'block':'none';$('reviewMeeting').style.display=tab==='meeting'?'block':'none';if(tab==='reflect')renderReflect();if(tab==='notes')renderNotes();if(tab==='meeting')renderMeetings();}
+};});
+
+// ======== HOME ========
+function renderHome(){
+  load();var t=today(),h=new Date().getHours();
+  $('greetingText').textContent=(h<6?'夜深了':h<12?'早上好':h<14?'中午好':h<18?'下午好':'晚上好')+'，同学';
+  $('dateText').textContent=new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+
+  // Timeline
+  var evs=DATA.events.filter(function(e){return e.date===t;}).sort(function(a,b){return(a.time||'').localeCompare(b.time||'');});
+  $('todayTimeline').innerHTML=evs.length?evs.map(function(e){return'<div class="tl-item '+e.type+'"><div class="tl-time">'+(e.time||'全天')+'</div><div class="tl-title">'+e.title+'</div>'+(e.desc?'<div style="font-size:11px;color:var(--ink-lighter);">'+e.desc+'</div>':'')+'</div>';}).join(''):'<div class="empty">今日无日程</div>';
+
+  // Tasks
+  var tasks=DATA.tasks.filter(function(tk){return tk.status!=='done';});
+  var done=DATA.tasks.filter(function(tk){return tk.status==='done';}).length;
+  $('taskProgress').textContent=done+'/'+(tasks.length+done);
+  $('questList').innerHTML=tasks.length?tasks.map(function(tk){return'<div class="check-row" onclick="toggleTask(\''+tk.id+'\',this)"><div class="check-circle">✓</div><span class="check-label" style="font-size:12px;">'+tk.title+'</span><span style="margin-left:auto;font-size:9px;color:var(--ink-lighter);">'+(tk.due?'📅'+fmtDate(tk.due):'')+'</span></div>';}).join(''):'<div class="empty">全部完成！</div>';
+
+  // Countdowns
+  $('countdownList').innerHTML=DATA.countdowns.length?DATA.countdowns.sort(function(a,b){return daysTo(a.date)-daysTo(b.date);}).map(function(c){var d=daysTo(c.date);return'<div class="countdown-item"><div class="cd-num">'+(d<0?'已过':'D-'+d)+'</div><div><div style="font-weight:600;">'+(c.icon||'')+' '+c.name+'</div><div style="font-size:10px;color:var(--ink-lighter);">'+fmtDate(c.date)+'</div></div></div>';}).join(''):'<div class="empty">暂无</div>';
+}
+
+function toggleTask(id,el){
+  load();var tk=DATA.tasks.find(function(t){return t.id===id;});if(!tk)return;
+  tk.status=tk.status==='done'?'todo':'done';save();
+  if(el){el.classList.toggle('done',tk.status==='done');}
+  if(tk.status==='done')confetti();renderHome();
+}
+
+// ======== SCHEDULE ========
+var calYear,calMonth,calSel,weekStart;
+function initCal(){var n=new Date();calYear=n.getFullYear();calMonth=n.getMonth();calSel=today();weekStart=new Date(n);weekStart.setDate(n.getDate()-n.getDay());}
+function renderCal(){
+  if(!calYear)initCal();
+  $('monthLabel').textContent=calYear+'年 '+(calMonth+1)+'月';
+  var fd=new Date(calYear,calMonth,1).getDay(),dim=new Date(calYear,calMonth+1,0).getDate(),t=today();
+  var ed=new Set(DATA.events.map(function(e){return e.date;}));
+  var h='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;">';
+  var dows='日一二三四五六';
+  for(var i=0;i<7;i++)h+='<div style="font-size:9px;color:var(--ink-lighter);">'+dows[i]+'</div>';
+  for(var i=0;i<fd;i++)h+='<div style="padding:6px;color:#ddd;">'+(new Date(calYear,calMonth-1,0).getDate()-fd+i+1)+'</div>';
+  for(var d=1;d<=dim;d++){
+    var ds=calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    var cls='padding:6px;cursor:pointer;';
+    if(ds===t)cls+='background:var(--ink);color:var(--paper);font-weight:700;';
+    if(ed.has(ds))cls+='border-bottom:2px solid var(--accent);';
+    h+='<div style="'+cls+'" onclick="selDay(\''+ds+'\')">'+d+'</div>';
+  }
+  h+='</div>';$('calGrid').innerHTML=h;selDay(calSel);
+}
+function selDay(ds){calSel=ds;var evs=DATA.events.filter(function(e){return e.date===ds;});$('dayEvents').innerHTML=evs.length?evs.map(function(e){return'<div style="padding:6px 0;border-bottom:1px solid var(--card-border);font-size:12px;"><b>'+e.title+'</b> '+(e.time||'')+'</div>';}).join(''):'<div class="empty">'+fmtDate(ds)+' 无事件</div>';}
+function chMonth(d){calMonth+=d;if(calMonth<0){calMonth=11;calYear--;}if(calMonth>11){calMonth=0;calYear++;}renderCal();}
+
+function renderWeek(){
+  if(!weekStart)initCal();
+  var end=new Date(weekStart);end.setDate(weekStart.getDate()+6);
+  $('weekLabel').textContent=fmtDate(weekStart.toISOString().split('T')[0])+' - '+fmtDate(end.toISOString().split('T')[0]);
+  var h='';for(var i=0;i<7;i++){var d=new Date(weekStart);d.setDate(weekStart.getDate()+i);var ds=d.toISOString().split('T')[0];var evs=DATA.events.filter(function(e){return e.date===ds;});h+='<div style="padding:8px;margin-bottom:4px;border:1px solid var(--card-border);"><div style="font-size:11px;font-weight:700;">周'+'日一二三四五六'[d.getDay()]+' '+fmtDate(ds)+'</div>'+(evs.length?evs.map(function(e){return'<div style="font-size:11px;">'+e.title+'</div>';}).join(''):'<div style="font-size:10px;color:var(--ink-lighter);">-</div>')+'</div>';}$('weekGrid').innerHTML=h;}
+function chWeek(d){weekStart.setDate(weekStart.getDate()+d*7);renderWeek();}
+
+function renderDDL(){
+  var t=today(),end=dtAdd(7),all=DATA.events.filter(function(e){return e.date>=t&&e.date<=end;}).concat(DATA.tasks.filter(function(tk){return tk.status!=='done'&&tk.due&&tk.due>=t&&tk.due<=end;}).map(function(tk){return{title:tk.title,date:tk.due,type:'task'};}));
+  all.sort(function(a,b){return a.date.localeCompare(b.date);});
+  $('ddlList').innerHTML=all.length?all.map(function(e){var d=daysTo(e.date),cls=d<=1?'color:var(--accent);':d<=3?'color:var(--gold);':'';return'<div style="padding:6px 0;border-bottom:1px solid var(--card-border);"><span style="'+cls+'font-weight:700;">'+(d<=1?'🔴':d<=3?'🟡':'🔵')+' D-'+d+'</span> '+e.title+' · '+fmtDate(e.date)+'</div>';}).join(''):'<div class="empty">未来7天无DDL 🎉</div>';
+}
+
+// ======== EVENTS & TASKS ========
+function saveEvent(){load();DATA.events.push({id:'e'+Date.now(),title:$('evTitle').value.trim(),date:$('evDate').value,time:$('evTime').value,type:$('evType').value});save();closeModal();renderHome();renderCal();}
+function saveTask(){load();DATA.tasks.push({id:'t'+Date.now(),title:$('tkTitle').value.trim(),category:$('tkCat').value,status:'todo',due:$('tkDue').value});save();closeModal();renderKanban();renderHome();}
+
+// ======== KANBAN ========
+function renderKanban(f){
+  load();f=f||'all';var tasks=f==='all'?DATA.tasks:DATA.tasks.filter(function(t){return t.category===f;});
+  var cols={todo:'待办',doing:'进行中',done:'已完成'};
+  $('kanbanBoard').innerHTML=Object.keys(cols).map(function(s){
+    var ct=tasks.filter(function(t){return t.status===s;});
+    return'<div class="kanban-col" style="margin-bottom:8px;" data-status="'+s+'" ondragover="event.preventDefault()" ondrop="dropTask(event,\''+s+'\')"><div class="kanban-title">'+cols[s]+' ('+ct.length+')</div>'+ct.map(function(t){return'<div class="kanban-card '+t.category+'" draggable="true" data-id="'+t.id+'" ondragstart="event.dataTransfer.setData(\'text\',\''+t.id+'\')">'+t.title+'<div style="font-size:9px;color:var(--ink-lighter);">'+(t.due?'📅'+fmtDate(t.due):'')+'</div></div>';}).join('')+'</div>';
+  }).join('');
+}
+var dragId=null;
+function dropTask(e,s){e.preventDefault();var id=event.dataTransfer.getData('text');load();var tk=DATA.tasks.find(function(t){return t.id===id;});if(tk){tk.status=s;save();renderKanban();renderHome();}}
+
+// ======== POMODORO ========
+var pomoSec=1500,pomoRun=false,pomoInt;
+function updatePomo(){var m=Math.floor(pomoSec/60),s=pomoSec%60;$('pomoTime').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
+function startPomo(){if(pomoRun)return;pomoRun=true;$('pomoStart').style.display='none';$('pomoPause').style.display='inline-flex';pomoInt=setInterval(function(){pomoSec--;updatePomo();if(pomoSec<=0){clearInterval(pomoInt);pomoRun=false;var c=parseInt($('pomoCount').textContent)+1;$('pomoCount').textContent=c;confetti();pomoSec=300;$('pomoStart').style.display='inline-flex';$('pomoPause').style.display='none';updatePomo();toast('番茄完成！休息5分钟');}},1000);}
+function pausePomo(){clearInterval(pomoInt);pomoRun=false;$('pomoStart').style.display='inline-flex';$('pomoPause').style.display='none';}
+function resetPomo(){clearInterval(pomoInt);pomoRun=false;pomoSec=1500;$('pomoStart').style.display='inline-flex';$('pomoPause').style.display='none';updatePomo();}
+
+// ======== FINANCE ========
+function saveFin(){load();DATA.finances.push({id:'f'+Date.now(),amount:parseFloat($('finAmt').value)||0,type:$('finType').value,cat:$('finCat').value,note:$('finNote').value.trim(),date:today()});save();closeModal();renderFin();}
+function renderFin(){
+  load();var tm=today().substring(0,7),mf=DATA.finances.filter(function(f){return f.date.startsWith(tm);});
+  var inc=mf.filter(function(f){return f.type==='income';}).reduce(function(s,f){return s+f.amount;},0);
+  var out=mf.filter(function(f){return f.type==='expense';}).reduce(function(s,f){return s+f.amount;},0);
+  $('finIn').textContent='¥'+inc;$('finOut').textContent='¥'+out;$('finBal').textContent='¥'+(inc-out);
+  // Pie
+  var cats={},exp=mf.filter(function(f){return f.type==='expense';});
+  exp.forEach(function(f){cats[f.cat]=(cats[f.cat]||0)+f.amount;});
+  var cvs=$('pieCanvas'),ctx=cvs.getContext('2d');ctx.clearRect(0,0,100,100);
+  var total=Object.values(cats).reduce(function(s,v){return s+v;},0)||1;
+  var angle=-Math.PI/2,clrs=['#2c2c2c','#5a5a5a','#8b1a1a','#5a7a6a','#999'],i=0,leg='';
+  var labels={food:'餐饮',study:'学习',transport:'交通',entertainment:'娱乐',other:'其他'};
+  Object.entries(cats).forEach(function(e){var slice=e[1]/total*Math.PI*2;ctx.beginPath();ctx.moveTo(50,50);ctx.arc(50,50,40,angle,angle+slice);ctx.fillStyle=clrs[i%5];ctx.fill();angle+=slice;
+    leg+='<span style="display:inline-block;width:8px;height:8px;background:'+clrs[i%5]+';margin:0 2px;"></span>'+(labels[e[0]]||e[0])+' '+(Math.round(e[1]/total*100))+'% ';
+    i++;});
+  $('pieLegend').innerHTML=leg||'无支出';
+  // List
+  $('finList').innerHTML=mf.slice(-8).reverse().map(function(f){return'<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:11px;border-bottom:1px solid var(--card-border);"><span>'+(f.type==='income'?'+':'-')+'¥'+f.amount+' '+f.note+'</span><span style="color:var(--ink-lighter);">'+f.date+'</span></div>';}).join('')||'<div class="empty">暂无记录</div>';
+}
+function exportCSV(){
+  load();var csv='日期,类型,分类,金额,备注\n';
+  DATA.finances.forEach(function(f){csv+=f.date+','+(f.type==='income'?'收入':'支出')+','+f.cat+','+f.amount+','+(f.note||'')+'\n';});
+  var b=new Blob(['﻿'+csv],{type:'text/csv'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='账本_'+today()+'.csv';a.click();toast('CSV已导出');
+}
+
+// ======== STUDY ========
+function saveSub(){load();DATA.subjects.push({name:$('subName').value.trim(),hw:parseInt($('subHw').value)||0,paper:parseInt($('subPaper').value)||0});save();closeModal();renderProgress();}
+function renderProgress(){
+  load();
+  $('subList').innerHTML=DATA.subjects.map(function(s,i){return'<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:12px;"><span>'+s.name+'</span><span style="color:var(--ink-lighter);">大作业'+s.hw+'% / 论文'+s.paper+'%</span></div><div class="progress-bar"><div class="progress-fill" style="width:'+s.hw+'%;"></div></div><div class="progress-bar" style="margin-top:2px;"><div class="progress-fill" style="width:'+s.paper+'%;background:var(--jade);"></div></div></div>';}).join('')||'<div class="empty">暂无科目</div>';
+  $('examList').innerHTML=DATA.exams.map(function(e){var d=daysTo(e.date);return'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--card-border);"><span>'+e.name+' · '+e.sub+'</span><span style="font-weight:700;color:'+(d<=7?'var(--accent)':'var(--ink)')+';">'+(d<0?'已结束':'D-'+d)+'</span></div>';}).join('')||'<div class="empty">暂无考试</div>';
+}
+function saveExam(){load();DATA.exams.push({id:'ex'+Date.now(),name:$('exName').value.trim(),date:$('exDate').value,sub:$('exSub').value.trim()});save();closeModal();renderProgress();}
+
+// Quiz
+var curQuiz=null,quizDone=false;
+function loadQuiz(){
+  load();if(!DATA.quiz.length){$('quizArea').innerHTML='<div class="empty">还没有题目</div>';return;}
+  curQuiz=DATA.quiz[Math.floor(Math.random()*DATA.quiz.length)];quizDone=false;
+  $('quizArea').innerHTML='<div style="padding:12px;border:1px solid var(--card-border);"><div style="font-weight:600;margin-bottom:8px;">'+curQuiz.q+'</div>'+curQuiz.opts.map(function(o,i){return'<div class="quiz-option" onclick="selOpt('+i+',this)">'+'ABCD'[i]+'. '+o+'</div>';}).join('')+'<div id="qzFeedback" style="margin-top:6px;font-size:12px;"></div><div style="margin-top:8px;display:flex;gap:6px;"><button class="btn btn-sm btn-primary" onclick="subQuiz()">提交</button><button class="btn btn-sm" onclick="loadQuiz()">换题</button></div></div>';
+}
+function selOpt(i,el){if(quizDone)return;document.querySelectorAll('.quiz-option').forEach(function(o){o.classList.remove('selected');});el.classList.add('selected');curQuiz._sel=i;}
+function subQuiz(){
+  if(quizDone||!curQuiz||curQuiz._sel===undefined){toast('请选择');return;}quizDone=true;
+  var correct=curQuiz._sel===curQuiz.ans;var opts=document.querySelectorAll('.quiz-option');
+  opts[curQuiz.ans].classList.add('correct');
+  if(correct){$('qzFeedback').innerHTML='<span style="color:var(--jade);">✅ 正确！</span>';confetti();}
+  else{opts[curQuiz._sel].classList.add('wrong');$('qzFeedback').innerHTML='<span style="color:var(--accent);">❌ 正确答案：'+'ABCD'[curQuiz.ans]+'</span>';
+    if(!DATA.wrongBook.find(function(w){return w.qid===curQuiz.id;})){DATA.wrongBook.push({id:'w'+Date.now(),qid:curQuiz.id,date:today(),reviewed:false});save();}}
+}
+function saveQuiz(){load();DATA.quiz.push({id:'q'+Date.now(),sub:$('qzSubject').value.trim(),q:$('qzQ').value.trim(),opts:[$('qzA').value.trim(),$('qzB').value.trim(),$('qzC').value.trim(),$('qzD').value.trim()],ans:parseInt($('qzAns').value)});save();closeModal();loadQuiz();}
+function renderWrong(){
+  load();var items=DATA.wrongBook.map(function(w){var q=DATA.quiz.find(function(q){return q.id===w.qid;});return q?Object.assign({},w,{q:q}):null;}).filter(Boolean);
+  $('wrongList').innerHTML=items.length?items.map(function(w){return'<div style="padding:8px;margin-bottom:4px;border:1px solid var(--card-border);border-left:2px solid var(--accent);"><div style="font-size:10px;color:var(--ink-lighter);">错于 '+w.date+'</div><div style="font-size:12px;">'+w.q.q+'</div><div style="color:var(--jade);font-size:11px;">✅ '+w.q.opts[w.q.ans]+'</div></div>';}).join(''):'<div class="empty">暂无错题 🎉</div>';
+}
+
+// Vocab
+function saveVocab(){load();DATA.vocab.push({word:$('vbWord').value.trim(),meaning:$('vbMeaning').value.trim(),reviewed:[]});save();closeModal();renderVocab();}
+function renderVocab(){
+  load();var t=today();
+  $('vbTotal').textContent=DATA.vocab.length;$('vbToday').textContent=DATA.vocab.filter(function(v){return v.reviewed.includes(t);}).length;
+  $('vocabList').innerHTML=DATA.vocab.map(function(v,i){return'<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border:1px solid var(--card-border);margin-bottom:4px;cursor:pointer;" onclick="this.classList.toggle(\'flipped\')"><div><b>'+v.word+'</b><div style="font-size:11px;color:var(--ink-lighter);display:none;" class="vb-meaning">'+v.meaning+'</div></div><button class="btn btn-sm" style="font-size:9px;" onclick="event.stopPropagation();reviewWord('+i+')">'+((v.reviewed||[]).includes(t)?'✅':'打卡')+'</button></div>';}).join('')||'<div class="empty">暂无单词</div>';
+  // Fix flip
+  setTimeout(function(){document.querySelectorAll('.flipped .vb-meaning').forEach(function(el){el.style.display='block';});},100);
+}
+function reviewWord(i){load();var t=today();if(!DATA.vocab[i].reviewed.includes(t)){DATA.vocab[i].reviewed.push(t);save();renderVocab();toast('打卡成功！');}}
+
+// ======== REVIEW ========
+function saveReflect(){
+  load();var t=today();DATA.reflections[t]={highlight:$('rHighlight').value.trim(),short:$('rShort').value.trim(),tomorrow:$('rTomorrow').value.trim(),mood:$('rMood').value.trim()};save();renderReflect();confetti();toast('复盘已保存');
+}
+function renderReflect(){
+  load();var t=today(),ref=DATA.reflections[t]||{};
+  $('rHighlight').value=ref.highlight||'';$('rShort').value=ref.short||'';$('rTomorrow').value=ref.tomorrow||'';$('rMood').value=ref.mood||'';
+  var hist=Object.entries(DATA.reflections).sort(function(a,b){return b[0].localeCompare(a[0]);}).slice(0,8);
+  $('reflectHistory').innerHTML=hist.length?hist.map(function(e){return'<div style="padding:4px 0;border-bottom:1px solid var(--card-border);font-size:11px;"><b>'+fmtDate(e[0])+'</b> '+e[1].mood+' '+e[1].highlight.substring(0,20)+'</div>';}).join(''):'<div class="empty">暂无</div>';
+}
+
+function saveNote(){load();DATA.notes.push({title:$('ntTitle').value.trim(),content:$('ntContent').value.trim(),date:today()});save();closeModal();renderNotes();}
+function renderNotes(){load();$('notesList').innerHTML=DATA.notes.slice().reverse().map(function(n){return'<div style="padding:8px;border:1px solid var(--card-border);margin-bottom:4px;"><div style="font-weight:600;">'+n.title+'</div><div style="font-size:10px;color:var(--ink-lighter);">'+n.date+'</div><div style="font-size:11px;">'+n.content.substring(0,100)+'</div></div>';}).join('')||'<div class="empty">暂无笔记</div>';}
+
+function saveMeeting(){load();DATA.meetings.push({title:$('mtTitle').value.trim(),date:$('mtDate').value,content:$('mtContent').value.trim()});save();closeModal();renderMeetings();}
+function renderMeetings(){load();$('meetingList').innerHTML=DATA.meetings.slice().reverse().map(function(m){return'<div style="padding:8px;border:1px solid var(--card-border);margin-bottom:4px;"><div style="font-weight:600;">'+m.title+'</div><div style="font-size:10px;color:var(--ink-lighter);">'+m.date+'</div><div style="font-size:11px;">'+m.content.substring(0,100)+'</div></div>';}).join('')||'<div class="empty">暂无记录</div>';}
+
+function saveCountdown(){load();DATA.countdowns.push({id:'cd'+Date.now(),name:$('cdName').value.trim(),date:$('cdDate').value,icon:'📅'});save();closeModal();renderHome();}
+
+// ======== IMPORT/EXPORT ========
+function exportData(){load();var b=new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='大学全能管家_'+today()+'.json';a.click();toast('已导出');}
+function importData(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){try{var d=JSON.parse(ev.target.result);if(!d.version){toast('格式错误');return;}if(!confirm('导入将覆盖当前数据，确定？'))return;localStorage.setItem(KEY,JSON.stringify(d));DATA=d;renderHome();toast('已导入');}catch(ex){toast('解析失败');}};r.readAsText(f);e.target.value='';}
+
+// ======== INIT ========
+initCal();
+renderHome();
+updatePomo();
+
+document.addEventListener('click',function(e){
+  var el=e.target.closest('.flipped');
+  if(el){var meaning=el.querySelector('.vb-meaning')||el.querySelector('div:nth-child(1) div');if(meaning)meaning.style.display=meaning.style.display==='block'?'none':'block';}
+});
+
+console.log('我的大学全能管家 · 水墨画风格 · 已就绪');
+</script>
+</body>
+</html>
