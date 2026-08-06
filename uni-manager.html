@@ -10,12 +10,12 @@
 <style>
 :root {
   --ink: #2c2c2c; --ink-light: #5a5a5a; --ink-lighter: #999;
-  --paper: #f8f5f0; --card: #fefdfb; --card-border: #e5e0d8;
+  --paper: #f7f3ed; --card: #fdfbf7; --card-border: #e0dbd0;
   --accent: #8b1a1a; --accent-light: #c44; --gold: #8b6914;
   --jade: #5a7a6a; --jade-light: #e8f0e8;
-  --shadow: 0 2px 12px rgba(0,0,0,0.05); --radius: 4px;
+  --shadow: 0 2px 16px rgba(0,0,0,0.06); --radius: 2px;
   --nav-height: 68px; --safe-bottom: env(safe-area-inset-bottom, 12px);
-  --font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Serif SC', 'Source Han Serif SC', 'STSong', serif;
+  --font: 'PingFang SC', 'Noto Serif SC', 'Source Han Serif SC', 'STSong', 'SimSun', serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{font-size:16px;-webkit-tap-highlight-color:transparent;}
@@ -24,8 +24,18 @@ body{
   max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh;
   overflow-x:hidden;padding-bottom:calc(var(--nav-height)+var(--safe-bottom)+12px);
   -webkit-font-smoothing:antialiased;user-select:none;
-  background-image:radial-gradient(ellipse at 20% 20%, rgba(0,0,0,0.02) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(0,0,0,0.02) 0%, transparent 50%);
+  background-color:var(--paper);
+  background-image:
+    /* 远山轮廓 */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 480 800'%3E%3Cpath d='M0,280 Q80,200 160,250 Q240,180 320,240 Q400,160 480,220 L480,800 L0,800Z' fill='%23ebe5d9' opacity='0.5'/%3E%3Cpath d='M0,320 Q100,260 200,300 Q300,230 400,290 Q440,260 480,280 L480,800 L0,800Z' fill='%23e5dfd2' opacity='0.4'/%3E%3Cpath d='M0,380 Q120,330 240,360 Q360,300 480,350 L480,800 L0,800Z' fill='%23dfd8c8' opacity='0.3'/%3E%3C/svg%3E"),
+    /* 水墨晕染 */
+    radial-gradient(ellipse at 15% 15%, rgba(100,80,60,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse at 85% 70%, rgba(80,60,40,0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.015) 0%, transparent 70%);
+  background-repeat:no-repeat;
+  background-position:0 100%,0 0,0 0,0 0,0 0;
+  background-size:100% auto,100% 100%,100% 100%,100% 100%,100% 100%;
+  background-attachment:fixed;
 }
 .bottom-nav{
   position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;
@@ -43,12 +53,15 @@ body{
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes popIn{0%{transform:scale(0.8);opacity:0}60%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
 .card{
-  background:var(--card);border:1px solid var(--card-border);padding:14px;margin-bottom:10px;
+  background:var(--card);border:1px solid var(--card-border);padding:16px 14px;margin-bottom:12px;
   box-shadow:var(--shadow);position:relative;
 }
-.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--ink-lighter),transparent);opacity:0.15;}
-.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
-.card-title{font-size:15px;font-weight:700;letter-spacing:0.5px;}
+/* 印章装饰 */
+.card.stamped::after{content:'阅';position:absolute;top:8px;right:10px;border:2px solid var(--accent);color:var(--accent);padding:3px 8px;font-size:16px;font-weight:900;transform:rotate(12deg);opacity:0.6;letter-spacing:2px;font-family:'STKaiti','KaiTi',serif;pointer-events:none;}
+.card::before{content:'';position:absolute;top:0;left:8px;right:8px;height:1px;background:linear-gradient(90deg,transparent,rgba(44,44,44,0.1),transparent);}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.card-title{font-size:15px;font-weight:700;letter-spacing:1px;}
+.card-title::before{content:'丨';color:var(--accent);margin-right:6px;font-weight:900;}
 .badge{font-size:10px;padding:2px 8px;font-weight:500;}
 .badge-red{color:var(--accent);}
 .badge-jade{color:var(--jade);}
@@ -133,6 +146,25 @@ select.input{appearance:none;padding-right:28px;background-image:url("data:image
 .alert-text{flex:1;min-width:0;}
 .nav-badge{position:absolute;top:0;right:6px;background:var(--accent);color:#fff;font-size:8px;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;padding:0 4px;}
 .alert-count{font-weight:700;color:var(--accent);}
+.cam-btn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--paper);font-size:14px;cursor:pointer;border:1px dashed var(--ink-lighter);flex-shrink:0;transition:all 0.2s;}
+.cam-btn:active{background:var(--ink);color:var(--paper);border-style:solid;}
+.cam-btn.has-photo{border-style:solid;border-color:var(--jade);background:var(--jade-light);}
+.photo-thumb{width:38px;height:38px;object-fit:cover;cursor:pointer;border:1px solid var(--card-border);flex-shrink:0;}
+.photo-thumb:active{transform:scale(1.2);}
+.cam-overlay{position:fixed;inset:0;z-index:250;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.55);}
+.cam-dialog{background:var(--card);padding:22px 18px;width:85%;max-width:320px;text-align:center;border:1px solid var(--ink);}
+.cam-dialog h4{font-size:16px;margin-bottom:4px;}
+.cam-dialog p{font-size:11px;color:var(--ink-lighter);margin-bottom:14px;}
+.cam-dialog .btn-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;}
+.cam-big-btn{padding:12px 18px;font-size:13px;font-weight:700;border:1px solid var(--ink);cursor:pointer;font-family:var(--font);background:var(--paper);transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.cam-big-btn:active{background:var(--ink);color:var(--paper);}
+.cam-big-btn.check{border-color:var(--jade);color:var(--jade);}
+.cam-big-btn.check:active{background:var(--jade);color:#fff;}
+.cam-big-btn.photo{border-color:var(--gold);color:var(--gold);}
+.cam-big-btn.photo:active{background:var(--gold);color:#fff;}
+.cam-big-btn .emoji{font-size:24px;}
+.cam-big-btn.cancel{font-size:11px;border-color:transparent;color:var(--ink-lighter);flex-direction:row;width:100%;justify-content:center;margin-top:2px;}
+.photo-modal-img{width:100%;border:1px solid var(--card-border);margin-bottom:8px;}
 </style>
 </head>
 <body>
@@ -217,6 +249,9 @@ select.input{appearance:none;padding-right:28px;background-image:url("data:image
   <button class="btn btn-sm" style="font-size:9px;padding:3px 8px;background:var(--card);" onclick="exportData()">导出</button>
   <button class="btn btn-sm" style="font-size:9px;padding:3px 8px;background:var(--card);" onclick="document.getElementById('importF').click()">导入</button>
   <input type="file" id="importF" accept=".json" style="display:none;" onchange="importData(event)">
+  <input type="file" id="camInput" accept="image/*" capture="environment" style="display:none;" onchange="handlePhoto(event)">
+  <!-- Photo Modal --><div class="modal-overlay" id="photoOverlay" style="display:none;" onclick="if(event.target===this)closePhoto()"><div class="modal" id="photoModal" style="display:block;"><span class="close-btn" onclick="closePhoto()">✕</span><h3>📸打卡照片</h3><img class="photo-modal-img" id="photoImg"><div style="font-size:10px;color:var(--ink-lighter);text-align:center;" id="photoMeta"></div><div style="display:flex;gap:6px;margin-top:8px;"><button class="btn btn-sm btn-danger" style="flex:1;" onclick="deletePhoto()">删除</button><button class="btn btn-sm" style="flex:1;" onclick="retakePhoto()">重拍</button></div></div></div>
+  <!-- Check-in Prompt --><div class="cam-overlay" id="camPrompt" style="display:none;" onclick="if(event.target===this)closeCamPrompt()"><div class="cam-dialog"><h4 id="camTaskTitle"></h4><p>选择打卡方式</p><div class="btn-row"><button class="cam-big-btn check" onclick="doCheckin('check')"><span class="emoji">✅</span>打勾完成</button><button class="cam-big-btn photo" onclick="doCheckin('photo')"><span class="emoji">📷</span>拍照打卡</button><button class="cam-big-btn" onclick="doCheckin('both')"><span class="emoji">🎯</span>打勾+拍照</button><button class="cam-big-btn cancel" onclick="closeCamPrompt()">取消</button></div></div></div>
 </div>
 
 <script>
@@ -286,11 +321,21 @@ function renderHome(){
   var evs=DATA.events.filter(function(e){return e.date===t;}).sort(function(a,b){return(a.time||'').localeCompare(b.time||'');});
   $('todayTimeline').innerHTML=evs.length?evs.map(function(e){return'<div class="tl-item '+e.type+'"><div class="tl-time">'+(e.time||'全天')+'</div><div class="tl-title">'+e.title+'</div>'+(e.desc?'<div style="font-size:11px;color:var(--ink-lighter);">'+e.desc+'</div>':'')+'</div>';}).join(''):'<div class="empty">今日无日程</div>';
 
-  // Tasks
-  var tasks=DATA.tasks.filter(function(tk){return tk.status!=='done';});
-  var done=DATA.tasks.filter(function(tk){return tk.status==='done';}).length;
-  $('taskProgress').textContent=done+'/'+(tasks.length+done);
-  $('questList').innerHTML=tasks.length?tasks.map(function(tk){return'<div class="check-row" onclick="toggleTask(\''+tk.id+'\',this)"><div class="check-circle">✓</div><span class="check-label" style="font-size:12px;">'+tk.title+'</span><span style="margin-left:auto;font-size:9px;color:var(--ink-lighter);">'+(tk.due?'📅'+fmtDate(tk.due):'')+'</span></div>';}).join(''):'<div class="empty">全部完成！</div>';
+  // Tasks - show active first, then done
+  var activeTasks=DATA.tasks.filter(function(tk){return tk.status!=='done';});
+  var doneTasks=DATA.tasks.filter(function(tk){return tk.status==='done';});
+  var allTasks=activeTasks.concat(doneTasks);
+  var done=doneTasks.length,total=allTasks.length;
+  $('taskProgress').textContent=done+'/'+total;
+  function renderTaskRow(tk){var isDone=tk.status==='done',hasPhoto=!!tk.photo;
+    return'<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--card-border);'+(isDone?'opacity:0.55;':'')+'">'+
+      (hasPhoto?'<img class="photo-thumb" src="'+tk.photo+'" onclick="event.stopPropagation();showPhoto(\''+tk.id+'\')">':'')+
+      '<div class="check-row'+(isDone?' done':'')+'" style="flex:1;min-width:0;" onclick="toggleTask(\''+tk.id+'\',this)"><div class="check-circle">'+(isDone?'✓':'')+'</div><span class="check-label" style="font-size:12px;">'+tk.title+'</span></div>'+
+      '<span style="font-size:9px;color:var(--ink-lighter);white-space:nowrap;">'+(tk.due?'📅'+fmtDate(tk.due):'')+(isDone&&tk.completedAt?' ✅':'' )+'</span>'+
+      (!isDone?'<div class="cam-btn'+(hasPhoto?' has-photo':'')+'" onclick="event.stopPropagation();openCamPrompt(\''+tk.id+'\',\''+tk.title.replace(/'/g,"\\'")+'\')">📷</div>':hasPhoto?'<div class="cam-btn has-photo" onclick="event.stopPropagation();showPhoto(\''+tk.id+'\')">📸</div>':'')+
+    '</div>';
+  }
+  $('questList').innerHTML=allTasks.length?allTasks.map(renderTaskRow).join(''):'<div class="empty">暂无任务</div>';
 
   // Countdowns
   $('countdownList').innerHTML=DATA.countdowns.length?DATA.countdowns.sort(function(a,b){return daysTo(a.date)-daysTo(b.date);}).map(function(c){var d=daysTo(c.date);return'<div class="countdown-item"><div class="cd-num">'+(d<0?'已过':'D-'+d)+'</div><div><div style="font-weight:600;">'+(c.icon||'')+' '+c.name+'</div><div style="font-size:10px;color:var(--ink-lighter);">'+fmtDate(c.date)+'</div></div></div>';}).join(''):'<div class="empty">暂无</div>';
@@ -298,8 +343,10 @@ function renderHome(){
 
 function toggleTask(id,el){
   load();var tk=DATA.tasks.find(function(t){return t.id===id;});if(!tk)return;
-  tk.status=tk.status==='done'?'todo':'done';save();
-  if(el){el.classList.toggle('done',tk.status==='done');}
+  tk.status=tk.status==='done'?'todo':'done';
+  if(tk.status==='done')tk.completedAt=today();else tk.completedAt=null;
+  save();
+  if(el){el.closest('.check-row').classList.toggle('done',tk.status==='done');}
   if(tk.status==='done')confetti();renderHome();
 }
 
@@ -499,6 +546,19 @@ if('Notification' in window&&Notification.permission==='default'){
 }
 // 定时检查
 setInterval(checkReminders,5*60*1000);
+
+// ======== PHOTO CHECK-IN ========
+var camTaskId=null,camMode=null;
+function openCamPrompt(id,title){camTaskId=id;$('camTaskTitle').textContent='✅ '+title;$('camPrompt').style.display='flex';}
+function closeCamPrompt(){$('camPrompt').style.display='none';camTaskId=null;camMode=null;}
+function doCheckin(mode){camMode=mode;if(mode==='check'){completeCheckin(null);}else if(mode==='photo'){$('camPrompt').style.display='none';$('camInput').click();}else if(mode==='both'){completeCheckin(null);setTimeout(function(){$('camInput').click();},500);}}
+function completeCheckin(photoUrl){if(!camTaskId)return;load();var tk=DATA.tasks.find(function(t){return t.id===camTaskId;});if(!tk)return;tk.status='done';tk.completedAt=today();if(photoUrl)tk.photo=photoUrl;save();closeCamPrompt();confetti();renderHome();if($('page-tasks').classList.contains('active'))renderKanban();}
+function handlePhoto(e){var f=e.target.files[0];if(!f){closeCamPrompt();return;}var r=new FileReader();r.onload=function(ev){var img=new Image();img.onload=function(){var c=document.createElement('canvas'),maxW=800,s=Math.min(1,maxW/Math.max(img.width,img.height));c.width=img.width*s;c.height=img.height*s;c.getContext('2d').drawImage(img,0,0,c.width,c.height);completeCheckin(c.toDataURL('image/jpeg',0.7));};img.src=ev.target.result;};r.readAsDataURL(f);e.target.value='';}
+var photoTaskId=null;
+function showPhoto(id){load();var tk=DATA.tasks.find(function(t){return t.id===id;});if(!tk||!tk.photo)return;photoTaskId=id;$('photoImg').src=tk.photo;$('photoMeta').textContent='完成于 '+(tk.completedAt||'');$('photoOverlay').style.display='flex';}
+function closePhoto(){$('photoOverlay').style.display='none';}
+function deletePhoto(){if(!photoTaskId)return;load();var tk=DATA.tasks.find(function(t){return t.id===photoTaskId;});if(tk){tk.photo=null;save();}closePhoto();renderHome();}
+function retakePhoto(){if(!photoTaskId)return;camTaskId=photoTaskId;closePhoto();$('camInput').click();}
 
 // ======== INIT ========
 initCal();
