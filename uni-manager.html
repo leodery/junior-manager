@@ -128,6 +128,11 @@ select.input{appearance:none;padding-right:28px;background-image:url("data:image
 /* CSV export */
 .csv-btn{border-color:var(--jade);color:var(--jade);}
 .csv-btn:active{background:var(--jade);color:#fff;}
+.alert-banner{background:linear-gradient(135deg,#fef9f0,#fdf5e6);border:1px solid var(--gold);padding:10px 12px;margin-bottom:10px;font-size:12px;display:flex;align-items:center;gap:8px;cursor:pointer;}
+.alert-icon{font-size:20px;flex-shrink:0;}
+.alert-text{flex:1;min-width:0;}
+.nav-badge{position:absolute;top:0;right:6px;background:var(--accent);color:#fff;font-size:8px;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;padding:0 4px;}
+.alert-count{font-weight:700;color:var(--accent);}
 </style>
 </head>
 <body>
@@ -139,6 +144,7 @@ select.input{appearance:none;padding-right:28px;background-image:url("data:image
 <div class="page active" id="page-home">
   <div class="section-title" id="greetingText"></div>
   <div class="section-sub" id="dateText"></div>
+  <div class="alert-banner" id="alertBanner" style="display:none;" onclick="scrollToTasks()"><span class="alert-icon">🔔</span><span class="alert-text" id="alertText"></span><span style="font-size:10px;color:var(--ink-lighter);">查看 ›</span></div>
 
   <div class="card"><div class="card-header"><span class="card-title">今日日程</span><button class="btn btn-sm" onclick="openModal('eventModal')">+</button></div><div class="timeline" id="todayTimeline"></div></div>
 
@@ -187,7 +193,7 @@ select.input{appearance:none;padding-right:28px;background-image:url("data:image
 <!-- ===== MODALS ===== -->
 <div class="modal-overlay" id="modalOverlay" style="display:none;" onclick="if(event.target===this)closeModal()">
   <div class="modal" id="eventModal" style="display:none;"><span class="close-btn" onclick="closeModal()">✕</span><h3>添加日程</h3><input class="input" id="evTitle" placeholder="标题"><input class="input" type="date" id="evDate"><input class="input" type="time" id="evTime"><select class="input" id="evType"><option value="exam">考试</option><option value="homework">作业</option><option value="personal">个人</option><option value="life">生活</option></select><button class="btn btn-primary" style="width:100%;" onclick="saveEvent()">保存</button></div>
-  <div class="modal" id="taskModal" style="display:none;"><span class="close-btn" onclick="closeModal()">✕</span><h3>添加任务</h3><input class="input" id="tkTitle" placeholder="标题"><select class="input" id="tkCat"><option value="course">课程</option><option value="exam">考试</option><option value="personal">个人</option><option value="life">生活</option></select><input class="input" type="date" id="tkDue"><button class="btn btn-primary" style="width:100%;" onclick="saveTask()">保存</button></div>
+  <div class="modal" id="taskModal" style="display:none;"><span class="close-btn" onclick="closeModal()">✕</span><h3>添加任务</h3><input class="input" id="tkTitle" placeholder="标题"><select class="input" id="tkCat"><option value="course">课程</option><option value="exam">考试</option><option value="personal">个人</option><option value="life">生活</option></select><input class="input" type="date" id="tkDue"><select class="input" id="tkRemind"><option value="">不提醒</option><option value="0">到期时提醒</option><option value="1">提前1天</option><option value="3">提前3天</option><option value="7">提前1周</option></select><button class="btn btn-primary" style="width:100%;" onclick="saveTask()">保存</button></div>
   <div class="modal" id="finModal" style="display:none;"><span class="close-btn" onclick="closeModal()">✕</span><h3>记账</h3><input class="input" type="number" id="finAmt" placeholder="金额"><select class="input" id="finType"><option value="expense">支出</option><option value="income">收入</option></select><select class="input" id="finCat"><option value="food">餐饮</option><option value="study">学习</option><option value="transport">交通</option><option value="entertainment">娱乐</option><option value="other">其他</option></select><input class="input" id="finNote" placeholder="备注"><button class="btn btn-primary" style="width:100%;" onclick="saveFin()">保存</button></div>
   <div class="modal" id="subModal" style="display:none;"><span class="close-btn" onclick="closeModal()">✕</span><h3>添加科目</h3><input class="input" id="subName" placeholder="科目名"><input class="input" type="number" id="subHw" placeholder="大作业进度%"><input class="input" type="number" id="subPaper" placeholder="论文进度%"><button class="btn btn-primary" style="width:100%;" onclick="saveSub()">保存</button></div>
   <div class="modal" id="examModal" style="display:none;"><span class="close-btn" onclick="closeModal()">✕</span><h3>添加考试</h3><input class="input" id="exName" placeholder="名称"><input class="input" type="date" id="exDate"><input class="input" id="exSub" placeholder="科目"><button class="btn btn-primary" style="width:100%;" onclick="saveExam()">保存</button></div>
@@ -200,7 +206,7 @@ select.input{appearance:none;padding-right:28px;background-image:url("data:image
 
 <!-- ===== NAV ===== -->
 <nav class="bottom-nav">
-  <div class="nav-item active" data-page="home"><span class="icon">🏠</span><span class="label">首页</span></div>
+  <div class="nav-item active" data-page="home" style="position:relative;"><span class="icon">🏠</span><span class="label">首页</span><span class="nav-badge" id="navBadge" style="display:none;">0</span></div>
   <div class="nav-item" data-page="schedule"><span class="icon">📅</span><span class="label">日程</span></div>
   <div class="nav-item" data-page="tasks"><span class="icon">📌</span><span class="label">任务</span></div>
   <div class="nav-item" data-page="study"><span class="icon">📚</span><span class="label">学习</span></div>
@@ -336,7 +342,7 @@ function renderDDL(){
 
 // ======== EVENTS & TASKS ========
 function saveEvent(){load();DATA.events.push({id:'e'+Date.now(),title:$('evTitle').value.trim(),date:$('evDate').value,time:$('evTime').value,type:$('evType').value});save();closeModal();renderHome();renderCal();}
-function saveTask(){load();DATA.tasks.push({id:'t'+Date.now(),title:$('tkTitle').value.trim(),category:$('tkCat').value,status:'todo',due:$('tkDue').value});save();closeModal();renderKanban();renderHome();}
+function saveTask(){load();DATA.tasks.push({id:'t'+Date.now(),title:$('tkTitle').value.trim(),category:$('tkCat').value,status:'todo',due:$('tkDue').value,remind:$('tkRemind').value});save();closeModal();renderKanban();renderHome();checkReminders();}
 
 // ======== KANBAN ========
 function renderKanban(f){
@@ -449,9 +455,55 @@ function saveCountdown(){load();DATA.countdowns.push({id:'cd'+Date.now(),name:$(
 function exportData(){load();var b=new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='大学全能管家_'+today()+'.json';a.click();toast('已导出');}
 function importData(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){try{var d=JSON.parse(ev.target.result);if(!d.version){toast('格式错误');return;}if(!confirm('导入将覆盖当前数据，确定？'))return;localStorage.setItem(KEY,JSON.stringify(d));DATA=d;renderHome();toast('已导入');}catch(ex){toast('解析失败');}};r.readAsText(f);e.target.value='';}
 
+// ======== REMINDERS ========
+function checkReminders(){
+  load();var t=today(),alerts=[];
+  DATA.tasks.forEach(function(tk){
+    if(tk.status==='done'||!tk.due||!tk.remind||tk.remind==='')return;
+    var due=new Date(tk.due+'T00:00:00'),now=new Date(t+'T00:00:00');
+    var diff=Math.ceil((due-now)/86400000);
+    var remindDays=parseInt(tk.remind);
+    if(diff<=remindDays&&diff>=0)alerts.push({title:tk.title,diff:diff,type:'task'});
+  });
+  DATA.events.forEach(function(e){
+    var diff=daysTo(e.date);
+    if(diff<=1&&diff>=0)alerts.push({title:e.title,diff:diff,type:'event'});
+  });
+  // 考试倒计时
+  DATA.exams.forEach(function(ex){
+    var diff=daysTo(ex.date);
+    if(diff<=7&&diff>=0)alerts.push({title:ex.name+' ('+ex.sub+')',diff:diff,type:'exam'});
+  });
+  // 排序:最近的排前面
+  alerts.sort(function(a,b){return a.diff-b.diff;});
+  // 更新UI
+  var badge=$('navBadge'),banner=$('alertBanner'),text=$('alertText');
+  if(alerts.length>0){
+    badge.style.display='flex';badge.textContent=alerts.length;
+    var first=alerts[0];
+    var label=first.diff===0?'今天':first.diff===1?'明天':'D-'+first.diff;
+    text.innerHTML='<b class="alert-count">'+label+'</b> '+first.title+(alerts.length>1?' 等<b>'+alerts.length+'</b>项':'');
+    banner.style.display='flex';
+    // 浏览器通知
+    if(alerts.some(function(a){return a.diff===0;})&&Notification.permission==='granted'){
+      try{new Notification('今日提醒',{body:alerts.filter(function(a){return a.diff===0;}).map(function(a){return a.title;}).join('、'),icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="70" font-size="60">🔔</text></svg>'});}catch(e){}
+    }
+  }else{
+    badge.style.display='none';banner.style.display='none';
+  }
+}
+function scrollToTasks(){document.querySelector('.nav-item[data-page="tasks"]').click();}
+// 请求通知权限
+if('Notification' in window&&Notification.permission==='default'){
+  setTimeout(function(){Notification.requestPermission();},3000);
+}
+// 定时检查
+setInterval(checkReminders,5*60*1000);
+
 // ======== INIT ========
 initCal();
 renderHome();
+checkReminders();
 updatePomo();
 
 document.addEventListener('click',function(e){
