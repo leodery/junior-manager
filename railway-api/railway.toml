@@ -1,5 +1,10 @@
 [build]
 builder = "nixpacks"
+buildCommand = "npm install"
 
 [deploy]
-startCommand = "npm start"
+startCommand = "node server.js"
+healthcheckPath = "/health"
+
+[nixpacks]
+providers = ["node"]
